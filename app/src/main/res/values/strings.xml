@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DotaSearch</string>
+    <string name="search">Поиск</string>
+    <string name="search_players">Поиск игроков</string>
+</resources>
