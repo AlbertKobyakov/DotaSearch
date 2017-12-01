@@ -1,5 +1,6 @@
 package com.example.albert.dotasearch.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -12,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -25,28 +27,27 @@ import com.example.albert.dotasearch.model.FoundUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class FoundUserActivity extends AppCompatActivity {
 
     private List<FoundUser> movieList;
-    private RecyclerView recyclerView;
     private FoundUserAdapter mAdapter;
-    private SearchView searchView;
-    private EditText editText;
+
+    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.searchView) SearchView searchView;
+    @BindView(R.id.searchPlayer) EditText editText;
+    @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.found_user_activity);
 
-        //ButterKnife.bind(this);
+        ButterKnife.bind(this);
 
-        recyclerView = findViewById(R.id.recycler_view);
-
-        searchView = findViewById(R.id.searchView);
-
-        editText = findViewById(R.id.searchPlayer);
+        initToolbar();
 
         Bundle bundle = getIntent().getExtras();
         movieList = bundle.getParcelableArrayList("com.example.albert.dotasearch.model.FoundUser");
@@ -73,7 +74,6 @@ public class FoundUserActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Delete is selected?", Toast.LENGTH_SHORT).show();
             }
         }));
-
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -107,6 +107,19 @@ public class FoundUserActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void initToolbar() {
+        //toolbar = findViewById(R.id.toolbar);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            toolbar.setTitle(R.string.search_players);
+            toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    return false;
+                }
+            });
+        }
     }
 
     private void prepareMovieData() {

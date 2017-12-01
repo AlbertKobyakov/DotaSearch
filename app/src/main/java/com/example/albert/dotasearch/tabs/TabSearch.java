@@ -1,26 +1,29 @@
-package com.example.albert.dotasearch;
+package com.example.albert.dotasearch.tabs;
 
+import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.albert.dotasearch.AbstractTabFragment;
+import com.example.albert.dotasearch.retrofit.DotaClient;
+import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.activity.FoundUserActivity;
-import com.example.albert.dotasearch.adapter.DotaAdapter;
-import com.example.albert.dotasearch.adapter.FoundUserAdapter;
 import com.example.albert.dotasearch.model.FoundUser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,30 +36,29 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class TabSearch extends AbstractTabFragment {
+
+    @BindView(R.id.btn_search) Button btnSearch;
+    @BindView(R.id.search_edit) EditText searchEditText;
+    @BindView(R.id.progress_bar) ProgressBar progressBar;
+    @BindView(R.id.recycler_view) RecyclerView recyclerView;
 
     private final static int CACHE_SIZE_BYTES = 1024 * 1024 * 2;
 
-    @BindView(R.id.search_edit) EditText searchEditText;
-    @BindView(R.id.btn_search) Button btnSearch;
-    //@BindView(R.id.imageView) ImageView imageView;
-    //@BindView(R.id.pagination_list) ListView listView;
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.progress_bar) ProgressBar progressBar;
-
-    private FoundUserAdapter mAdapter;
-
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        Log.e("onCreateView", "onCreateViewFirstPage");
 
-        ButterKnife.bind(this);
+        final View view = inflater.inflate(R.layout.fragment_search, container, false);
 
+        ButterKnife.bind(this, view);
+
+        return view;
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         if(btnSearch != null && btnSearch.getVisibility() == View.INVISIBLE){
             btnSearch.setVisibility(View.VISIBLE);
@@ -66,14 +68,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static TabSearch getInstance(Context context) {
+        Bundle args = new Bundle();
+        TabSearch fragment = new TabSearch();
+        fragment.setArguments(args);
+        fragment.setContext(context);
+        fragment.setTitle(context.getString(R.string.search));
+        return fragment;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     @OnClick(R.id.btn_search)
-    public void onClick(View v) {
+    public void onClick(final View v) {
         btnSearch.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
         String editText = searchEditText.getText().toString();
 
         OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
-        builder.cache(new Cache(getApplicationContext().getCacheDir(), CACHE_SIZE_BYTES));
+        builder.cache(new Cache(v.getContext().getCacheDir(), CACHE_SIZE_BYTES));
         OkHttpClient clientAok = builder.build();
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
         retrofitBuilder.baseUrl("https://api.opendota.com").client(clientAok).addConverterFactory(GsonConverterFactory.create());
@@ -100,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 mAdapter.notifyDataSetChanged();*/
 
 
-                Intent intent = new Intent(MainActivity.this, FoundUserActivity.class);
+                Intent intent = new Intent(v.getContext(), FoundUserActivity.class);
                 ArrayList<FoundUser> repos = response.body();
                 intent.putExtra("com.example.albert.dotasearch.model.FoundUser", repos);
                 startActivity(intent);
@@ -114,24 +129,8 @@ public class MainActivity extends AppCompatActivity {
                 btnSearch.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.INVISIBLE);
                 Log.e("ERRRO", t.getMessage() + " " + t.getLocalizedMessage());
-                Toast.makeText(MainActivity.this, t.getMessage() + " " + 44, Toast.LENGTH_LONG).show();
+                Toast.makeText(v.getContext(), t.getMessage() + " " + 44, Toast.LENGTH_LONG).show();
             }
         });
-
-        /*DotaClient client = new UtilDota().initRetrofit();
-        Call<List<ProPlayer>> call = client.getProPlayer();
-        call.enqueue(new Callback<List<ProPlayer>>() {
-            @Override
-            public void onResponse(Call<List<ProPlayer>> call, Response<List<ProPlayer>> response) {
-                List<ProPlayer> repos = response.body();
-                Toast.makeText(MainActivity.this, repos.get(5).getName(), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFailure(Call<List<ProPlayer>> call, Throwable t) {
-                Log.e("ERRRO", t.getMessage() + " " + t.getLocalizedMessage());
-                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });*/
     }
 }

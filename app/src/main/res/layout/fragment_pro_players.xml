@@ -1,24 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.v7.widget.Toolbar
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:id="@+id/toolbar"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark"/>
-    </android.support.design.widget.AppBarLayout>
-
 <RelativeLayout
     android:layout_below="@id/appBar"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -32,7 +12,7 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/dddd">
+        android:id="@+id/textInputLayout">
         <EditText
             android:id="@+id/searchPlayer"
             android:layout_width="match_parent"
@@ -46,9 +26,20 @@
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/dddd"
+        android:layout_below="@id/textInputLayout"
         android:background="#fff"
         android:layout_margin="20dp"/>
+
+    <TextView
+        android:id="@+id/text_view_no_internet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Нет интернет соединения (((("
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:visibility="invisible"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -57,5 +48,4 @@
         android:scrollbars="vertical"
         android:layout_below="@id/searchView"/>
 
-</RelativeLayout>
 </RelativeLayout>

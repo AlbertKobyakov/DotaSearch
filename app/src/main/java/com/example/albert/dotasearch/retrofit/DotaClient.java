@@ -1,4 +1,4 @@
-package com.example.albert.dotasearch;
+package com.example.albert.dotasearch.retrofit;
 
 import com.example.albert.dotasearch.model.FoundUser;
 import com.example.albert.dotasearch.model.ProPlayer;

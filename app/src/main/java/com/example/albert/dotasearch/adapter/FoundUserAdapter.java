@@ -2,14 +2,12 @@ package com.example.albert.dotasearch.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.albert.dotasearch.MainActivity;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.FoundUser;
 import com.squareup.picasso.Picasso;

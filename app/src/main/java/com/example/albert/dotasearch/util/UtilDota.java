@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
-import com.example.albert.dotasearch.DotaClient;
+import com.example.albert.dotasearch.retrofit.DotaClient;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
