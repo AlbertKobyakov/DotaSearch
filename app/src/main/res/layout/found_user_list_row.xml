@@ -17,7 +17,7 @@
         android:id="@+id/imageView"/>
 
     <TextView
-        android:id="@+id/genre"
+        android:id="@+id/name_found_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/imageView" />

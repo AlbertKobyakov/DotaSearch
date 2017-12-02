@@ -9,7 +9,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.albert.dotasearch.R;
@@ -33,7 +36,7 @@ public class RankingActivity extends AppCompatActivity {
     private RankingAdapter mAdapter;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.searchView) SearchView searchView;
+    //@BindView(R.id.searchView) SearchView searchView;
 
     private String division;
     private String divisionTranslate;
@@ -53,7 +56,7 @@ public class RankingActivity extends AppCompatActivity {
 
         getLeaderBoard(division);
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        /*searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mAdapter.filter(query);
@@ -67,7 +70,7 @@ public class RankingActivity extends AppCompatActivity {
                 }
                 return true;
             }
-        });
+        });*/
     }
 
     public void getLeaderBoard(String division){
@@ -121,8 +124,44 @@ public class RankingActivity extends AppCompatActivity {
                 }
             });
 
+            toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                }
+            });
+
             //toolbar.inflateMenu(R.menu.menu_main);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_search);
+
+        SearchView searchView = (SearchView)item.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mAdapter.filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.filter(newText);
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     public static void setPositionLeaderboard(){

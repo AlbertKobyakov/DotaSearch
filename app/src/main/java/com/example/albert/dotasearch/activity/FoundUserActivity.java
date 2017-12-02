@@ -3,6 +3,7 @@ package com.example.albert.dotasearch.activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -13,6 +14,8 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,12 +35,12 @@ import butterknife.ButterKnife;
 
 public class FoundUserActivity extends AppCompatActivity {
 
-    private List<FoundUser> movieList;
+    public static List<FoundUser> foundUsers;
     private FoundUserAdapter mAdapter;
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.searchView) SearchView searchView;
-    @BindView(R.id.searchPlayer) EditText editText;
+    //@BindView(R.id.searchView) SearchView searchView;
+    //@BindView(R.id.searchPlayer) EditText editText;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Override
@@ -50,12 +53,12 @@ public class FoundUserActivity extends AppCompatActivity {
         initToolbar();
 
         Bundle bundle = getIntent().getExtras();
-        movieList = bundle.getParcelableArrayList("com.example.albert.dotasearch.model.FoundUser");
+        foundUsers = bundle.getParcelableArrayList("com.example.albert.dotasearch.model.FoundUser");
 
         /*movieList = getIntent().getParcelableExtra("FoundUserList");
         ArrayList<FoundUser> ml = getIntent().getParcelableExtra("FoundUserList");*/
 
-        mAdapter = new FoundUserAdapter(movieList, FoundUserActivity.this);
+        mAdapter = new FoundUserAdapter(foundUsers, FoundUserActivity.this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
@@ -65,7 +68,7 @@ public class FoundUserActivity extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                FoundUser foundUser = movieList.get(position);
+                FoundUser foundUser = foundUsers.get(position);
                 Toast.makeText(getApplicationContext(), foundUser.getAccountId() + " is selected!", Toast.LENGTH_SHORT).show();
             }
 
@@ -75,7 +78,7 @@ public class FoundUserActivity extends AppCompatActivity {
             }*/
         }));
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        /*searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mAdapter.filter(query);
@@ -104,24 +107,65 @@ public class FoundUserActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
 
             }
+        });*/
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_search);
+
+        SearchView searchView = (SearchView)item.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mAdapter.filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.filter(newText);
+                return false;
+            }
         });
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     private void initToolbar() {
         //toolbar = findViewById(R.id.toolbar);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toolbar.setTitle(R.string.search_players);
+
             toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    return false;
+                Toast.makeText(getApplicationContext(), "OnCkickMenu", Toast.LENGTH_LONG).show();
+
+                return false;
                 }
             });
+
+            toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                }
+            });
+
+            //toolbar.inflateMenu(R.menu.menu_main);
         }
     }
 
     private void prepareMovieData() {
-        movieList = getIntent().getParcelableExtra("FoundUserList");
+        foundUsers = getIntent().getParcelableExtra("FoundUserList");
 
         //mAdapter.notifyDataSetChanged();
     }
