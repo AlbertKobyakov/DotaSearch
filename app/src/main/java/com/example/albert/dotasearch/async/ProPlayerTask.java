@@ -28,7 +28,7 @@ public class ProPlayerTask extends AsyncTask<Void, Void, List<ProPlayer>> {
     @Override
     protected List<ProPlayer> doInBackground(Void... voids) {
         final List<ProPlayer> proPlayers;
-        DotaClient client = new UtilDota().initRetrofit();
+        DotaClient client = new UtilDota().initRetrofit("https://api.opendota.com");
         Call<List<ProPlayer>> call = client.getProPlayer();
         call.enqueue(new Callback<List<ProPlayer>>() {
             @Override

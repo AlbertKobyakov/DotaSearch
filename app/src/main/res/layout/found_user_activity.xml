@@ -40,8 +40,6 @@
             android:hint="Имя игрока:"/>
     </android.support.design.widget.TextInputLayout>
 
-
-
     <android.support.v7.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"

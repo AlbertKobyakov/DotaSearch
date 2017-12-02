@@ -3,18 +3,25 @@
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:src="@drawable/ranked"
+        android:id="@+id/imageView"/>
+
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/radioGroup"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true">
+        android:layout_below="@id/imageView">
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/radioBtnEurope"
-            android:text="Европа"/>
+            android:text="Европа"
+            android:focusedByDefault="true"/>
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,11 +41,21 @@
 
     </RadioGroup>
 
-    <!--<TextView
+    <Button
+        android:id="@+id/btn_ranked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/radioGroup"
+        android:layout_centerHorizontal="true"
+        android:text="Go!"/>
+
+    <TextView
+        android:id="@+id/textTestLeaderBoard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/tab_ranking"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"/>-->
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_ranked"
+        />
 
 </RelativeLayout>

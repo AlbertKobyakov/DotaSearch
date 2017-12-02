@@ -5,4 +5,10 @@
     <string name="tab_pro_players">Про Игроки</string>
     <string name="tab_ranking">Рейтинг Игроков</string>
     <string name="search_title">Поиск</string>
+    <string name="toolbar_for_ranking">Рейтинг %1$s</string>
+
+    <string name="Europe">Европа</string>
+    <string name="Asia">Азия</string>
+    <string name="USA">Америка</string>
+    <string name="China">Китай</string>
 </resources>

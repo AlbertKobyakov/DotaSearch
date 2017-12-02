@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
+import com.example.albert.dotasearch.model.Leaderboard;
 import com.example.albert.dotasearch.retrofit.DotaClient;
+
+import java.util.List;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -15,9 +18,9 @@ public class UtilDota {
 
     final String GENERAL_VALUE = "general_value";
 
-    public DotaClient initRetrofit(){
+    public DotaClient initRetrofit(String generalUrl){
         Retrofit.Builder builder = new Retrofit.Builder()
-                .baseUrl("https://api.opendota.com")
+                .baseUrl(generalUrl)
                 .addConverterFactory(GsonConverterFactory.create());
 
         Retrofit retrofit = builder.build();
@@ -40,5 +43,15 @@ public class UtilDota {
 
         Toast.makeText(activity, "Load Value", Toast.LENGTH_SHORT).show();
         return value;
+    }
+
+    public static List<Leaderboard> setPositionLeaderboard(List<Leaderboard> leaderboards){
+        int position = 1;
+
+        for (Leaderboard leaderboard : leaderboards){
+            leaderboard.setPosition(position++);
+        }
+
+        return leaderboards;
     }
 }

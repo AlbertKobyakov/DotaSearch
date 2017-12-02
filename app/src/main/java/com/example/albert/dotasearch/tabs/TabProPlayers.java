@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -33,6 +34,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class TabProPlayers  extends AbstractTabFragment {
+
+    private static final String FRAGMENT_NAME = "TabProPlayers";
+    private static final int LAYOUT = R.layout.fragment_pro_players;
+
     public static List<ProPlayer> proPlayers = new ArrayList<>();
     private ProPlayerAdapter mAdapter;
 
@@ -41,8 +46,6 @@ public class TabProPlayers  extends AbstractTabFragment {
     @BindView(R.id.searchPlayer) EditText editText;
     @BindView(R.id.text_view_no_internet) TextView textViewNotInternet;
 
-
-    private static final int LAYOUT = R.layout.fragment_pro_players;
 
     public static TabProPlayers getInstance(Context context) {
         Bundle args = new Bundle();
@@ -62,10 +65,17 @@ public class TabProPlayers  extends AbstractTabFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
 
+        Log.e(FRAGMENT_NAME, "onCreateView");
+
         ButterKnife.bind(this, view);
 
         if(proPlayers.size() < 10){
             getAllProPlayers(view);
+        } else {
+
+            Toast.makeText(view.getContext(), "Load to cash", Toast.LENGTH_LONG).show();
+
+            setAdapterAndRecyclerView();
         }
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(view.getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
@@ -75,10 +85,10 @@ public class TabProPlayers  extends AbstractTabFragment {
                 Toast.makeText(view.getContext(), proPlayer.getAccountId() + " is selected!", Toast.LENGTH_SHORT).show();
             }
 
-            @Override
+            /*@Override
             public void onLongClick(View view, int position) {
                 Toast.makeText(view.getContext(), "Delete is selected?", Toast.LENGTH_SHORT).show();
-            }
+            }*/
         }));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -101,7 +111,7 @@ public class TabProPlayers  extends AbstractTabFragment {
     }
 
     public void getAllProPlayers(final View view){
-        DotaClient client = new UtilDota().initRetrofit();
+        DotaClient client = new UtilDota().initRetrofit("https://api.opendota.com");
         Call<List<ProPlayer>> call = client.getProPlayer();
         call.enqueue(new Callback<List<ProPlayer>>() {
             @Override
@@ -109,15 +119,7 @@ public class TabProPlayers  extends AbstractTabFragment {
                 proPlayers = response.body();
 
                 if(proPlayers != null){
-                    mAdapter = new ProPlayerAdapter(proPlayers, view.getContext());
-                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext());
-                    recyclerView.setLayoutManager(mLayoutManager);
-                    //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-                    recyclerView.setItemAnimator(new DefaultItemAnimator());
-                    recyclerView.setAdapter(mAdapter);
-                    Log.e("init pro", proPlayers.size()+"");
-
-
+                    setAdapterAndRecyclerView();
                     Toast.makeText(view.getContext(), proPlayers.get(5).getName(), Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(view.getContext(), "Что-то пошло не так", Toast.LENGTH_LONG).show();
@@ -141,6 +143,15 @@ public class TabProPlayers  extends AbstractTabFragment {
                 Toast.makeText(view.getContext(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    public void setAdapterAndRecyclerView(){
+        mAdapter = new ProPlayerAdapter(proPlayers, view.getContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
     }
 
 }

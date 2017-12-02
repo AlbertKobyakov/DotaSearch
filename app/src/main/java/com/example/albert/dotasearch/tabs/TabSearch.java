@@ -22,6 +22,7 @@ import com.example.albert.dotasearch.retrofit.DotaClient;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.activity.FoundUserActivity;
 import com.example.albert.dotasearch.model.FoundUser;
+import com.example.albert.dotasearch.util.UtilDota;
 
 import java.util.ArrayList;
 
@@ -38,19 +39,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TabSearch extends AbstractTabFragment {
 
+    private static final String FRAGMENT_NAME = "TabSearch";
+    //private final static int CACHE_SIZE_BYTES = 1024 * 1024 * 2;
+    private final static int LAYOUT = R.layout.fragment_search;
+
     @BindView(R.id.btn_search) Button btnSearch;
     @BindView(R.id.search_edit) EditText searchEditText;
     @BindView(R.id.progress_bar) ProgressBar progressBar;
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
-
-    private final static int CACHE_SIZE_BYTES = 1024 * 1024 * 2;
+    //@BindView(R.id.recycler_view) RecyclerView recyclerView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        Log.e("onCreateView", "onCreateViewFirstPage");
+        Log.e(FRAGMENT_NAME, "onCreateView");
 
-        final View view = inflater.inflate(R.layout.fragment_search, container, false);
+        final View view = inflater.inflate(LAYOUT, container, false);
 
         ButterKnife.bind(this, view);
 
@@ -87,7 +90,7 @@ public class TabSearch extends AbstractTabFragment {
         progressBar.setVisibility(View.VISIBLE);
         String editText = searchEditText.getText().toString();
 
-        OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
+        /*OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
         builder.cache(new Cache(v.getContext().getCacheDir(), CACHE_SIZE_BYTES));
         OkHttpClient clientAok = builder.build();
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
@@ -96,9 +99,9 @@ public class TabSearch extends AbstractTabFragment {
 
         Retrofit retrofit = retrofitBuilder.build();
 
-        DotaClient client = retrofit.create(DotaClient.class);
+        DotaClient client = retrofit.create(DotaClient.class);*/
 
-        //DotaClient client = new UtilDota().initRetrofit();
+        DotaClient client = new UtilDota().initRetrofit("https://api.opendota.com");
         Call<ArrayList<FoundUser>> call = client.getFoundUsers(editText);
         call.enqueue(new Callback<ArrayList<FoundUser>>() {
             @Override

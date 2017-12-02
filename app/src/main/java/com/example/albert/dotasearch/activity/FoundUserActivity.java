@@ -69,10 +69,10 @@ public class FoundUserActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), foundUser.getAccountId() + " is selected!", Toast.LENGTH_SHORT).show();
             }
 
-            @Override
+            /*@Override
             public void onLongClick(View view, int position) {
                 Toast.makeText(getApplicationContext(), "Delete is selected?", Toast.LENGTH_SHORT).show();
-            }
+            }*/
         }));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -105,8 +105,6 @@ public class FoundUserActivity extends AppCompatActivity {
 
             }
         });
-
-
     }
 
     private void initToolbar() {

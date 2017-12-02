@@ -6,6 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.albert.dotasearch.R;
@@ -53,6 +54,15 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 }
             });
+
+            //enable search to toolbar
+            //toolbar.inflateMenu(R.menu.menu_main);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

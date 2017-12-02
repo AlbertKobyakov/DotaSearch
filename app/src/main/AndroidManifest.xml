@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.FoundUserActivity" />
+        <activity android:name=".activity.RankingActivity" />
     </application>
 
 </manifest>
