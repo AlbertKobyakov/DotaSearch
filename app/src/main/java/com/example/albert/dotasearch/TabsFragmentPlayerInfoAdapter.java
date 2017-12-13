@@ -5,18 +5,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.example.albert.dotasearch.tabs.TabProPlayers;
-import com.example.albert.dotasearch.tabs.TabRanking;
-import com.example.albert.dotasearch.tabs.TabSearch;
+import com.example.albert.dotasearch.tabs.TabMatchesPlayer;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class TabsFragmentAdapter extends FragmentPagerAdapter {
+public class TabsFragmentPlayerInfoAdapter extends FragmentPagerAdapter {
     private Map<Integer, AbstractTabFragment> tabs;
     private Context context;
 
-    public TabsFragmentAdapter(FragmentManager fm, Context context) {
+    public TabsFragmentPlayerInfoAdapter(FragmentManager fm, Context context) {
         super(fm);
 
         this.context = context;
@@ -41,8 +39,8 @@ public class TabsFragmentAdapter extends FragmentPagerAdapter {
 
     private void initTabsMap(Context context) {
         tabs = new HashMap<>();
-        tabs.put(0, TabSearch.getInstance(context));
-        tabs.put(1, TabProPlayers.getInstance(context));
-        tabs.put(2, TabRanking.getInstance(context));
+        tabs.put(0, TabMatchesPlayer.getInstance(context));
+        /*tabs.put(1, TabProPlayers.getInstance(context));
+        tabs.put(2, TabRanking.getInstance(context));*/
     }
 }

@@ -22,6 +22,7 @@
         </activity>
         <activity android:name=".activity.FoundUserActivity" />
         <activity android:name=".activity.RankingActivity" />
+        <activity android:name=".activity.PlayerInfoActivity" />
     </application>
 
 </manifest>

@@ -159,4 +159,16 @@ public class ProPlayer {
     public long getLockedUntil() {
         return lockedUntil;
     }
+
+    public void setPersonaname(String personaname) {
+        this.personaname = personaname;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
+    }
+
+    public void setAvatarmedium(String avatarmedium) {
+        this.avatarmedium = avatarmedium;
+    }
 }

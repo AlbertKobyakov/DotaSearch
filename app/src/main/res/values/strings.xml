@@ -11,4 +11,7 @@
     <string name="Asia">Азия</string>
     <string name="USA">Америка</string>
     <string name="China">Китай</string>
+    <string name="unknown">Неизвестно</string>
+    <string name="search_result">Результаты поиска по запросу: %1$s</string>
+    <string name="tab_matches_player">Матчи</string>
 </resources>

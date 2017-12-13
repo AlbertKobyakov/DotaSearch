@@ -8,13 +8,17 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
@@ -86,54 +90,34 @@ public class TabSearch extends AbstractTabFragment {
 
     @OnClick(R.id.btn_search)
     public void onClick(final View v) {
-        btnSearch.setVisibility(View.INVISIBLE);
-        progressBar.setVisibility(View.VISIBLE);
-        String editText = searchEditText.getText().toString();
+        final String editText = searchEditText.getText().toString();
+        if(editText.trim().length() == 0){
+            Toast.makeText(v.getContext(), "Вы не ввели не 1 символа ((", Toast.LENGTH_LONG).show();
+        } else {
+            btnSearch.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
 
-        /*OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
-        builder.cache(new Cache(v.getContext().getCacheDir(), CACHE_SIZE_BYTES));
-        OkHttpClient clientAok = builder.build();
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
-        retrofitBuilder.baseUrl("https://api.opendota.com").client(clientAok).addConverterFactory(GsonConverterFactory.create());
-        //retrofitBuilder.baseUrl("https://api.opendota.com").client(clientAok).addConverterFactory(GsonConverterFactory.create());
+            DotaClient client = new UtilDota().initRetrofit("https://api.opendota.com");
+            Call<ArrayList<FoundUser>> call = client.getFoundUsers(editText);
+            call.enqueue(new Callback<ArrayList<FoundUser>>() {
+                @Override
+                public void onResponse(Call<ArrayList<FoundUser>> call, Response<ArrayList<FoundUser>> response) {
+                    Intent intent = new Intent(v.getContext(), FoundUserActivity.class);
+                    ArrayList<FoundUser> repos = response.body();
+                    intent.putExtra("com.example.albert.dotasearch.model.FoundUser", repos);
+                    startActivity(intent);
+                }
 
-        Retrofit retrofit = retrofitBuilder.build();
-
-        DotaClient client = retrofit.create(DotaClient.class);*/
-
-        DotaClient client = new UtilDota().initRetrofit("https://api.opendota.com");
-        Call<ArrayList<FoundUser>> call = client.getFoundUsers(editText);
-        call.enqueue(new Callback<ArrayList<FoundUser>>() {
-            @Override
-            public void onResponse(Call<ArrayList<FoundUser>> call, Response<ArrayList<FoundUser>> response) {
-                //listView.setAdapter(new DotaAdapter(MainActivity.this, response.body()));
-
-                /*mAdapter = new FoundUserAdapter(response.body(), MainActivity.this);
-                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-                recyclerView.setLayoutManager(mLayoutManager);
-                //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-                recyclerView.setItemAnimator(new DefaultItemAnimator());
-                recyclerView.setAdapter(mAdapter);
-
-                mAdapter.notifyDataSetChanged();*/
+                @Override
+                public void onFailure(Call<ArrayList<FoundUser>> call, Throwable t) {
+                    btnSearch.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.INVISIBLE);
+                    Log.e("ERRRO", t.getMessage() + " " + t.getLocalizedMessage());
+                    Toast.makeText(v.getContext(), t.getMessage() + " " + 44, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
 
 
-                Intent intent = new Intent(v.getContext(), FoundUserActivity.class);
-                ArrayList<FoundUser> repos = response.body();
-                intent.putExtra("com.example.albert.dotasearch.model.FoundUser", repos);
-                startActivity(intent);
-                /*List<FoundUser> repos = response.body();
-                Picasso.with(getApplicationContext()).load(repos.get(1).getAvatarfull()).fit().into(imageView);
-                Toast.makeText(MainActivity.this, repos.get(1).getAccountId()+"", Toast.LENGTH_LONG).show();*/
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<FoundUser>> call, Throwable t) {
-                btnSearch.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.INVISIBLE);
-                Log.e("ERRRO", t.getMessage() + " " + t.getLocalizedMessage());
-                Toast.makeText(v.getContext(), t.getMessage() + " " + 44, Toast.LENGTH_LONG).show();
-            }
-        });
     }
 }

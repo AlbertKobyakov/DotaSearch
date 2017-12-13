@@ -1,5 +1,6 @@
 package com.example.albert.dotasearch.activity;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -39,8 +40,6 @@ public class FoundUserActivity extends AppCompatActivity {
     private FoundUserAdapter mAdapter;
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    //@BindView(R.id.searchView) SearchView searchView;
-    //@BindView(R.id.searchPlayer) EditText editText;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Override
@@ -55,9 +54,6 @@ public class FoundUserActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         foundUsers = bundle.getParcelableArrayList("com.example.albert.dotasearch.model.FoundUser");
 
-        /*movieList = getIntent().getParcelableExtra("FoundUserList");
-        ArrayList<FoundUser> ml = getIntent().getParcelableExtra("FoundUserList");*/
-
         mAdapter = new FoundUserAdapter(foundUsers, FoundUserActivity.this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -69,7 +65,12 @@ public class FoundUserActivity extends AppCompatActivity {
             @Override
             public void onClick(View view, int position) {
                 FoundUser foundUser = foundUsers.get(position);
+
                 Toast.makeText(getApplicationContext(), foundUser.getAccountId() + " is selected!", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(FoundUserActivity.this, PlayerInfoActivity.class);
+                intent.putExtra("accountId", foundUser.getAccountId());
+                startActivity(intent);
             }
 
             /*@Override
@@ -77,42 +78,10 @@ public class FoundUserActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Delete is selected?", Toast.LENGTH_SHORT).show();
             }*/
         }));
-
-        /*searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mAdapter.filter(query);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mAdapter.filter(newText);
-                return true;
-            }
-        });
-
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mAdapter.filter(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });*/
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
 
@@ -137,18 +106,7 @@ public class FoundUserActivity extends AppCompatActivity {
     }
 
     private void initToolbar() {
-        //toolbar = findViewById(R.id.toolbar);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toolbar.setTitle(R.string.search_players);
-
-            toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                Toast.makeText(getApplicationContext(), "OnCkickMenu", Toast.LENGTH_LONG).show();
-
-                return false;
-                }
-            });
 
             toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
             setSupportActionBar(toolbar);
@@ -161,12 +119,5 @@ public class FoundUserActivity extends AppCompatActivity {
             });
 
             //toolbar.inflateMenu(R.menu.menu_main);
-        }
-    }
-
-    private void prepareMovieData() {
-        foundUsers = getIntent().getParcelableExtra("FoundUserList");
-
-        //mAdapter.notifyDataSetChanged();
     }
 }

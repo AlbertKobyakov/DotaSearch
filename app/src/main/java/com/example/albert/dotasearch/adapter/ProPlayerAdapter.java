@@ -13,13 +13,14 @@ import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.tabs.TabProPlayers;
 import com.squareup.picasso.Picasso;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ProPlayerAdapter  extends RecyclerView.Adapter<ProPlayerAdapter.MyViewHolder>{
+public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyViewHolder>{
     //private List<ProPlayer> proPlayers;
     private List<ProPlayer> proPlayersCopy;
     public Context context;
@@ -58,12 +59,11 @@ public class ProPlayerAdapter  extends RecyclerView.Adapter<ProPlayerAdapter.MyV
     public void onBindViewHolder(ProPlayerAdapter.MyViewHolder holder, int position) {
         ProPlayer proPlayer = TabProPlayers.proPlayers.get(position);
 
-        holder.nameProPlayer.setText(proPlayer.getName() + proPlayer.getAccountId());
+        holder.nameProPlayer.setText(proPlayer.getName());
         holder.personalNameProPlayer.setText(proPlayer.getPersonaname());
         holder.teamNameProPlayer.setText(proPlayer.getTeamName());
 
-        Picasso.with(context).load(proPlayer.getAvatarfull()).fit().into(holder.imageView);
-
+        Picasso.with(context).load(proPlayer.getAvatarmedium()).fit().into(holder.imageView);
     }
 
     @Override
@@ -87,7 +87,6 @@ public class ProPlayerAdapter  extends RecyclerView.Adapter<ProPlayerAdapter.MyV
                         TabProPlayers.proPlayers.add(item);
                     }
                 }
-
             }
         }
         notifyDataSetChanged();

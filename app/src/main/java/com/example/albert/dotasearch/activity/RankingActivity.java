@@ -115,27 +115,19 @@ public class RankingActivity extends AppCompatActivity {
     }
 
     private void initToolbar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            toolbar.setTitle(getString(R.string.toolbar_for_ranking, divisionTranslate));
-            toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    return false;
-                }
-            });
+        toolbar.setTitle(getString(R.string.toolbar_for_ranking, divisionTranslate));
 
-            toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onBackPressed();
-                }
-            });
+        toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
-            //toolbar.inflateMenu(R.menu.menu_main);
-        }
+        //toolbar.inflateMenu(R.menu.menu_main);
     }
 
     @Override

@@ -4,17 +4,19 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.R;
@@ -33,7 +35,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TabProPlayers  extends AbstractTabFragment {
+public class TabProPlayers extends AbstractTabFragment {
 
     private static final String FRAGMENT_NAME = "TabProPlayers";
     private static final int LAYOUT = R.layout.fragment_pro_players;
@@ -45,7 +47,6 @@ public class TabProPlayers  extends AbstractTabFragment {
     @BindView(R.id.searchView) SearchView searchView;
     @BindView(R.id.searchPlayer) EditText editText;
     @BindView(R.id.text_view_no_internet) TextView textViewNotInternet;
-
 
     public static TabProPlayers getInstance(Context context) {
         Bundle args = new Bundle();
@@ -106,7 +107,6 @@ public class TabProPlayers  extends AbstractTabFragment {
                 return true;
             }
         });
-
         return view;
     }
 
@@ -117,6 +117,7 @@ public class TabProPlayers  extends AbstractTabFragment {
             @Override
             public void onResponse(Call<List<ProPlayer>> call, Response<List<ProPlayer>> response) {
                 proPlayers = response.body();
+                setProPlayerDefaultPersonalNameTeamNameAndAvatar(proPlayers);
 
                 if(proPlayers != null){
                     setAdapterAndRecyclerView();
@@ -124,7 +125,6 @@ public class TabProPlayers  extends AbstractTabFragment {
                 } else {
                     Toast.makeText(view.getContext(), "Что-то пошло не так", Toast.LENGTH_LONG).show();
                 }
-
             }
 
             @Override
@@ -154,4 +154,18 @@ public class TabProPlayers  extends AbstractTabFragment {
         recyclerView.setAdapter(mAdapter);
     }
 
+    public void setProPlayerDefaultPersonalNameTeamNameAndAvatar(List<ProPlayer> proPlayers){
+        for(ProPlayer proPlayer : proPlayers){
+            if(proPlayer.getPersonaname() == null || proPlayer.getPersonaname().trim().length() == 0){
+                proPlayer.setPersonaname(getString(R.string.unknown));
+            }
+            if(proPlayer.getTeamName() == null || proPlayer.getTeamName().trim().length() == 0){
+                proPlayer.setTeamName(getString(R.string.unknown));
+            }
+            if(proPlayer.getAvatarmedium() == null){
+                proPlayer.setAvatarmedium("https://steamcdn-a.akamaihd.net/steamcommunity/public" +
+                        "/images/avatars/fe/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_medium.jpg");
+            }
+        }
+    }
 }
