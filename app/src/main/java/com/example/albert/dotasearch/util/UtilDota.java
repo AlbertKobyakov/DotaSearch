@@ -121,6 +121,16 @@ public class UtilDota {
         }
     }
 
+    public static void storeLeaderboardInDB(List<Leaderboard> leaderboards){
+        if(db.leaderboardDao().getAll().size() == 0){
+            db.leaderboardDao().insertAll(leaderboards);
+            Log.e("insertLeaderboard", "Success. Leaderboard save to Db " + Thread.currentThread().getName() + " " + leaderboards.size());
+        } else {
+            db.leaderboardDao().updateAll(leaderboards);
+            Log.e("updateLeaderboard", "Success. Leaderboard save to Db " + Thread.currentThread().getName() + " " + leaderboards.size());
+        }
+    }
+
     public List<ProPlayer> setProPlayerDefaultPersonalNameTeamNameAndAvatar(List<ProPlayer> proPlayers){
         for(ProPlayer proPlayer : proPlayers){
             if(proPlayer.getPersonaname() == null || proPlayer.getPersonaname().trim().length() == 0){

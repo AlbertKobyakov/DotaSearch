@@ -1,8 +1,13 @@
 package com.example.albert.dotasearch.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity
 public class Leaderboard {
 
     @SerializedName("rank")
@@ -22,10 +27,12 @@ public class Leaderboard {
     private String sponsor;
     @SerializedName("solo_mmr")
     @Expose
+    @Ignore
     private Object soloMmr;
     @SerializedName("country")
     @Expose
     private String country;
+    @PrimaryKey
     private int position;
 
     public int getPosition() {

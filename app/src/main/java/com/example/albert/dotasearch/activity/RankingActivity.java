@@ -8,18 +8,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.adapter.RankingAdapter;
 import com.example.albert.dotasearch.model.Leaderboard;
-import com.example.albert.dotasearch.model.TimeRefreshLeaderBoard;
-import com.example.albert.dotasearch.retrofit.DotaClient;
-import com.example.albert.dotasearch.util.UtilDota;
 
 import java.util.List;
 
@@ -28,9 +25,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+
+import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public class RankingActivity extends AppCompatActivity {
 
@@ -59,18 +55,13 @@ public class RankingActivity extends AppCompatActivity {
 
         initToolbar();
 
-        getLeaderBoard(division);
-    }
-
-    public void getLeaderBoard(String division){
-
-        UtilDota.initRetrofitRxDota2Ru().getLeaderBorderRx(division)
+        db.leaderboardDao().getAllRx()
+                .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(timeRefreshLeaderBoard -> setPositionLeaderboard(timeRefreshLeaderBoard.getLeaderboard()))
                 .subscribe(
-                        timeRefreshLeaderBoard -> setRecyclerViewAdapter(timeRefreshLeaderBoard),
-                        error -> Toast.makeText(RankingActivity.this, error.getMessage(), Toast.LENGTH_LONG).show()
+                        leaderboards -> setRecyclerViewAdapter(leaderboards),
+                        error -> Log.e(TAG, error.getLocalizedMessage())
                 );
     }
 

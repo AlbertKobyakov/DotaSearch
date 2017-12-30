@@ -12,15 +12,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.activity.RankingActivity;
+import com.example.albert.dotasearch.model.Leaderboard;
+import com.example.albert.dotasearch.util.UtilDota;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class TabRanking extends AbstractTabFragment {
 
@@ -79,11 +86,37 @@ public class TabRanking extends AbstractTabFragment {
         if(division == null){
             Snackbar.make(view, "Выберите регион", Snackbar.LENGTH_LONG).show();
         } else {
+            getLeaderBoardApiAndStoreToBd(division);
             Snackbar.make(view, "Selected: " + division, Snackbar.LENGTH_LONG).show();
-            Intent intent = new Intent(view.getContext(), RankingActivity.class);
-            intent.putExtra("division", division);
-            startActivity(intent);
         }
+    }
+
+    public void goToRankingActivity(){
+        Intent intent = new Intent(view.getContext(), RankingActivity.class);
+        intent.putExtra("division", division);
+        startActivity(intent);
+    }
+
+    public void getLeaderBoardApiAndStoreToBd(String division){
+
+        UtilDota.initRetrofitRxDota2Ru().getLeaderBorderRx(division)
+                .map(timeRefreshLeaderBoard -> addPositionToLeaderboard(timeRefreshLeaderBoard.getLeaderboard()))
+                .doOnNext(UtilDota::storeLeaderboardInDB)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        timeRefreshLeaderBoard -> goToRankingActivity(),
+                        error -> Log.e(TAG, error.getLocalizedMessage())
+                );
+    }
+
+    public List<Leaderboard> addPositionToLeaderboard(List<Leaderboard> leaderboards){
+        int position = 1;
+
+        for (Leaderboard leaderboard : leaderboards){
+            leaderboard.setPosition(position++);
+        }
+        return leaderboards;
     }
 
     @Override
