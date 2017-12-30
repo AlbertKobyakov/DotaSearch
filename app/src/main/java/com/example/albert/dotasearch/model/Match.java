@@ -50,14 +50,15 @@ public class Match {
     @SerializedName("party_size")
     @Expose
     private long partySize;
-    private boolean win;
 
-    public boolean isWin() {
-        return win;
+    private String heroName;
+
+    public String getHeroName() {
+        return heroName;
     }
 
-    public void setWin(boolean win) {
-        this.win = win;
+    public void setHeroName(String heroName) {
+        this.heroName = heroName;
     }
 
     public long getMatchId() {

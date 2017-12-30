@@ -31,31 +31,28 @@
                 android:id="@+id/imageView"/>
 -->
             <TextView
-                android:id="@+id/name_pro_player"
+                android:id="@+id/match_hero"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="sdfsdfsdf"
                 android:layout_weight="1"/>
 
             <TextView
-                android:id="@+id/personal_name_pro_playere"
+                android:id="@+id/match_result"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="sdfsdfsdf"
                 android:layout_weight="1"/>
 
             <TextView
-                android:id="@+id/teame_name_pro_playere"
+                android:id="@+id/match_duration"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="sdfsdfsdf"
                 android:layout_weight="1"/>
 
             <TextView
-                android:id="@+id/win"
+                android:id="@+id/match_kda"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"/>

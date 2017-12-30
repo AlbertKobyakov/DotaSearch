@@ -29,10 +29,15 @@ import com.example.albert.dotasearch.model.FoundUser;
 import com.example.albert.dotasearch.util.UtilDota;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -42,24 +47,23 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TabSearch extends AbstractTabFragment {
-
-    private static final String FRAGMENT_NAME = "TabSearch";
-    //private final static int CACHE_SIZE_BYTES = 1024 * 1024 * 2;
     private final static int LAYOUT = R.layout.fragment_search;
+    private final static String TAG = "TabSearch";
+
+    private Unbinder unbinder;
 
     @BindView(R.id.btn_search) Button btnSearch;
     @BindView(R.id.search_edit) EditText searchEditText;
     @BindView(R.id.progress_bar) ProgressBar progressBar;
-    //@BindView(R.id.recycler_view) RecyclerView recyclerView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        Log.e(FRAGMENT_NAME, "onCreateView");
+        Log.e(TAG, "onCreateView");
 
         final View view = inflater.inflate(LAYOUT, container, false);
 
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         return view;
     }
@@ -97,27 +101,32 @@ public class TabSearch extends AbstractTabFragment {
             btnSearch.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
 
-            DotaClient client = new UtilDota().initRetrofit("https://api.opendota.com");
-            Call<ArrayList<FoundUser>> call = client.getFoundUsers(editText);
-            call.enqueue(new Callback<ArrayList<FoundUser>>() {
-                @Override
-                public void onResponse(Call<ArrayList<FoundUser>> call, Response<ArrayList<FoundUser>> response) {
-                    Intent intent = new Intent(v.getContext(), FoundUserActivity.class);
-                    ArrayList<FoundUser> repos = response.body();
-                    intent.putExtra("com.example.albert.dotasearch.model.FoundUser", repos);
-                    startActivity(intent);
-                }
-
-                @Override
-                public void onFailure(Call<ArrayList<FoundUser>> call, Throwable t) {
-                    btnSearch.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    Log.e("ERRRO", t.getMessage() + " " + t.getLocalizedMessage());
-                    Toast.makeText(v.getContext(), t.getMessage() + " " + 44, Toast.LENGTH_LONG).show();
-                }
-            });
+            UtilDota.initRetrofitRx().getFoundUsersRx(editText)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            foundUsers -> apiSuccess(foundUsers, v),
+                            error -> apiError(error, v));
         }
+    }
 
+    public void apiError(Throwable t, View v){
+        btnSearch.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
+        Log.e(TAG, "apiError: " + t.getMessage() + " " + t.getLocalizedMessage());
+        Toast.makeText(v.getContext(), t.getMessage() + " " + 44, Toast.LENGTH_LONG).show();
+    }
 
+    public void apiSuccess(List<FoundUser> foundUsers, View v){
+        Log.e(TAG, "apiSuccess");
+        Intent intent = new Intent(v.getContext(), FoundUserActivity.class);
+        ArrayList<FoundUser> repos = new ArrayList<>(foundUsers);
+        intent.putExtra("com.example.albert.dotasearch.model.FoundUser", repos);
+        startActivity(intent);
+    }
+
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

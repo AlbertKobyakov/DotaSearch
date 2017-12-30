@@ -9,10 +9,16 @@ import android.arch.persistence.room.Update;
 import com.example.albert.dotasearch.model.Hero;
 
 import java.util.List;
+
+import io.reactivex.Single;
+
 @Dao
 public interface HeroDao {
     @Query("SELECT * FROM hero")
     List<Hero> getAll();
+
+    @Query("SELECT * FROM hero")
+    Single<List<Hero>> getAllRx();
 
     @Insert
     void insertAll(List<Hero> heroes);

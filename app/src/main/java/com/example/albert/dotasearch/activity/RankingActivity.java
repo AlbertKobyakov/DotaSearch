@@ -1,6 +1,5 @@
 package com.example.albert.dotasearch.activity;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -26,27 +25,33 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RankingActivity extends AppCompatActivity {
 
+    public static String TAG = "RankingActivity";
+    public static int LATYOUT = R.layout.activity_ranking;
+
     public static List<Leaderboard> leaderboards;
     private RankingAdapter mAdapter;
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    //@BindView(R.id.searchView) SearchView searchView;
-
     private String division;
     private String divisionTranslate;
+    public Unbinder unbinder;
+
+    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ranking);
+        setContentView(LATYOUT);
 
-        ButterKnife.bind(this);
+        unbinder = ButterKnife.bind(this);
 
         division = getIntent().getStringExtra("division");
 
@@ -55,51 +60,27 @@ public class RankingActivity extends AppCompatActivity {
         initToolbar();
 
         getLeaderBoard(division);
-
-        /*searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mAdapter.filter(query);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if(mAdapter != null){
-                    mAdapter.filter(newText);
-                }
-                return true;
-            }
-        });*/
     }
 
     public void getLeaderBoard(String division){
-        DotaClient client = new UtilDota().initRetrofit("http://www.dota2.com");
-        Call<TimeRefreshLeaderBoard> call = client.getLeaderBorder(division);
-        call.enqueue(new Callback<TimeRefreshLeaderBoard>() {
-            @Override
-            public void onResponse(Call<TimeRefreshLeaderBoard> call, Response<TimeRefreshLeaderBoard> response) {
-                TimeRefreshLeaderBoard timeRefreshLeaderBoard = response.body();
 
-                //Получаем список Leaderboard без позиций и добавляем позиции
-                leaderboards = timeRefreshLeaderBoard.getLeaderboard();
-                setPositionLeaderboard();
+        UtilDota.initRetrofitRxDota2Ru().getLeaderBorderRx(division)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(timeRefreshLeaderBoard -> setPositionLeaderboard(timeRefreshLeaderBoard.getLeaderboard()))
+                .subscribe(
+                        timeRefreshLeaderBoard -> setRecyclerViewAdapter(timeRefreshLeaderBoard),
+                        error -> Toast.makeText(RankingActivity.this, error.getMessage(), Toast.LENGTH_LONG).show()
+                );
+    }
 
-                //Получаем список и добавляем в него позиции
-                //leaderboards = UtilDota.setPositionLeaderboard(timeRefreshLeaderBoard.getLeaderboard());
-
-                mAdapter = new RankingAdapter(leaderboards, RankingActivity.this);
-                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-                recyclerView.setLayoutManager(mLayoutManager);
-                recyclerView.setItemAnimator(new DefaultItemAnimator());
-                recyclerView.setAdapter(mAdapter);
-            }
-
-            @Override
-            public void onFailure(Call<TimeRefreshLeaderBoard> call, Throwable t) {
-                Toast.makeText(RankingActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+    public void setRecyclerViewAdapter(List<Leaderboard> leaderboards){
+        RankingActivity.leaderboards = leaderboards;
+        mAdapter = new RankingAdapter(leaderboards, RankingActivity.this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
     }
 
     public void setDivisionTranslate(){
@@ -156,11 +137,18 @@ public class RankingActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    public static void setPositionLeaderboard(){
+    public List<Leaderboard> setPositionLeaderboard(List<Leaderboard> leaderboards){
         int position = 1;
 
         for (Leaderboard leaderboard : leaderboards){
             leaderboard.setPosition(position++);
         }
+        return leaderboards;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
     }
 }

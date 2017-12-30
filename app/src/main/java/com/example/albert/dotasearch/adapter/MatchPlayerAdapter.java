@@ -5,12 +5,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.albert.dotasearch.R;
+import com.example.albert.dotasearch.activity.MainActivity;
+import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Match;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +20,15 @@ import butterknife.ButterKnife;
 
 public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.MyViewHolder>{
     //private List<ProPlayer> proPlayers;
-    private List<Match> proPlayersCopy;
+    private List<Match> matchesCopy;
     public Context context;
 
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.name_pro_player) TextView nameProPlayer;
-        @BindView(R.id.personal_name_pro_playere) TextView personalNameProPlayer;
-        @BindView(R.id.teame_name_pro_playere) TextView teamNameProPlayer;
-        @BindView(R.id.win) TextView win;
+        @BindView(R.id.match_hero) TextView hero;
+        @BindView(R.id.match_result) TextView result;
+        @BindView(R.id.match_duration) TextView duration;
+        @BindView(R.id.match_kda) TextView kda;
         //@BindView(R.id.imageView) ImageView imageView;
 
 
@@ -42,7 +42,7 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
 
     public MatchPlayerAdapter(List<Match> proPlayerList, Context context) {
         //this.proPlayers = new ArrayList<>(proPlayerList);
-        this.proPlayersCopy = new ArrayList<>(proPlayerList);
+        this.matchesCopy = new ArrayList<>(proPlayerList);
         this.context = context;
     }
 
@@ -56,25 +56,36 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
 
     @Override
     public void onBindViewHolder(MatchPlayerAdapter.MyViewHolder holder, int position) {
-        Match proPlayer = proPlayersCopy.get(position);
+        Match match = matchesCopy.get(position);
 
-        holder.nameProPlayer.setText(proPlayer.getMatchId()+"");
-        holder.personalNameProPlayer.setText(proPlayer.getStartTime()+"");
-        holder.teamNameProPlayer.setText(proPlayer.getHeroId()+"");
-        if(proPlayer.getPlayerSlot() >= 0 && proPlayer.getPlayerSlot() < 5 && proPlayer.isRadiantWin()){
-            holder.win.setText("Win");
-        } else if(proPlayer.getPlayerSlot() >= 128 && proPlayer.getPlayerSlot() < 133 && !proPlayer.isRadiantWin()){
-            holder.win.setText("Win");
+        long minutes = match.getDuration()/60;
+        long seconds = match.getDuration()-(minutes*60);
+
+        holder.kda.setText(context.getResources().getString(R.string.kda, match.getKills(), match.getDeaths(), match.getAssists()));
+        holder.duration.setText(context.getResources().getString(R.string.match_duration,minutes,seconds));
+        holder.hero.setText(match.getHeroName());
+
+        /*for(Hero hero : MainActivity.heroList){
+            if(match.getHeroId() == hero.getId()){
+                holder.hero.setText(hero.getLocalizedName());
+                break;
+            }
+        }*/
+
+        if(match.getPlayerSlot() >= 0 && match.getPlayerSlot() < 5 && match.isRadiantWin()){
+            holder.result.setText(context.getResources().getString(R.string.win));
+        } else if(match.getPlayerSlot() >= 128 && match.getPlayerSlot() < 133 && !match.isRadiantWin()){
+            holder.result.setText(context.getResources().getString(R.string.win));
         } else {
-            holder.win.setText("Lose");
+            holder.result.setText(context.getResources().getString(R.string.lose));
         }
 
 
-        //Picasso.with(context).load(proPlayer.getAvatarmedium()).fit().into(holder.imageView);
+        //Picasso.with(context).load(match.getAvatarmedium()).fit().into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return proPlayersCopy.size();
+        return matchesCopy.size();
     }
 }

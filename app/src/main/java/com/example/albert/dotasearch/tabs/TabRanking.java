@@ -7,8 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -26,8 +24,7 @@ import butterknife.Unbinder;
 
 public class TabRanking extends AbstractTabFragment {
 
-    private final static String FRAGMENT_NAME = "TabRanking";
-
+    private final static String TAG = "TabRanking";
     private static final int LAYOUT = R.layout.fragment_ranking;
 
     @BindView(R.id.textTestLeaderBoard) TextView textView;
@@ -35,9 +32,7 @@ public class TabRanking extends AbstractTabFragment {
     @BindView(R.id.btn_ranked) Button btn_ranked;
 
     private Unbinder unbinder;
-
     private String division;
-
 
     public static TabRanking getInstance(Context context) {
         Bundle args = new Bundle();
@@ -59,7 +54,7 @@ public class TabRanking extends AbstractTabFragment {
 
         unbinder = ButterKnife.bind(this, view);
 
-        Log.e(FRAGMENT_NAME, "onCreateView");
+        Log.e(TAG, "onCreateView");
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override

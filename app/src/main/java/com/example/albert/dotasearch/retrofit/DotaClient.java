@@ -6,13 +6,11 @@ import com.example.albert.dotasearch.model.Match;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.model.TimeRefreshLeaderBoard;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -22,9 +20,17 @@ public interface DotaClient {
     @GET("/api/proPlayers/")
     Call<List<ProPlayer>> getProPlayer();
 
+    @GET("/api/proPlayers/")
+    Observable<List<ProPlayer>> getAllProPlayerRx();
+
     @GET("/api/search")
     Call<ArrayList<FoundUser>> getFoundUsers(
         @Query("q") String query
+    );
+
+    @GET("/api/search")
+    Observable<List<FoundUser>> getFoundUsersRx(
+            @Query("q") String query
     );
 
     @GET("/webapi/ILeaderboard/GetDivisionLeaderboard/v0001")
@@ -32,10 +38,21 @@ public interface DotaClient {
         @Query("division") String division
     );
 
+    @GET("/webapi/ILeaderboard/GetDivisionLeaderboard/v0001")
+    Observable<TimeRefreshLeaderBoard> getLeaderBorderRx(
+            @Query("division") String division
+    );
+
     @GET("/api/players/{Id}/matches")
     Call<List<Match>> getMatchesPlayer(
         @Path("Id") long playerId,
         @Query("limit") int limit
+    );
+
+    @GET("/api/players/{Id}/matches")
+    Single<List<Match>> getMatchesPlayerRx(
+            @Path("Id") long playerId,
+            @Query("limit") int limit
     );
 
     @GET("/api/players/{Id}/matches")
@@ -59,7 +76,7 @@ public interface DotaClient {
     );
 
     @GET("/api/heroes")
-    Call<List<Hero>> getAllHeroes();
+    Single<List<Hero>> getAllHeroes();
 
     @GET("/api/heroes")
     Observable<List<Hero>> getAllHeroesRx();
