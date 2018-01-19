@@ -104,6 +104,8 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
                     for(Hero hero : heroList){
                         if(match.getHeroId() == hero.getId()){
                             match.setHeroName(hero.getLocalizedName());
+                            match.setIconUrl(hero.getIcon());
+                            match.setImgUrl(hero.getImg());
                             break;
                         }
                     }

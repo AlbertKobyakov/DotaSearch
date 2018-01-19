@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
+import com.example.albert.dotasearch.activity.MainActivity;
 import com.example.albert.dotasearch.retrofit.DotaClient;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.activity.FoundUserActivity;
@@ -64,6 +65,7 @@ public class TabSearch extends AbstractTabFragment {
         final View view = inflater.inflate(LAYOUT, container, false);
 
         unbinder = ButterKnife.bind(this, view);
+
 
         return view;
     }

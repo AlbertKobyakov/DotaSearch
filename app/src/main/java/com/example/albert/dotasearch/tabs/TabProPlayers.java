@@ -7,6 +7,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
+import com.example.albert.dotasearch.activity.MainActivity;
 import com.example.albert.dotasearch.adapter.ProPlayerAdapter;
 import com.example.albert.dotasearch.model.ProPlayer;
 
@@ -38,11 +40,12 @@ public class TabProPlayers extends AbstractTabFragment {
 
     private Unbinder unbinder;
     public static List<ProPlayer> proPlayers = new ArrayList<>();
-    private ProPlayerAdapter mAdapter;
+    public static ProPlayerAdapter mAdapter;
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.searchView) SearchView searchView;
     @BindView(R.id.text_view_no_internet) TextView textViewNotInternet;
+    //@BindView(R.id.toolbar) Toolbar toolbar;
 
     public static TabProPlayers getInstance(Context context) {
         Bundle args = new Bundle();
@@ -99,6 +102,8 @@ public class TabProPlayers extends AbstractTabFragment {
                 return true;
             }
         });
+
+
 
         return view;
     }

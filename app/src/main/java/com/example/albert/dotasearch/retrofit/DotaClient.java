@@ -2,6 +2,7 @@ package com.example.albert.dotasearch.retrofit;
 
 import com.example.albert.dotasearch.model.FoundUser;
 import com.example.albert.dotasearch.model.Hero;
+import com.example.albert.dotasearch.model.HeroStats;
 import com.example.albert.dotasearch.model.Match;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.model.TimeRefreshLeaderBoard;
@@ -75,9 +76,15 @@ public interface DotaClient {
             @Query("win") int win
     );
 
-    @GET("/api/heroes")
+    @GET("/api/heroStats")
     Single<List<Hero>> getAllHeroes();
 
-    @GET("/api/heroes")
+    @GET("/api/heroStats")
     Observable<List<Hero>> getAllHeroesRx();
+
+    /*@GET("/api/heroStats")
+    Single<List<HeroStats>> getAllHeroStats();
+
+    @GET("/api/heroStats")
+    Observable<List<HeroStats>> getAllHeroStatsRx();*/
 }

@@ -5,12 +5,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.activity.MainActivity;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Match;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,7 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
         @BindView(R.id.match_result) TextView result;
         @BindView(R.id.match_duration) TextView duration;
         @BindView(R.id.match_kda) TextView kda;
-        //@BindView(R.id.imageView) ImageView imageView;
+        @BindView(R.id.imageView) ImageView imageView;
 
 
         MyViewHolder(View view) {
@@ -62,7 +64,9 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
         long seconds = match.getDuration()-(minutes*60);
 
         holder.kda.setText(context.getResources().getString(R.string.kda, match.getKills(), match.getDeaths(), match.getAssists()));
+
         holder.duration.setText(context.getResources().getString(R.string.match_duration,minutes,seconds));
+
         holder.hero.setText(match.getHeroName());
 
         /*for(Hero hero : MainActivity.heroList){
@@ -80,8 +84,7 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
             holder.result.setText(context.getResources().getString(R.string.lose));
         }
 
-
-        //Picasso.with(context).load(match.getAvatarmedium()).fit().into(holder.imageView);
+        Picasso.with(context).load("https://api.opendota.com" + match.getImgUrl()).fit().into(holder.imageView);
     }
 
     @Override

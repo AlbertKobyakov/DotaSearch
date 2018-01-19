@@ -52,6 +52,24 @@ public class Match {
     private long partySize;
 
     private String heroName;
+    private String iconUrl;
+    private String imgUrl;
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String icon_url) {
+        this.iconUrl = icon_url;
+    }
 
     public String getHeroName() {
         return heroName;

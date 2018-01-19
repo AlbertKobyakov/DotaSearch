@@ -25,11 +25,10 @@
             android:layout_height="wrap_content"
             android:gravity="center">
 
-            <!--<ImageView
-                android:layout_width="50dp"
+            <ImageView
+                android:layout_width="80dp"
                 android:layout_height="50dp"
                 android:id="@+id/imageView"/>
--->
             <TextView
                 android:id="@+id/match_hero"
                 android:layout_width="0dp"

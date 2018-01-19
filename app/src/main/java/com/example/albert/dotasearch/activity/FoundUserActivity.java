@@ -70,6 +70,7 @@ public class FoundUserActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(FoundUserActivity.this, PlayerInfoActivity.class);
                 intent.putExtra("accountId", foundUser.getAccountId());
+                intent.putExtra("personalName", foundUser.getPersonaname());
                 startActivity(intent);
             }
 

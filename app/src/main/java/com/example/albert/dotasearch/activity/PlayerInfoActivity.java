@@ -6,7 +6,11 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.TabsFragmentAdapter;
@@ -22,6 +26,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
 
     //@BindView(R.id.testText) TextView test;
     public static long accountId;
+    public static String personalName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,9 +36,28 @@ public class PlayerInfoActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         accountId = getIntent().getLongExtra("accountId", 0);
+        personalName = getIntent().getStringExtra("personalName");
         initToolbar();
         initTabs();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_for_player_info, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /*@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_search:
+                Toast.makeText(this, "EMail", Toast.LENGTH_LONG).show();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }*/
 
     private void initTabs() {
         viewPager = findViewById(R.id.viewPager);
@@ -48,7 +72,17 @@ public class PlayerInfoActivity extends AppCompatActivity {
     }
     private void initToolbar() {
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.app_name);
+        toolbar.setTitle(getResources().getString(R.string.statistics_player, personalName, accountId));
+
+        toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
         //enable search to toolbar
         //toolbar.inflateMenu(R.menu.menu_fragment);

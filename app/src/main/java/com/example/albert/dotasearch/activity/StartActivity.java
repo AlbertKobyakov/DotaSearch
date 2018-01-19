@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.Hero;
+import com.example.albert.dotasearch.model.HeroStats;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.util.UtilDota;
 
@@ -27,6 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
