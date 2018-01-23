@@ -10,6 +10,8 @@ import android.widget.Toast;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.Hero;
+import com.example.albert.dotasearch.model.Item;
+import com.example.albert.dotasearch.model.ItemsInfoWithSteame;
 import com.example.albert.dotasearch.model.Leaderboard;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.retrofit.DotaClient;
@@ -28,6 +30,7 @@ import static com.example.albert.dotasearch.activity.StartActivity.db;
 public class UtilDota {
 
     private final static int CACHE_SIZE_BYTES = 1024 * 1024 * 2;
+    private final static String TAG = "UtilDota";
 
     private Context context;
 
@@ -77,6 +80,14 @@ public class UtilDota {
                 .build().create(DotaClient.class);
     }
 
+    public static DotaClient initRetrofitRxSteame(){
+        return new Retrofit.Builder()
+                .baseUrl("https://api.steampowered.com")
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build().create(DotaClient.class);
+    }
+
     public static DotaClient initRetrofitRxDota2Ru(){
         return new Retrofit.Builder()
                 .baseUrl("http://www.dota2.com")
@@ -108,6 +119,44 @@ public class UtilDota {
         } else {
             db.proPlayerDao().updateAll(proPlayers);
             Log.e("updateProPlayer", "Success. proPlayers save to Db " + Thread.currentThread().getName() + " " + proPlayers.size());
+        }
+    }
+
+
+    public static String createUrlItem(String nameItem){
+        nameItem = nameItem.replace("item_", "");
+        nameItem = "https://api.opendota.com/apps/dota2/images/items/" + nameItem + "_lg.png";
+        Log.d(TAG, "String after replace = " + nameItem);
+        return nameItem;
+    }
+
+    public static void setUrlItem(List<Item> items){
+        for (int i = 0; i < items.size(); i++){
+            Item item = items.get(i);
+            String itemName = item.getName();
+            items.get(i).setItemUrl(createUrlItem(itemName));
+        }
+    }
+
+    public static void storeItemsSteamInDB(ItemsInfoWithSteame itemsInfoWithSteame){
+        long status = itemsInfoWithSteame.getResult().getStatus();
+        if(status == 200){
+            Log.e(TAG, "successes, status = " + status);
+
+            List<Item> items = itemsInfoWithSteame.getResult().getItems();
+
+            setUrlItem(items);
+
+            if(db.itemDao().getAll().size() == 0){
+                db.itemDao().insertAll(items);
+                Log.e(TAG, "Success. items save to Db");
+            } else {
+                db.itemDao().updateAll(items);
+                Log.e(TAG, "Success. items save to Db");
+            }
+
+        } else {
+            Log.e(TAG, "error storeItemsSteamInDB, status = " + status);
         }
     }
 

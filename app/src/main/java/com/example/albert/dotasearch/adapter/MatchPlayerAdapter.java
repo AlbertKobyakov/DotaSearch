@@ -9,9 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.albert.dotasearch.R;
-import com.example.albert.dotasearch.activity.MainActivity;
-import com.example.albert.dotasearch.model.Hero;
-import com.example.albert.dotasearch.model.Match;
+import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -22,7 +20,7 @@ import butterknife.ButterKnife;
 
 public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.MyViewHolder>{
     //private List<ProPlayer> proPlayers;
-    private List<Match> matchesCopy;
+    private List<MatchShortInfo> matchesCopy;
     public Context context;
 
 
@@ -42,7 +40,7 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
     }
 
 
-    public MatchPlayerAdapter(List<Match> proPlayerList, Context context) {
+    public MatchPlayerAdapter(List<MatchShortInfo> proPlayerList, Context context) {
         //this.proPlayers = new ArrayList<>(proPlayerList);
         this.matchesCopy = new ArrayList<>(proPlayerList);
         this.context = context;
@@ -58,33 +56,33 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
 
     @Override
     public void onBindViewHolder(MatchPlayerAdapter.MyViewHolder holder, int position) {
-        Match match = matchesCopy.get(position);
+        MatchShortInfo matchShortInfo = matchesCopy.get(position);
 
-        long minutes = match.getDuration()/60;
-        long seconds = match.getDuration()-(minutes*60);
+        long minutes = matchShortInfo.getDuration()/60;
+        long seconds = matchShortInfo.getDuration()-(minutes*60);
 
-        holder.kda.setText(context.getResources().getString(R.string.kda, match.getKills(), match.getDeaths(), match.getAssists()));
+        holder.kda.setText(context.getResources().getString(R.string.kda, matchShortInfo.getKills(), matchShortInfo.getDeaths(), matchShortInfo.getAssists()));
 
         holder.duration.setText(context.getResources().getString(R.string.match_duration,minutes,seconds));
 
-        holder.hero.setText(match.getHeroName());
+        holder.hero.setText(matchShortInfo.getHeroName());
 
         /*for(Hero hero : MainActivity.heroList){
-            if(match.getHeroId() == hero.getId()){
+            if(matchShortInfo.getHeroId() == hero.getId()){
                 holder.hero.setText(hero.getLocalizedName());
                 break;
             }
-        }*/
+        }/*/
 
-        if(match.getPlayerSlot() >= 0 && match.getPlayerSlot() < 5 && match.isRadiantWin()){
+        if(matchShortInfo.getPlayerSlot() >= 0 && matchShortInfo.getPlayerSlot() < 5 && matchShortInfo.isRadiantWin()){
             holder.result.setText(context.getResources().getString(R.string.win));
-        } else if(match.getPlayerSlot() >= 128 && match.getPlayerSlot() < 133 && !match.isRadiantWin()){
+        } else if(matchShortInfo.getPlayerSlot() >= 128 && matchShortInfo.getPlayerSlot() < 133 && !matchShortInfo.isRadiantWin()){
             holder.result.setText(context.getResources().getString(R.string.win));
         } else {
             holder.result.setText(context.getResources().getString(R.string.lose));
         }
 
-        Picasso.with(context).load("https://api.opendota.com" + match.getImgUrl()).fit().into(holder.imageView);
+        Picasso.with(context).load("https://api.opendota.com" + matchShortInfo.getImgUrl()).fit().into(holder.imageView);
     }
 
     @Override

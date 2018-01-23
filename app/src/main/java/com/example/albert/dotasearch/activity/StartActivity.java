@@ -19,6 +19,8 @@ import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.HeroStats;
+import com.example.albert.dotasearch.model.Item;
+import com.example.albert.dotasearch.model.ItemsInfoWithSteame;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.util.UtilDota;
 
@@ -37,6 +39,7 @@ public class StartActivity extends AppCompatActivity {
 
     private static final int LAYOUT = R.layout.activity_start;
     private static final String TAG = "StartActivity";
+    private static final String KEY = "995568B765FC5D3F7448225D67F51425";
 
     public static AppDatabase db;
     private ConnectivityChangedReceiverTest connectivityReceiver;
@@ -75,6 +78,19 @@ public class StartActivity extends AppCompatActivity {
         finish();
     }
 
+    public void saveItems(){
+        Observable<ItemsInfoWithSteame> itemsSteamApi = UtilDota.initRetrofitRxSteame().getItemInfoSteamRx(KEY)
+                .doOnNext(UtilDota::storeItemsSteamInDB) //сохраняю в бд
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        itemsSteamApi.subscribe(
+                itemsInfoWithSteame -> Log.d(TAG, itemsInfoWithSteame.getResult().getItems().size() + ""),
+                error -> Log.e(TAG, error.getLocalizedMessage() + "4"),
+                this::loadMainActivity
+        );
+    }
+
     public void getDataFromApiAndSaveToBD(){
         Observable<List<Hero>> heroApi = UtilDota.initRetrofitRx().getAllHeroesRx()
                 .doOnNext(UtilDota::storeHeroesInDB) //сохраняю в бд
@@ -86,6 +102,7 @@ public class StartActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
 
+
         Observable<LoadDataHeroAndProPlayerApi> loadDefaultDataWithApi = Observable.zip(heroApi, proPlayerApi, new BiFunction<List<Hero>, List<ProPlayer>, LoadDataHeroAndProPlayerApi>() {
             @Override
             public LoadDataHeroAndProPlayerApi apply(List<Hero> heroes, List<ProPlayer> proPlayers) throws Exception {
@@ -96,9 +113,12 @@ public class StartActivity extends AppCompatActivity {
         loadDefaultDataWithApi.subscribe(
                 loadDataHeroAndProPlayerApi -> Log.e("onNext", loadDataHeroAndProPlayerApi.heroes.size() + " "),
                 error -> Log.e("onError", error.getLocalizedMessage()),
-                this::loadMainActivity
+                //this::loadMainActivity
+                this::saveItems
         );
+
     }
+
 
     @OnClick(R.id.btn_exit)
     public void onClick(View view){

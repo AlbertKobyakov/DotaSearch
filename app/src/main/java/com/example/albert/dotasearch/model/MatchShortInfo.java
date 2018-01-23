@@ -3,7 +3,7 @@ package com.example.albert.dotasearch.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Match {
+public class MatchShortInfo {
 
     @SerializedName("match_id")
     @Expose
@@ -87,7 +87,7 @@ public class Match {
         this.matchId = matchId;
     }
 
-    public Match withMatchId(long matchId) {
+    public MatchShortInfo withMatchId(long matchId) {
         this.matchId = matchId;
         return this;
     }
@@ -100,7 +100,7 @@ public class Match {
         this.playerSlot = playerSlot;
     }
 
-    public Match withPlayerSlot(long playerSlot) {
+    public MatchShortInfo withPlayerSlot(long playerSlot) {
         this.playerSlot = playerSlot;
         return this;
     }
@@ -113,7 +113,7 @@ public class Match {
         this.radiantWin = radiantWin;
     }
 
-    public Match withRadiantWin(boolean radiantWin) {
+    public MatchShortInfo withRadiantWin(boolean radiantWin) {
         this.radiantWin = radiantWin;
         return this;
     }
@@ -126,7 +126,7 @@ public class Match {
         this.duration = duration;
     }
 
-    public Match withDuration(long duration) {
+    public MatchShortInfo withDuration(long duration) {
         this.duration = duration;
         return this;
     }
@@ -139,7 +139,7 @@ public class Match {
         this.gameMode = gameMode;
     }
 
-    public Match withGameMode(long gameMode) {
+    public MatchShortInfo withGameMode(long gameMode) {
         this.gameMode = gameMode;
         return this;
     }
@@ -152,7 +152,7 @@ public class Match {
         this.lobbyType = lobbyType;
     }
 
-    public Match withLobbyType(long lobbyType) {
+    public MatchShortInfo withLobbyType(long lobbyType) {
         this.lobbyType = lobbyType;
         return this;
     }
@@ -165,7 +165,7 @@ public class Match {
         this.heroId = heroId;
     }
 
-    public Match withHeroId(long heroId) {
+    public MatchShortInfo withHeroId(long heroId) {
         this.heroId = heroId;
         return this;
     }
@@ -178,7 +178,7 @@ public class Match {
         this.startTime = startTime;
     }
 
-    public Match withStartTime(long startTime) {
+    public MatchShortInfo withStartTime(long startTime) {
         this.startTime = startTime;
         return this;
     }
@@ -191,7 +191,7 @@ public class Match {
         this.version = version;
     }
 
-    public Match withVersion(long version) {
+    public MatchShortInfo withVersion(long version) {
         this.version = version;
         return this;
     }
@@ -204,7 +204,7 @@ public class Match {
         this.kills = kills;
     }
 
-    public Match withKills(long kills) {
+    public MatchShortInfo withKills(long kills) {
         this.kills = kills;
         return this;
     }
@@ -217,7 +217,7 @@ public class Match {
         this.deaths = deaths;
     }
 
-    public Match withDeaths(long deaths) {
+    public MatchShortInfo withDeaths(long deaths) {
         this.deaths = deaths;
         return this;
     }
@@ -230,7 +230,7 @@ public class Match {
         this.assists = assists;
     }
 
-    public Match withAssists(long assists) {
+    public MatchShortInfo withAssists(long assists) {
         this.assists = assists;
         return this;
     }
@@ -243,7 +243,7 @@ public class Match {
         this.skill = skill;
     }
 
-    public Match withSkill(Object skill) {
+    public MatchShortInfo withSkill(Object skill) {
         this.skill = skill;
         return this;
     }
@@ -256,7 +256,7 @@ public class Match {
         this.leaverStatus = leaverStatus;
     }
 
-    public Match withLeaverStatus(long leaverStatus) {
+    public MatchShortInfo withLeaverStatus(long leaverStatus) {
         this.leaverStatus = leaverStatus;
         return this;
     }
@@ -269,7 +269,7 @@ public class Match {
         this.partySize = partySize;
     }
 
-    public Match withPartySize(long partySize) {
+    public MatchShortInfo withPartySize(long partySize) {
         this.partySize = partySize;
         return this;
     }
@@ -281,13 +281,13 @@ public class Match {
 
     @Override
     public boolean equals(Object obj) {
-        Match match = (Match)obj;
-        return getMatchId() == match.getMatchId();
+        MatchShortInfo matchShortInfo = (MatchShortInfo)obj;
+        return getMatchId() == matchShortInfo.getMatchId();
     }
 
     @Override
     public String toString() {
-        return "Match{" +
+        return "MatchShortInfo{" +
                 "matchId=" + matchId +
                 '}';
     }

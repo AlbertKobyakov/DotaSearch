@@ -2,8 +2,9 @@ package com.example.albert.dotasearch.retrofit;
 
 import com.example.albert.dotasearch.model.FoundUser;
 import com.example.albert.dotasearch.model.Hero;
-import com.example.albert.dotasearch.model.HeroStats;
-import com.example.albert.dotasearch.model.Match;
+import com.example.albert.dotasearch.model.ItemsInfoWithSteame;
+import com.example.albert.dotasearch.model.MatchFullInfo;
+import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.model.TimeRefreshLeaderBoard;
 
@@ -45,32 +46,32 @@ public interface DotaClient {
     );
 
     @GET("/api/players/{Id}/matches")
-    Call<List<Match>> getMatchesPlayer(
+    Call<List<MatchShortInfo>> getMatchesPlayer(
         @Path("Id") long playerId,
         @Query("limit") int limit
     );
 
     @GET("/api/players/{Id}/matches")
-    Single<List<Match>> getMatchesPlayerRx(
+    Single<List<MatchShortInfo>> getMatchesPlayerRx(
             @Path("Id") long playerId,
             @Query("limit") int limit
     );
 
     @GET("/api/players/{Id}/matches")
-    Call<List<Match>> getMatchesPlayer(
+    Call<List<MatchShortInfo>> getMatchesPlayer(
         @Path("Id") long playerId,
         @Query("limit") int limit,
         @Query("win") int win
     );
 
     @GET("/api/players/{Id}/matches")
-    Observable<List<Match>> getListMatchesPlayerReact(
+    Observable<List<MatchShortInfo>> getListMatchesPlayerReact(
         @Path("Id") long playerId,
         @Query("limit") int limit
     );
 
     @GET("/api/players/{Id}/matches")
-    Observable<List<Match>> getListWinMatchesPlayerReact(
+    Observable<List<MatchShortInfo>> getListWinMatchesPlayerReact(
             @Path("Id") long playerId,
             @Query("limit") int limit,
             @Query("win") int win
@@ -82,9 +83,15 @@ public interface DotaClient {
     @GET("/api/heroStats")
     Observable<List<Hero>> getAllHeroesRx();
 
-    /*@GET("/api/heroStats")
-    Single<List<HeroStats>> getAllHeroStats();
+    @GET("/api/matches/{match_id}")
+    Observable<MatchFullInfo> getMatchFullInfoRx(
+            @Path("match_id") long matchId
+    );
 
-    @GET("/api/heroStats")
-    Observable<List<HeroStats>> getAllHeroStatsRx();*/
+    @GET("/IEconDOTA2_570/GetGameItems/v0001/")
+    Observable<ItemsInfoWithSteame> getItemInfoSteamRx(
+            @Query("key") String key
+    );
+
+
 }

@@ -7,19 +7,17 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.albert.dotasearch.R;
-import com.example.albert.dotasearch.TabsFragmentAdapter;
 import com.example.albert.dotasearch.TabsFragmentPlayerInfoAdapter;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class PlayerInfoActivity extends AppCompatActivity {
+
+    public static final String TAG = "PlayerInfoActivity";
+    public static final int LAYOUT = R.layout.activity_player_info;
 
     private ViewPager viewPager;
     public Toolbar toolbar;
@@ -31,7 +29,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_player_info);
+        setContentView(LAYOUT);
 
         ButterKnife.bind(this);
 

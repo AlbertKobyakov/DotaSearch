@@ -1,6 +1,7 @@
 package com.example.albert.dotasearch.tabs;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -10,12 +11,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.R;
+import com.example.albert.dotasearch.RecyclerTouchListener;
+import com.example.albert.dotasearch.activity.MatchDetailActivity;
+import com.example.albert.dotasearch.activity.PlayerInfoActivity;
 import com.example.albert.dotasearch.adapter.MatchPlayerAdapter;
 import com.example.albert.dotasearch.model.Hero;
-import com.example.albert.dotasearch.model.Match;
+import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.util.UtilDota;
 
 import java.util.ArrayList;
@@ -34,13 +39,14 @@ import static com.example.albert.dotasearch.activity.PlayerInfoActivity.accountI
 
 public class TabMatchesPlayer  extends AbstractTabFragment {
 
-    private static final String FRAGMENT_NAME = "TabMatchesPlayer";
+    private static final String TAG = "TabMatchesPlayer";
     private static final int LAYOUT = R.layout.fragment_matches_player;
 
     //public static AppDatabase db;
 
-    public static List<Match> matches = new ArrayList<>();
+    public static List<MatchShortInfo> matches = new ArrayList<>();
     private MatchPlayerAdapter mAdapter;
+    private List<MatchShortInfo> matchList;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -63,14 +69,14 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
 
-        Log.e(FRAGMENT_NAME, "onCreateView");
+        Log.e(TAG, "onCreateView");
 
         ButterKnife.bind(this, view);
 
         //fix console warning, skip recycle adapter
-        setAdapterAndRecyclerView(new ArrayList<>());
+        //setAdapterAndRecyclerView(new ArrayList<>());
 
-        Single<List<Match>> matches = UtilDota.initRetrofitRx(/*"https://api.opendota.com"*/)
+        Single<List<MatchShortInfo>> matches = UtilDota.initRetrofitRx(/*"https://api.opendota.com"*/)
                 //.create(DotaClient.class)
                 .getMatchesPlayerRx(accountId, 20)
                 .subscribeOn(Schedulers.io())
@@ -95,17 +101,17 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
             public void onSuccess(GetHeroAndMatch getHeroAndMatch) {
                 List<Hero> heroList = getHeroAndMatch.heroes;
 
-                List<Match> matchList = getHeroAndMatch.matches;
+                matchList = getHeroAndMatch.matches;
 
                 Log.e("Hero",heroList.toString());
-                Log.e("Pro",matchList.toString());
+                Log.e("Pro", matchList.toString());
 
-                for(Match match : matchList){
+                for(MatchShortInfo matchShortInfo : matchList){
                     for(Hero hero : heroList){
-                        if(match.getHeroId() == hero.getId()){
-                            match.setHeroName(hero.getLocalizedName());
-                            match.setIconUrl(hero.getIcon());
-                            match.setImgUrl(hero.getImg());
+                        if(matchShortInfo.getHeroId() == hero.getId()){
+                            matchShortInfo.setHeroName(hero.getLocalizedName());
+                            matchShortInfo.setIconUrl(hero.getIcon());
+                            matchShortInfo.setImgUrl(hero.getImg());
                             break;
                         }
                     }
@@ -122,19 +128,34 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
         return view;
     }
 
-    public void setAdapterAndRecyclerView(List<Match> matches) {
+    public void setAdapterAndRecyclerView(List<MatchShortInfo> matches) {
         mAdapter = new MatchPlayerAdapter(matches, view.getContext());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(context, recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Toast.makeText(context, matchList.get(position).toString(), Toast.LENGTH_SHORT).show();
+
+                toMatchDetailActivity(position);
+            }
+        }));
+    }
+
+    public void toMatchDetailActivity(int position){
+        Intent intent = new Intent(context, MatchDetailActivity.class);
+        intent.putExtra("matchId", matchList.get(position).getMatchId());
+        startActivity(intent);
     }
 
     class GetHeroAndMatch {
-       List<Match> matches;
+       List<MatchShortInfo> matches;
         List<Hero> heroes;
 
-        public GetHeroAndMatch(List<Match> matches, List<Hero> heroes) {
+        public GetHeroAndMatch(List<MatchShortInfo> matches, List<Hero> heroes) {
             this.matches = matches;
             this.heroes = heroes;
         }

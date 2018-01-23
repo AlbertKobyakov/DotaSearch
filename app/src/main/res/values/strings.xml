@@ -15,8 +15,8 @@
     <string name="search_result">Результаты поиска по запросу: %1$s</string>
 
     <string name="tab_matches_player">Матчи</string>
-    <string name="win">Победа</string>
-    <string name="lose">Поражение</string>
+    <string name="win">win</string>
+    <string name="lose">lose</string>
     <string name="kda">%1$d/%2$d/%3$d</string>
     <string name="match_duration">%1$d:%2$d</string>
     <string name="exit">Выход</string>
@@ -24,4 +24,7 @@
     <string name="create_new">Создать новый</string>
     <string name="open">Открыть</string>
     <string name="statistics_player">%1$s [%2$d]</string>
+    <string name="match_detail">Матч %1$d</string>
+
+    <string name="tab_match_detail">Подробнее</string>
 </resources>

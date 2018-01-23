@@ -10,6 +10,9 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -40,10 +43,10 @@ public class TabProPlayers extends AbstractTabFragment {
 
     private Unbinder unbinder;
     public static List<ProPlayer> proPlayers = new ArrayList<>();
-    public static ProPlayerAdapter mAdapter;
+    public ProPlayerAdapter mAdapter;
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.searchView) SearchView searchView;
+    //@BindView(R.id.searchView) SearchView searchView;
     @BindView(R.id.text_view_no_internet) TextView textViewNotInternet;
     //@BindView(R.id.toolbar) Toolbar toolbar;
 
@@ -63,6 +66,8 @@ public class TabProPlayers extends AbstractTabFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        setHasOptionsMenu(true);
         view = inflater.inflate(LAYOUT, container, false);
 
         unbinder = ButterKnife.bind(this, view);
@@ -86,26 +91,30 @@ public class TabProPlayers extends AbstractTabFragment {
                 Toast.makeText(view.getContext(), "Delete is selected?", Toast.LENGTH_SHORT).show();
             }*/
         }));
+        return view;
+    }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem item = menu.findItem(R.id.menu_search);
+
+        SearchView searchView = (SearchView)item.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mAdapter.filter(query);
-                return true;
+                return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(mAdapter != null){
-                    mAdapter.filter(newText);
-                }
-                return true;
+                mAdapter.filter(newText);
+                return false;
             }
         });
-
-
-
-        return view;
     }
 
     public void setAdapterAndRecyclerView(List<ProPlayer> proPlayers){
