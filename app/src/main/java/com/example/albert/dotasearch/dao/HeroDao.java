@@ -20,6 +20,9 @@ public interface HeroDao {
     @Query("SELECT * FROM hero")
     Single<List<Hero>> getAllRx();
 
+    @Query("SELECT * FROM hero WHERE id == :id LIMIT 1")
+    Single<Hero> getHeroByIdRx(long id);
+
     @Insert
     void insertAll(List<Hero> heroes);
 

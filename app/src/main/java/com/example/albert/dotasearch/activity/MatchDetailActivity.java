@@ -5,26 +5,29 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.TabsFragmentMatchDetailAdapter;
-import com.example.albert.dotasearch.TabsFragmentPlayerInfoAdapter;
+import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.MatchFullInfo;
 import com.example.albert.dotasearch.util.UtilDota;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public class MatchDetailActivity extends AppCompatActivity {
 
@@ -36,9 +39,19 @@ public class MatchDetailActivity extends AppCompatActivity {
 
     public static long matchId;
     public static MatchFullInfo matchFullInfo;
+    public static List<Item> items;
+    public static Map<Long, Item> itemsMap;
 
-    public void setMatchFullInfo(MatchFullInfo matchFullInfoTemp){
-        matchFullInfo = matchFullInfoTemp;
+    public void setLocalMatchFullInfoAndItems(MatchDetailAndItems matchDetailAndItems){
+        matchFullInfo = matchDetailAndItems.matchFullInfo;
+
+        items = matchDetailAndItems.items;
+
+        itemsMap = new HashMap<>();
+
+        for(int i = 0; i < items.size(); i++){
+            itemsMap.put(items.get(i).getId(), items.get(i));
+        }
     }
 
     @Override
@@ -55,15 +68,28 @@ public class MatchDetailActivity extends AppCompatActivity {
         initToolbar();
         //initTabs();
 
-        UtilDota.initRetrofitRx()
+        Observable<MatchFullInfo> matchFullInfoObservable = UtilDota.initRetrofitRx()
                 .getMatchFullInfoRx(matchId)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        //matchFullInfo -> Log.d(TAG, (matchFullInfo.getDuration()/60) + ":" + (matchFullInfo.getDuration()-((matchFullInfo.getDuration()/60)*60))),
-                        this::setMatchFullInfo,
-                        error -> Log.e(TAG, error.getLocalizedMessage()),
-                        this::initTabs);
+                .observeOn(AndroidSchedulers.mainThread());
+
+        Observable<List<Item>> itemsObservable = db.itemDao().getAllRx()
+                .toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        Observable<MatchDetailAndItems> matchDetailAndItemsObservableZip = Observable.zip(matchFullInfoObservable, itemsObservable, new BiFunction<MatchFullInfo, List<Item>, MatchDetailAndItems>() {
+            @Override
+            public MatchDetailAndItems apply(MatchFullInfo matchFullInfo, List<Item> items) throws Exception {
+                return new MatchDetailAndItems(matchFullInfo, items);
+            }
+        });
+
+        matchDetailAndItemsObservableZip.subscribe(
+                this::setLocalMatchFullInfoAndItems,
+                error -> Log.e(TAG, error.getLocalizedMessage()),
+                this::initTabs
+        );
     }
 
     private void initToolbar() {
@@ -88,5 +114,15 @@ public class MatchDetailActivity extends AppCompatActivity {
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    private class MatchDetailAndItems{
+        MatchFullInfo matchFullInfo;
+        List<Item> items;
+
+        public MatchDetailAndItems(MatchFullInfo matchFullInfo, List<Item> items) {
+            this.matchFullInfo = matchFullInfo;
+            this.items = items;
+        }
     }
 }

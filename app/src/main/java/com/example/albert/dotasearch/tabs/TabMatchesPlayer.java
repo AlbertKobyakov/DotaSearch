@@ -121,7 +121,7 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
 
             @Override
             public void onError(Throwable e) {
-
+                Log.e(TAG, e.getLocalizedMessage());
             }
         });
 

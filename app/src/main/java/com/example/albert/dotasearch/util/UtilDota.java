@@ -1,23 +1,24 @@
 package com.example.albert.dotasearch.util;
 
 import android.app.Activity;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.example.albert.dotasearch.R;
-import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
-import com.example.albert.dotasearch.model.ItemsInfoWithSteame;
+import com.example.albert.dotasearch.model.ItemsInfoWithSteam;
 import com.example.albert.dotasearch.model.Leaderboard;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.retrofit.DotaClient;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -115,10 +116,10 @@ public class UtilDota {
     public static void storeProPlayersInDB(List<ProPlayer> proPlayers){
         if(db.proPlayerDao().getAll().size() == 0){
             db.proPlayerDao().insertAll(proPlayers);
-            Log.e("insertProPlayer", "Success. proPlayers save to Db " + Thread.currentThread().getName() + " " + proPlayers.size());
+            Log.e(TAG, "Success. proPlayers insert to Db " + Thread.currentThread().getName() + " " + proPlayers.size());
         } else {
             db.proPlayerDao().updateAll(proPlayers);
-            Log.e("updateProPlayer", "Success. proPlayers save to Db " + Thread.currentThread().getName() + " " + proPlayers.size());
+            Log.e(TAG, "Success. proPlayers update to Db " + Thread.currentThread().getName() + " " + proPlayers.size());
         }
     }
 
@@ -138,21 +139,24 @@ public class UtilDota {
         }
     }
 
-    public static void storeItemsSteamInDB(ItemsInfoWithSteame itemsInfoWithSteame){
-        long status = itemsInfoWithSteame.getResult().getStatus();
+    public static void storeItemsSteamInDB(ItemsInfoWithSteam itemsInfoWithSteam){
+        long status = itemsInfoWithSteam.getResult().getStatus();
         if(status == 200){
             Log.e(TAG, "successes, status = " + status);
 
-            List<Item> items = itemsInfoWithSteame.getResult().getItems();
+            List<Item> items = itemsInfoWithSteam.getResult().getItems();
+
+            //add item with id = 0
+            items.add(new Item(0, "empty", "item_empty"));
 
             setUrlItem(items);
 
             if(db.itemDao().getAll().size() == 0){
                 db.itemDao().insertAll(items);
-                Log.e(TAG, "Success. items save to Db");
+                Log.e(TAG, "Success. items insert to Db");
             } else {
                 db.itemDao().updateAll(items);
-                Log.e(TAG, "Success. items save to Db");
+                Log.e(TAG, "Success. items update to Db");
             }
 
         } else {
@@ -163,10 +167,10 @@ public class UtilDota {
     public static void storeHeroesInDB(List<Hero> heroes){
         if(db.heroDao().getAll().size() == 0){
             db.heroDao().insertAll(heroes);
-            Log.e("insertHero", "Success. heroes save to Db " + Thread.currentThread().getName() + " " + heroes.size());
+            Log.e(TAG, "Success. heroes insert to Db " + Thread.currentThread().getName() + " " + heroes.size());
         } else {
             db.heroDao().updateAll(heroes);
-            Log.e("updateHero", "Success. heroes save to Db " + Thread.currentThread().getName() + " " + heroes.size());
+            Log.e(TAG, "Success. heroes update to Db " + Thread.currentThread().getName() + " " + heroes.size());
         }
     }
 
@@ -194,5 +198,50 @@ public class UtilDota {
             }
         }
         return proPlayers;
+    }
+
+    public static String getGameModeById(int id){
+        SparseArray<String> gameModes = new SparseArray<>();
+
+        gameModes.append(0, "None");
+        gameModes.append(1, "All Pick");
+        gameModes.append(2, "Captain's Mode");
+        gameModes.append(3, "Random Draft");
+        gameModes.append(4, "Single Draft");
+        gameModes.append(5, "All Random");
+        gameModes.append(6, "Intro");
+        gameModes.append(7, "Diretide");
+        gameModes.append(8, "Reverse Captain's Mode");
+        gameModes.append(9, "The Greeviling");
+        gameModes.append(10, "Tutorial");
+        gameModes.append(11, "Mid Only");
+        gameModes.append(12, "Least Played");
+        gameModes.append(13, "New Player Pool");
+        gameModes.append(14, "Compendium Matchmaking");
+        gameModes.append(15, "Co-op vs Bots");
+        gameModes.append(16, "Captains Draft");
+        gameModes.append(18, "Ability Draft");
+        gameModes.append(20, "All Random Deathmatch");
+        gameModes.append(21, "1v1 Mid Only");
+        gameModes.append(22, "All Pick");
+
+        return gameModes.get(id);
+    }
+
+    public static String getLobbyTypeById(int id){
+        SparseArray<String> lobbyTypes = new SparseArray<>();
+
+        lobbyTypes.append(-1, "Invalid");
+        lobbyTypes.append(0, "Normal");
+        lobbyTypes.append(1, "Practise");
+        lobbyTypes.append(2, "Tournament");
+        lobbyTypes.append(3, "Tutorial");
+        lobbyTypes.append(4, "Co-op with bots");
+        lobbyTypes.append(5, "Team match");
+        lobbyTypes.append(6, "Solo Queue");
+        lobbyTypes.append(7, "Ranked");
+        lobbyTypes.append(8, "1v1 Mid");
+
+        return lobbyTypes.get(id);
     }
 }

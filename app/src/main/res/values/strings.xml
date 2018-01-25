@@ -27,4 +27,10 @@
     <string name="match_detail">Матч %1$d</string>
 
     <string name="tab_match_detail">Подробнее</string>
+    <string name="anonymous">Аноним</string>
+    <string name="radiant_victory">Свет победил</string>
+    <string name="dire_victory">Тьма победила</string>
+    <string name="game_mode_and_lobby_type">%1$s, %2$s</string>
+    <string name="score_and_duration">%1$d - %2$d   /   %3$d:%4$d</string>
+    <string name="level">Ур. %1$d</string>
 </resources>

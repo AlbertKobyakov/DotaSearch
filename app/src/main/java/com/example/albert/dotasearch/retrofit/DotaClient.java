@@ -2,7 +2,7 @@ package com.example.albert.dotasearch.retrofit;
 
 import com.example.albert.dotasearch.model.FoundUser;
 import com.example.albert.dotasearch.model.Hero;
-import com.example.albert.dotasearch.model.ItemsInfoWithSteame;
+import com.example.albert.dotasearch.model.ItemsInfoWithSteam;
 import com.example.albert.dotasearch.model.MatchFullInfo;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.model.ProPlayer;
@@ -89,7 +89,7 @@ public interface DotaClient {
     );
 
     @GET("/IEconDOTA2_570/GetGameItems/v0001/")
-    Observable<ItemsInfoWithSteame> getItemInfoSteamRx(
+    Observable<ItemsInfoWithSteam> getItemInfoSteamRx(
             @Query("key") String key
     );
 

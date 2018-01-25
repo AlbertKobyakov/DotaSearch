@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class ItemsInfoWithSteame {
+public class ItemsInfoWithSteam {
 
     @SerializedName("result")
     @Expose

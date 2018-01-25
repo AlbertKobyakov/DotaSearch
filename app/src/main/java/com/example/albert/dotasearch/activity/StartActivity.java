@@ -18,9 +18,8 @@ import android.widget.TextView;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.Hero;
-import com.example.albert.dotasearch.model.HeroStats;
 import com.example.albert.dotasearch.model.Item;
-import com.example.albert.dotasearch.model.ItemsInfoWithSteame;
+import com.example.albert.dotasearch.model.ItemsInfoWithSteam;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.util.UtilDota;
 
@@ -30,9 +29,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Function3;
 import io.reactivex.schedulers.Schedulers;
 
 public class StartActivity extends AppCompatActivity {
@@ -78,61 +76,77 @@ public class StartActivity extends AppCompatActivity {
         finish();
     }
 
-    public void saveItems(){
-        Observable<ItemsInfoWithSteame> itemsSteamApi = UtilDota.initRetrofitRxSteame().getItemInfoSteamRx(KEY)
-                .doOnNext(UtilDota::storeItemsSteamInDB) //сохраняю в бд
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+    public void getDataFromApiAndSaveToBD(boolean loadMainActivity){
+        Observable<List<Hero>> heroApi = UtilDota.initRetrofitRx()
+                .getAllHeroesRx()
+                .doOnNext(UtilDota::storeHeroesInDB); //сохраняю в бд
 
-        itemsSteamApi.subscribe(
-                itemsInfoWithSteame -> Log.d(TAG, itemsInfoWithSteame.getResult().getItems().size() + ""),
-                error -> Log.e(TAG, error.getLocalizedMessage() + "4"),
-                this::loadMainActivity
-        );
+        Observable<List<ProPlayer>> proPlayerApi = UtilDota.initRetrofitRx()
+                .getAllProPlayerRx()
+                .doOnNext(UtilDota::storeProPlayersInDB); //сохраняю в бд
+
+        Observable<ItemsInfoWithSteam> itemsSteamApi = UtilDota.initRetrofitRxSteame()
+                .getItemInfoSteamRx(KEY)
+                .doOnNext(UtilDota::storeItemsSteamInDB); //сохраняю в бд
+
+        Observable<Boolean> loadDefaultDataWithApi = Observable.zip(heroApi, proPlayerApi, itemsSteamApi, new Function3<List<Hero>, List<ProPlayer>, ItemsInfoWithSteam, Boolean>() {
+                    @Override
+                    public Boolean apply(List<Hero> heroes, List<ProPlayer> proPlayers, ItemsInfoWithSteam itemsInfoWithSteam) throws Exception {
+                        return heroes.size() > 0 && itemsInfoWithSteam.getResult().getItems().size() > 0 && proPlayers.size() > 0;
+                    }
+                });
+
+        if(loadMainActivity){
+            loadDefaultDataWithApi.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            b -> Log.e("onNext", "Success"),
+                            error -> Log.e("onError", error.getLocalizedMessage() + "3"),
+                            this::loadMainActivity
+                    );
+        } else {
+            loadDefaultDataWithApi.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            b -> Log.e("onNext", "Success"),
+                            error -> Log.e("onError", error.getLocalizedMessage() + "3"),
+                            () -> Log.d(TAG, "onComplete")
+                    );
+        }
+
+
     }
 
-    public void getDataFromApiAndSaveToBD(){
-        Observable<List<Hero>> heroApi = UtilDota.initRetrofitRx().getAllHeroesRx()
-                .doOnNext(UtilDota::storeHeroesInDB) //сохраняю в бд
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+    public void runMainActivityAndLoadDefaultData(Boolean success){
+        if(success){
+            getDataFromApiAndSaveToBD(false);
+            loadMainActivity();
+        } else {
+            getDataFromApiAndSaveToBD(true);
+        }
+    }
 
-        Observable<List<ProPlayer>> proPlayerApi = UtilDota.initRetrofitRx().getAllProPlayerRx()
-                .doOnNext(UtilDota::storeProPlayersInDB) //сохраняю в бд
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-
-
-        Observable<LoadDataHeroAndProPlayerApi> loadDefaultDataWithApi = Observable.zip(heroApi, proPlayerApi, new BiFunction<List<Hero>, List<ProPlayer>, LoadDataHeroAndProPlayerApi>() {
+    public void checkDefaultInfoInDB(){
+        Observable<List<Item>> data1 = db.itemDao().getAllRx().toObservable();
+        Observable<List<Hero>> data2 = db.heroDao().getAllRx().toObservable();
+        Observable<List<ProPlayer>> data3 = db.proPlayerDao().getAllRx().toObservable();
+        Observable<Boolean> zip = Observable.zip(data1, data2, data3, new Function3<List<Item>, List<Hero>, List<ProPlayer>, Boolean>() {
             @Override
-            public LoadDataHeroAndProPlayerApi apply(List<Hero> heroes, List<ProPlayer> proPlayers) throws Exception {
-                return new LoadDataHeroAndProPlayerApi(heroes, proPlayers);
+            public Boolean apply(List<Item> items, List<Hero> heroes, List<ProPlayer> proPlayers) throws Exception {
+                return items.size() > 0 && heroes.size() > 0 && proPlayers.size() > 0;
             }
         });
-
-        loadDefaultDataWithApi.subscribe(
-                loadDataHeroAndProPlayerApi -> Log.e("onNext", loadDataHeroAndProPlayerApi.heroes.size() + " "),
-                error -> Log.e("onError", error.getLocalizedMessage()),
-                //this::loadMainActivity
-                this::saveItems
-        );
-
+        zip.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        StartActivity.this::runMainActivityAndLoadDefaultData
+                );
     }
 
 
     @OnClick(R.id.btn_exit)
     public void onClick(View view){
         finish();
-    }
-
-    private class LoadDataHeroAndProPlayerApi{
-        List<Hero> heroes;
-        List<ProPlayer> proPlayers;
-
-        public LoadDataHeroAndProPlayerApi(List<Hero> heroes, List<ProPlayer> proPlayers) {
-            this.heroes = heroes;
-            this.proPlayers = proPlayers;
-        }
     }
 
     private class ConnectivityChangedReceiverTest extends BroadcastReceiver {
@@ -149,7 +163,9 @@ public class StartActivity extends AppCompatActivity {
                 if(btnExit.getVisibility() == View.VISIBLE){
                     btnExit.setVisibility(View.INVISIBLE);
                 }
-                getDataFromApiAndSaveToBD();
+
+                checkDefaultInfoInDB();
+
             } else {
                 textViewLoading.setText("Интернет соединение отсутствует...");
                 btnExit.setVisibility(View.VISIBLE);
