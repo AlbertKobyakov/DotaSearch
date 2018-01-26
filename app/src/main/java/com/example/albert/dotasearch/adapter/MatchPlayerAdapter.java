@@ -2,6 +2,7 @@ package com.example.albert.dotasearch.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.albert.dotasearch.R;
+import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.squareup.picasso.Picasso;
 
@@ -19,10 +21,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.MyViewHolder>{
-    //private List<ProPlayer> proPlayers;
     private List<MatchShortInfo> matchesCopy;
+    private SparseArray<Hero> heroesMap;
     public Context context;
-
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.match_hero) TextView hero;
@@ -31,7 +32,6 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
         @BindView(R.id.match_kda) TextView kda;
         @BindView(R.id.imageView) ImageView imageView;
 
-
         MyViewHolder(View view) {
             super(view);
 
@@ -39,11 +39,19 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
         }
     }
 
-
-    public MatchPlayerAdapter(List<MatchShortInfo> proPlayerList, Context context) {
-        //this.proPlayers = new ArrayList<>(proPlayerList);
-        this.matchesCopy = new ArrayList<>(proPlayerList);
+    public MatchPlayerAdapter(List<MatchShortInfo> matches, List<Hero> heroes, Context context) {
+        this.matchesCopy = new ArrayList<>(matches);
         this.context = context;
+        this.heroesMap = convertListToMap(heroes);
+    }
+
+    public SparseArray<Hero> convertListToMap(List<Hero> heroesCopy){
+        heroesMap = new SparseArray<>();
+        for(int i = 0; i < heroesCopy.size(); i++){
+            int heroId = (int)heroesCopy.get(i).getId();
+            heroesMap.append(heroId, heroesCopy.get(i));
+        }
+        return heroesMap;
     }
 
     @Override
@@ -61,18 +69,15 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
         long minutes = matchShortInfo.getDuration()/60;
         long seconds = matchShortInfo.getDuration()-(minutes*60);
 
+        int heroId = (int)matchShortInfo.getHeroId();
+        String heroName = heroesMap.get(heroId).getLocalizedName();
+        String heroImg = heroesMap.get(heroId).getImg();
+
         holder.kda.setText(context.getResources().getString(R.string.kda, matchShortInfo.getKills(), matchShortInfo.getDeaths(), matchShortInfo.getAssists()));
 
         holder.duration.setText(context.getResources().getString(R.string.match_duration,minutes,seconds));
 
-        holder.hero.setText(matchShortInfo.getHeroName());
-
-        /*for(Hero hero : MainActivity.heroList){
-            if(matchShortInfo.getHeroId() == hero.getId()){
-                holder.hero.setText(hero.getLocalizedName());
-                break;
-            }
-        }/*/
+        holder.hero.setText(heroName);
 
         if(matchShortInfo.getPlayerSlot() >= 0 && matchShortInfo.getPlayerSlot() < 5 && matchShortInfo.isRadiantWin()){
             holder.result.setText(context.getResources().getString(R.string.win));
@@ -82,7 +87,7 @@ public class MatchPlayerAdapter extends RecyclerView.Adapter<MatchPlayerAdapter.
             holder.result.setText(context.getResources().getString(R.string.lose));
         }
 
-        Picasso.with(context).load("https://api.opendota.com" + matchShortInfo.getImgUrl()).fit().into(holder.imageView);
+        Picasso.with(context).load(heroImg).fit().into(holder.imageView);
     }
 
     @Override

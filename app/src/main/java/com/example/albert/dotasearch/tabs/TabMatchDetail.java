@@ -41,8 +41,6 @@ public class TabMatchDetail extends AbstractTabFragment {
     private List<MatchFullInfo.Player> playersDire;
     private List<MatchFullInfo.Player> playersRadiant;
 
-
-    //@BindView(R.id.text_detail) TextView textView;
     @BindView(R.id.recycler_view_radiant) RecyclerView recyclerViewRadiant;
     @BindView(R.id.recycler_view_dire) RecyclerView recyclerViewDire;
 
@@ -72,14 +70,7 @@ public class TabMatchDetail extends AbstractTabFragment {
 
         unbinder = ButterKnife.bind(this, view);
 
-        Log.e(TAG, "onCreateView");
-
-        Toast.makeText(context, matchFullInfo.getMatchId()+"", Toast.LENGTH_SHORT).show();
-
-        Log.d(TAG, matchFullInfo.getPlayers().toString());
-
         players = matchFullInfo.getPlayers();
-
 
         int idGameMode = (int)matchFullInfo.getGameMode();
         int idLobbyType = (int)matchFullInfo.getLobbyType();
@@ -105,23 +96,12 @@ public class TabMatchDetail extends AbstractTabFragment {
 
         scoreAndDuration.setText(getResources().getString(R.string.score_and_duration, radiantScore, direScore, minutes, seconds));
 
-        Log.d(TAG, gameMode + " " + lobbyType + " " + minutes + ":" + seconds + " " + radiantScore + " : " + direScore + " Radiant win? " + isRadiantWin);
-
-
-        /*StringBuilder name = new StringBuilder();
-
-        for(int  i = 0; i < matchFullInfo.getPlayers().size(); i++) {
-            name.append(matchFullInfo.getPlayers().get(i).getPersonaname()).append("; ");
-        }
-
-        textView.setText(name.append(" size items = ").append(items.size()));*/
-
-        setAdapterAndRecyclerView(matchFullInfo, items, view.getContext());
+        setAdapterAndRecyclerView(items, view.getContext());
 
         return view;
     }
 
-    public void setAdapterAndRecyclerView(MatchFullInfo matchFullInfo, List<Item> items, Context context) {
+    public void setAdapterAndRecyclerView(List<Item> items, Context context) {
         playersRadiant = players.subList(0, 5);
         playersDire = players.subList(5, 10);
 

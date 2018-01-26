@@ -30,10 +30,9 @@ public class Item {
 
     private String itemUrl;
 
-    public Item(long id, String name, String itemUrl) {
+    public Item(long id, String name) {
         this.id = id;
         this.name = name;
-        this.itemUrl = itemUrl;
     }
 
     public String getItemUrl() {
@@ -96,7 +95,6 @@ public class Item {
     public String toString() {
         return "Item{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
                 '}';
     }
 }

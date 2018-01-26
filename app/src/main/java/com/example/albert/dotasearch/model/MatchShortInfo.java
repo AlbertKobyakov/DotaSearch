@@ -51,11 +51,11 @@ public class MatchShortInfo {
     @Expose
     private long partySize;
 
-    private String heroName;
+    /*private String heroName;
     private String iconUrl;
-    private String imgUrl;
+    private String imgUrl;*/
 
-    public String getImgUrl() {
+    /*public String getImgUrl() {
         return imgUrl;
     }
 
@@ -77,7 +77,7 @@ public class MatchShortInfo {
 
     public void setHeroName(String heroName) {
         this.heroName = heroName;
-    }
+    }*/
 
     public long getMatchId() {
         return matchId;

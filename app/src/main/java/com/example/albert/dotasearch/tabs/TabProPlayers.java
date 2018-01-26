@@ -1,6 +1,7 @@
 package com.example.albert.dotasearch.tabs;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -46,9 +47,7 @@ public class TabProPlayers extends AbstractTabFragment {
     public ProPlayerAdapter mAdapter;
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    //@BindView(R.id.searchView) SearchView searchView;
     @BindView(R.id.text_view_no_internet) TextView textViewNotInternet;
-    //@BindView(R.id.toolbar) Toolbar toolbar;
 
     public static TabProPlayers getInstance(Context context) {
         Bundle args = new Bundle();
@@ -76,7 +75,6 @@ public class TabProPlayers extends AbstractTabFragment {
                 .getAllRx()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(this::setProPlayerDefaultPersonalNameTeamNameAndAvatar)
                 .subscribe(this::setAdapterAndRecyclerView);
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(view.getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
@@ -125,23 +123,6 @@ public class TabProPlayers extends AbstractTabFragment {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
-    }
-
-    public List<ProPlayer> setProPlayerDefaultPersonalNameTeamNameAndAvatar(List<ProPlayer> proPlayers){
-        for(ProPlayer proPlayer : proPlayers){
-            if(proPlayer.getPersonaname() == null || proPlayer.getPersonaname().trim().length() == 0){
-                proPlayer.setPersonaname(getString(R.string.unknown));
-            }
-            if(proPlayer.getTeamName() == null || proPlayer.getTeamName().trim().length() == 0){
-                proPlayer.setTeamName(getString(R.string.unknown));
-            }
-            if(proPlayer.getAvatarmedium() == null){
-                proPlayer.setAvatarmedium("https://steamcdn-a.akamaihd.net/steamcommunity/public" +
-                        "/images/avatars/fe/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_medium.jpg");
-            }
-        }
-        Log.e(TAG, "setProPlayerDefaultPersonalNameTeamNameAndAvatar");
-        return proPlayers;
     }
 
     @Override

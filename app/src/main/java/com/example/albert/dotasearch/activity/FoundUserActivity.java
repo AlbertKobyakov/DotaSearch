@@ -66,8 +66,6 @@ public class FoundUserActivity extends AppCompatActivity {
             public void onClick(View view, int position) {
                 FoundUser foundUser = foundUsers.get(position);
 
-                Toast.makeText(getApplicationContext(), foundUser.getAccountId() + " is selected!", Toast.LENGTH_SHORT).show();
-
                 Intent intent = new Intent(FoundUserActivity.this, PlayerInfoActivity.class);
                 intent.putExtra("accountId", foundUser.getAccountId());
                 intent.putExtra("personalName", foundUser.getPersonaname());
@@ -108,7 +106,6 @@ public class FoundUserActivity extends AppCompatActivity {
 
     private void initToolbar() {
             toolbar.setTitle(R.string.search_players);
-
             toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -118,7 +115,5 @@ public class FoundUserActivity extends AppCompatActivity {
                     onBackPressed();
                 }
             });
-
-            //toolbar.inflateMenu(R.menu.menu_main);
     }
 }

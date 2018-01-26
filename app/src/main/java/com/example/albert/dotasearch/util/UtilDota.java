@@ -16,9 +16,7 @@ import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.retrofit.DotaClient;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -33,7 +31,7 @@ public class UtilDota {
     private final static int CACHE_SIZE_BYTES = 1024 * 1024 * 2;
     private final static String TAG = "UtilDota";
 
-    private Context context;
+    private static Context context;
 
     public UtilDota(Context context) {
         this.context = context;
@@ -123,7 +121,6 @@ public class UtilDota {
         }
     }
 
-
     public static String createUrlItem(String nameItem){
         nameItem = nameItem.replace("item_", "");
         nameItem = "https://api.opendota.com/apps/dota2/images/items/" + nameItem + "_lg.png";
@@ -139,6 +136,13 @@ public class UtilDota {
         }
     }
 
+    public static void setMissingItems(List<Item> items){
+        items.add(new Item(0, "item_empty"));
+        items.add(new Item(195, "item_recipe_diffusal_blade_2"));
+        items.add(new Item(196, "item_diffusal_blade_2"));
+        items.add(new Item(84, "item_flying_courier"));
+    }
+
     public static void storeItemsSteamInDB(ItemsInfoWithSteam itemsInfoWithSteam){
         long status = itemsInfoWithSteam.getResult().getStatus();
         if(status == 200){
@@ -146,9 +150,7 @@ public class UtilDota {
 
             List<Item> items = itemsInfoWithSteam.getResult().getItems();
 
-            //add item with id = 0
-            items.add(new Item(0, "empty", "item_empty"));
-
+            setMissingItems(items);
             setUrlItem(items);
 
             if(db.itemDao().getAll().size() == 0){
@@ -164,7 +166,16 @@ public class UtilDota {
         }
     }
 
+    public static void setHeroFullIconAndImageUrl(List<Hero> heroes){
+        for(Hero hero : heroes){
+            hero.setImg("https://api.opendota.com" + hero.getImg());
+            hero.setIcon("https://api.opendota.com" + hero.getIcon());
+        }
+    }
+
     public static void storeHeroesInDB(List<Hero> heroes){
+        setHeroFullIconAndImageUrl(heroes);
+
         if(db.heroDao().getAll().size() == 0){
             db.heroDao().insertAll(heroes);
             Log.e(TAG, "Success. heroes insert to Db " + Thread.currentThread().getName() + " " + heroes.size());

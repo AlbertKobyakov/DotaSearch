@@ -21,7 +21,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyViewHolder>{
-    //private List<ProPlayer> proPlayers;
+
+    public static final String TAG = "ProPlayerAdapter";
+    public static final int LAYOUT = R.layout.pro_player_list_row;
+
+
     private List<ProPlayer> proPlayersCopy;
     public Context context;
 
@@ -42,7 +46,6 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
 
 
     public ProPlayerAdapter(List<ProPlayer> proPlayerList, Context context) {
-        //this.proPlayers = new ArrayList<>(proPlayerList);
         this.proPlayersCopy = new ArrayList<>(proPlayerList);
         this.context = context;
     }
@@ -50,7 +53,7 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
     @Override
     public ProPlayerAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.pro_player_list_row, parent, false);
+                .inflate(LAYOUT, parent, false);
 
         return new ProPlayerAdapter.MyViewHolder(itemView);
     }
@@ -59,11 +62,21 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
     public void onBindViewHolder(ProPlayerAdapter.MyViewHolder holder, int position) {
         ProPlayer proPlayer = TabProPlayers.proPlayers.get(position);
 
-        holder.nameProPlayer.setText(proPlayer.getName());
-        holder.personalNameProPlayer.setText(proPlayer.getPersonaname());
-        holder.teamNameProPlayer.setText(proPlayer.getTeamName());
+        if(proPlayer.getName() != null && proPlayer.getName().trim().length() > 0){
+            holder.nameProPlayer.setText(proPlayer.getName());
+        }
 
-        Picasso.with(context).load(proPlayer.getAvatarmedium()).fit().into(holder.imageView);
+        if(proPlayer.getPersonaname() != null && proPlayer.getPersonaname().trim().length() > 0){
+            holder.personalNameProPlayer.setText(proPlayer.getPersonaname());
+        }
+
+        if(proPlayer.getTeamName() != null && proPlayer.getTeamName().trim().length() > 0){
+            holder.teamNameProPlayer.setText(proPlayer.getTeamName());
+        }
+
+        if(proPlayer.getAvatarmedium() != null){
+            Picasso.with(context).load(proPlayer.getAvatarmedium()).fit().into(holder.imageView);
+        }
     }
 
     @Override

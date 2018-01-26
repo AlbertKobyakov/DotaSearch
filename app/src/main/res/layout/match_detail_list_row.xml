@@ -73,21 +73,24 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop"
+                        android:background="@color/background_image_view"/>
 
                     <ImageView
                         android:id="@+id/item_1"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop"
+                        android:background="@color/background_image_view"/>
 
                     <ImageView
                         android:id="@+id/item_2"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop"
+                        android:background="@color/background_image_view"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -100,21 +103,24 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop"
+                        android:background="@color/background_image_view"/>
 
                     <ImageView
                         android:id="@+id/item_4"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop"
+                        android:background="@color/background_image_view"/>
 
                     <ImageView
                         android:id="@+id/item_5"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop"
+                        android:background="@color/background_image_view"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

@@ -17,21 +17,17 @@ import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.MatchDetailActivity;
-import com.example.albert.dotasearch.activity.PlayerInfoActivity;
 import com.example.albert.dotasearch.adapter.MatchPlayerAdapter;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.util.UtilDota;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Single;
-import io.reactivex.SingleObserver;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.example.albert.dotasearch.activity.StartActivity.db;
@@ -42,11 +38,9 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
     private static final String TAG = "TabMatchesPlayer";
     private static final int LAYOUT = R.layout.fragment_matches_player;
 
-    //public static AppDatabase db;
-
-    public static List<MatchShortInfo> matches = new ArrayList<>();
     private MatchPlayerAdapter mAdapter;
     private List<MatchShortInfo> matchList;
+    private List<Hero> heroList;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -73,63 +67,35 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
 
         ButterKnife.bind(this, view);
 
-        //fix console warning, skip recycle adapter
-        //setAdapterAndRecyclerView(new ArrayList<>());
-
-        Single<List<MatchShortInfo>> matches = UtilDota.initRetrofitRx(/*"https://api.opendota.com"*/)
-                //.create(DotaClient.class)
+        Observable<List<MatchShortInfo>> matches = UtilDota.initRetrofitRx()
                 .getMatchesPlayerRx(accountId, 20)
+                .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-                /*.subscribe(this::setAdapterAndRecyclerView);*/
 
-        Single<List<Hero>> heroes = db.heroDao().getAllRx()
-                //.toObservable()
+        Observable<List<Hero>> heroes = db.heroDao().getAllRx()
+                .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-                /*.subscribe(System.out::println);*/
 
-        Single<GetHeroAndMatch> combine = Single.zip(matches, heroes, GetHeroAndMatch::new);
+        Observable<GetHeroAndMatch> combine = Observable.zip(matches, heroes, GetHeroAndMatch::new);
 
-        combine.subscribe(new SingleObserver<GetHeroAndMatch>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onSuccess(GetHeroAndMatch getHeroAndMatch) {
-                List<Hero> heroList = getHeroAndMatch.heroes;
-
-                matchList = getHeroAndMatch.matches;
-
-                Log.e("Hero",heroList.toString());
-                Log.e("Pro", matchList.toString());
-
-                for(MatchShortInfo matchShortInfo : matchList){
-                    for(Hero hero : heroList){
-                        if(matchShortInfo.getHeroId() == hero.getId()){
-                            matchShortInfo.setHeroName(hero.getLocalizedName());
-                            matchShortInfo.setIconUrl(hero.getIcon());
-                            matchShortInfo.setImgUrl(hero.getImg());
-                            break;
-                        }
-                    }
-                }
-                setAdapterAndRecyclerView(matchList);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.e(TAG, e.getLocalizedMessage());
-            }
-        });
+        combine.subscribe(
+                this::setLocalArrays,
+                error -> Log.e(TAG, error.getLocalizedMessage()),
+                () -> setAdapterAndRecyclerView(matchList, heroList)
+        );
 
         return view;
     }
 
-    public void setAdapterAndRecyclerView(List<MatchShortInfo> matches) {
-        mAdapter = new MatchPlayerAdapter(matches, view.getContext());
+    public void setLocalArrays(GetHeroAndMatch getHeroAndMatch){
+        matchList = getHeroAndMatch.matches;
+        heroList = getHeroAndMatch.heroes;
+    }
+
+    public void setAdapterAndRecyclerView(List<MatchShortInfo> matches, List<Hero> heroes) {
+        mAdapter = new MatchPlayerAdapter(matches, heroes, view.getContext());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -138,8 +104,6 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(context, recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Toast.makeText(context, matchList.get(position).toString(), Toast.LENGTH_SHORT).show();
-
                 toMatchDetailActivity(position);
             }
         }));
@@ -152,7 +116,7 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
     }
 
     class GetHeroAndMatch {
-       List<MatchShortInfo> matches;
+        List<MatchShortInfo> matches;
         List<Hero> heroes;
 
         public GetHeroAndMatch(List<MatchShortInfo> matches, List<Hero> heroes) {
@@ -160,5 +124,4 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
             this.heroes = heroes;
         }
     }
-
 }

@@ -768,7 +768,7 @@ public class Hero {
 
     @Override
     public String toString() {
-        return "HeroStats{" +
+        return "Hero{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", localizedName='" + localizedName + '\'' +

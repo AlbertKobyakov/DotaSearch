@@ -30,7 +30,6 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
     public static final String TAG = "MatchDetailAdapter";
     public static final int LAYOUT = R.layout.match_detail_list_row;
 
-    //public MatchFullInfo matchFullInfo;
     public List<MatchFullInfo.Player> players;
     public List<Item> items;
     public Context context;
@@ -72,7 +71,6 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
 
     @Override
     public void onBindViewHolder(MatchDetailAdapter.MyViewHolder holder, int position) {
-
         MatchFullInfo.Player currentPlayer = players.get(position);
 
         long idItem0 = currentPlayer.getItem0();
@@ -84,6 +82,11 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         long countKill = players.get(position).getKills();
         long countDeath = players.get(position).getDeaths();
         long countAssists = players.get(position).getAssists();
+
+        Log.d(TAG, items.toString());
+        Log.d(TAG, itemsMap.get(idItem0).getItemUrl() + "");
+        Log.e(TAG, currentPlayer.getItem0() + " id" + " position: " + position);
+        Log.e(TAG, currentPlayer.toString());
 
         String urlItem0 = itemsMap.get(idItem0).getItemUrl();
         String urlItem1 = itemsMap.get(idItem1).getItemUrl();
@@ -118,16 +121,10 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
                         error -> Log.e(TAG, error.getLocalizedMessage()),
                         () -> Log.d(TAG, "onComplete")
                 );
-
-         /*Log.d(TAG, items.toString());
-            Log.d(TAG, itemsMap.get(idItem0).getItemUrl() + "");
-
-            Log.e(TAG, currentPlayer.getItem0() + " id" + " position: " + position);
-            Log.e(TAG, currentPlayer.toString());*/
     }
 
     public void setImageView(Hero hero, MatchDetailAdapter.MyViewHolder holder){
-        Picasso.with(context).load("https://api.opendota.com" + hero.getImg()).fit().into(holder.imageView);
+        Picasso.with(context).load(hero.getImg()).fit().into(holder.imageView);
     }
 
     @Override
