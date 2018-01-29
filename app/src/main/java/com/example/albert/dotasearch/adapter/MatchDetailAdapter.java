@@ -13,6 +13,7 @@ import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.MatchFullInfo;
+import com.example.albert.dotasearch.util.UtilDota;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
     class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.player_name) TextView playerName;
         @BindView(R.id.player_kda) TextView playerKda;
+        @BindView(R.id.player_rank) TextView playerRank;
         @BindView(R.id.item_0) ImageView imageViewItem0;
         @BindView(R.id.item_1) ImageView imageViewItem1;
         @BindView(R.id.item_2) ImageView imageViewItem2;
@@ -102,10 +104,12 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         Picasso.with(context).load(urlItem4).error(R.drawable.item_background).fit().into(holder.imageViewItem4);
         Picasso.with(context).load(urlItem5).error(R.drawable.item_background).fit().into(holder.imageViewItem5);
 
+        if(currentPlayer.getRankTier() != 0){
+            holder.playerRank.setText(UtilDota.getRankTier(currentPlayer.getRankTier()));
+        }
+
         if(currentPlayer.getPersonaname() != null){
             holder.playerName.setText(currentPlayer.getPersonaname());
-        } else {
-            holder.playerName.setText(R.string.anonymous);
         }
 
         holder.playerLvl.setText(context.getResources().getString(R.string.level, players.get(position).getLevel()));

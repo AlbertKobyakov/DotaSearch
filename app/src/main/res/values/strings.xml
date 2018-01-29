@@ -33,4 +33,11 @@
     <string name="game_mode_and_lobby_type">%1$s, %2$s</string>
     <string name="score_and_duration">%1$d - %2$d   /   %3$d:%4$d</string>
     <string name="level">Ур. %1$d</string>
+    <string name="default_level">Ур. 1</string>
+    <string name="tab_match_detail_radiant">Свет</string>
+    <string name="tab_match_detail_dire">Тьма</string>
+    <string name="default_kda">0/0/0</string>
+    <string name="tab_match_detail_farm">Фарм</string>
+    <string name="tab_match_detail_damage">Урон</string>
+    <string name="tab_match_overview">Обзор</string>
 </resources>

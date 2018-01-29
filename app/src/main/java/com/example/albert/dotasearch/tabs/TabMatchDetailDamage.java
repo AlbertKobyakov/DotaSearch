@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +15,9 @@ import android.widget.Toast;
 import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.adapter.MatchDetailAdapter;
+import com.example.albert.dotasearch.adapter.MatchDetailDamageAdapter;
 import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.MatchFullInfo;
-import com.example.albert.dotasearch.util.UtilDota;
 
 import java.util.List;
 
@@ -29,14 +28,14 @@ import butterknife.Unbinder;
 import static com.example.albert.dotasearch.activity.MatchDetailActivity.items;
 import static com.example.albert.dotasearch.activity.MatchDetailActivity.matchFullInfo;
 
-public class TabMatchDetail extends AbstractTabFragment {
+public class TabMatchDetailDamage extends AbstractTabFragment {
 
-    private static final String TAG = "TabMatchDetail";
-    private static final int LAYOUT = R.layout.fragment_match_detail;
+    private static final String TAG = "TabMatchDetailDamage";
+    private static final int LAYOUT = R.layout.fragment_match_detail_damage;
 
     private Unbinder unbinder;
-    private MatchDetailAdapter mAdapterRadiant;
-    private MatchDetailAdapter mAdapterDire;
+    private MatchDetailDamageAdapter mAdapterRadiant;
+    private MatchDetailDamageAdapter mAdapterDire;
 
     private List<MatchFullInfo.Player> playersDire;
     private List<MatchFullInfo.Player> playersRadiant;
@@ -44,18 +43,18 @@ public class TabMatchDetail extends AbstractTabFragment {
     @BindView(R.id.recycler_view_radiant) RecyclerView recyclerViewRadiant;
     @BindView(R.id.recycler_view_dire) RecyclerView recyclerViewDire;
 
-    @BindView(R.id.who_win) TextView whoWin;
+   /* @BindView(R.id.who_win) TextView whoWin;
     @BindView(R.id.game_mode_and_lobby_type) TextView gameModeAndLobbyType;
-    @BindView(R.id.score_and_duration) TextView scoreAndDuration;
+    @BindView(R.id.score_and_duration) TextView scoreAndDuration;*/
 
     public List<MatchFullInfo.Player> players;
 
-    public static TabMatchDetail getInstance(Context context) {
+    public static TabMatchDetailDamage getInstance(Context context) {
         Bundle args = new Bundle();
-        TabMatchDetail fragment = new TabMatchDetail();
+        TabMatchDetailDamage fragment = new TabMatchDetailDamage();
         fragment.setArguments(args);
         fragment.setContext(context);
-        fragment.setTitle(context.getString(R.string.tab_match_overview));
+        fragment.setTitle(context.getString(R.string.tab_match_detail_damage));
         return fragment;
     }
 
@@ -70,9 +69,11 @@ public class TabMatchDetail extends AbstractTabFragment {
 
         unbinder = ButterKnife.bind(this, view);
 
+        Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
+
         players = matchFullInfo.getPlayers();
 
-        int idGameMode = (int)matchFullInfo.getGameMode();
+        /*int idGameMode = (int)matchFullInfo.getGameMode();
         int idLobbyType = (int)matchFullInfo.getLobbyType();
 
         String gameMode = UtilDota.getGameModeById(idGameMode);
@@ -94,7 +95,7 @@ public class TabMatchDetail extends AbstractTabFragment {
 
         gameModeAndLobbyType.setText(getResources().getString(R.string.game_mode_and_lobby_type, gameMode, lobbyType));
 
-        scoreAndDuration.setText(getResources().getString(R.string.score_and_duration, radiantScore, direScore, minutes, seconds));
+        scoreAndDuration.setText(getResources().getString(R.string.score_and_duration, radiantScore, direScore, minutes, seconds));*/
 
         setAdapterAndRecyclerView(items, view.getContext());
 
@@ -105,14 +106,14 @@ public class TabMatchDetail extends AbstractTabFragment {
         playersRadiant = players.subList(0, 5);
         playersDire = players.subList(5, 10);
 
-        mAdapterRadiant = new MatchDetailAdapter(playersRadiant, items, context);
+        mAdapterRadiant = new MatchDetailDamageAdapter(playersRadiant, items, context);
         RecyclerView.LayoutManager mLayoutManagerRadiant = new LinearLayoutManager(view.getContext());
         recyclerViewRadiant.setLayoutManager(mLayoutManagerRadiant);
         recyclerViewRadiant.setItemAnimator(new DefaultItemAnimator());
         recyclerViewRadiant.setNestedScrollingEnabled(false);
         recyclerViewRadiant.setAdapter(mAdapterRadiant);
 
-        mAdapterDire = new MatchDetailAdapter(playersDire, items, context);
+        mAdapterDire = new MatchDetailDamageAdapter(playersDire, items, context);
         RecyclerView.LayoutManager mLayoutManagerDire = new LinearLayoutManager(view.getContext());
         recyclerViewDire.setLayoutManager(mLayoutManagerDire);
         recyclerViewDire.setItemAnimator(new DefaultItemAnimator());

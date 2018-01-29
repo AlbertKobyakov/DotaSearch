@@ -6,7 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.example.albert.dotasearch.tabs.TabMatchDetail;
-import com.example.albert.dotasearch.tabs.TabMatchesPlayer;
+import com.example.albert.dotasearch.tabs.TabMatchDetailFarm;
+import com.example.albert.dotasearch.tabs.TabMatchDetailDamage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class TabsFragmentMatchDetailAdapter extends FragmentPagerAdapter {
     private void initTabsMap(Context context) {
         tabs = new HashMap<>();
         tabs.put(0, TabMatchDetail.getInstance(context));
-        /*tabs.put(1, TabProPlayers.getInstance(context));
-        tabs.put(2, TabRanking.getInstance(context));*/
+        tabs.put(1, TabMatchDetailDamage.getInstance(context));
+        tabs.put(2, TabMatchDetailFarm.getInstance(context));
     }
 }

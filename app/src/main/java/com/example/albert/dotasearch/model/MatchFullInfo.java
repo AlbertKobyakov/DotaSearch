@@ -890,7 +890,7 @@ public class MatchFullInfo {
         private long abandons;
         @SerializedName("rank_tier")
         @Expose
-        private Object rankTier;
+        private int rankTier;
         @SerializedName("cosmetics")
         @Expose
         private List<Object> cosmetics = null;
@@ -1721,11 +1721,11 @@ public class MatchFullInfo {
             this.abandons = abandons;
         }
 
-        public Object getRankTier() {
+        public int getRankTier() {
             return rankTier;
         }
 
-        public void setRankTier(Object rankTier) {
+        public void setRankTier(int rankTier) {
             this.rankTier = rankTier;
         }
 

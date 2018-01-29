@@ -16,6 +16,7 @@ import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.retrofit.DotaClient;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import okhttp3.Cache;
@@ -254,5 +255,65 @@ public class UtilDota {
         lobbyTypes.append(8, "1v1 Mid");
 
         return lobbyTypes.get(id);
+    }
+
+    public static String getRankTier(Integer id){
+
+        SparseArray<String> rankTiers = new SparseArray<>();
+
+        rankTiers.append(10, "Herald[0]");
+        rankTiers.append(11, "Herald[1]");
+        rankTiers.append(12, "Herald[2]");
+        rankTiers.append(13, "Herald[3]");
+        rankTiers.append(14, "Herald[4]");
+        rankTiers.append(15, "Herald[5]");
+        rankTiers.append(20, "Guardian[0]");
+        rankTiers.append(21, "Guardian[1]");
+        rankTiers.append(22, "Guardian[2]");
+        rankTiers.append(23, "Guardian[3]");
+        rankTiers.append(24, "Guardian[4]");
+        rankTiers.append(25, "Guardian[5]");
+        rankTiers.append(30, "Crusader[0]");
+        rankTiers.append(31, "Crusader[1]");
+        rankTiers.append(32, "Crusader[2]");
+        rankTiers.append(33, "Crusader[3]");
+        rankTiers.append(34, "Crusader[4]");
+        rankTiers.append(35, "Crusader[5]");
+        rankTiers.append(40, "Archon[0]");
+        rankTiers.append(41, "Archon[1]");
+        rankTiers.append(42, "Archon[2]");
+        rankTiers.append(43, "Archon[3]");
+        rankTiers.append(44, "Archon[4]");
+        rankTiers.append(45, "Archon[5]");
+        rankTiers.append(50, "Legend[0]");
+        rankTiers.append(51, "Legend[1]");
+        rankTiers.append(52, "Legend[2]");
+        rankTiers.append(53, "Legend[3]");
+        rankTiers.append(54, "Legend[4]");
+        rankTiers.append(55, "Legend[5]");
+        rankTiers.append(61, "Ancient[1]");
+        rankTiers.append(62, "Ancient[2]");
+        rankTiers.append(63, "Ancient[3]");
+        rankTiers.append(64, "Ancient[4]");
+        rankTiers.append(65, "Ancient[5]");
+        rankTiers.append(70, "Divine[0]");
+        rankTiers.append(71, "Divine[1]");
+        rankTiers.append(72, "Divine[2]");
+        rankTiers.append(73, "Divine[3]");
+        rankTiers.append(74, "Divine[4]");
+        rankTiers.append(75, "Divine[5]");
+
+        return rankTiers.get(id);
+    }
+
+    public static String formatLongNumberToFloatWitK(Long number){
+        String result;
+        if(number != 0){
+            float numberToFloat = (float)number / 1000;
+            result = new DecimalFormat("###.#").format(numberToFloat) + "k";
+        } else {
+            result = "-";
+        }
+        return result;
     }
 }

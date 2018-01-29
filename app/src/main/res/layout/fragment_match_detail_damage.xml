@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<ScrollView android:layout_width="match_parent"
+    android:layout_below="@id/appBar"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".activity.MainActivity">
+
+        <TextView
+            android:id="@+id/text_radiant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Radiant"
+            android:layout_centerHorizontal="true"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_radiant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_radiant"/>
+
+        <TextView
+            android:id="@+id/text_dire"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dire"
+            android:layout_below="@id/recycler_view_radiant"
+            android:layout_centerHorizontal="true"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_dire"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_dire"/>
+
+    </RelativeLayout>
+</ScrollView>
+
