@@ -3,6 +3,7 @@ package com.example.albert.dotasearch.adapter;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,7 @@ import android.widget.TextView;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
-import com.example.albert.dotasearch.model.MatchFullInfo;
+import com.example.albert.dotasearch.model.Player;
 import com.example.albert.dotasearch.util.UtilDota;
 import com.squareup.picasso.Picasso;
 
@@ -31,7 +32,7 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
     public static final String TAG = "MatchDetailAdapter";
     public static final int LAYOUT = R.layout.match_detail_list_row;
 
-    public List<MatchFullInfo.Player> players;
+    public List<Player> players;
     public List<Item> items;
     public Context context;
 
@@ -57,7 +58,7 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         }
     }
 
-    public MatchDetailAdapter(List<MatchFullInfo.Player> players, List<Item> items, Context context) {
+    public MatchDetailAdapter(List<Player> players, List<Item> items, Context context) {
         this.players = players;
         this.items = items;
         this.context = context;
@@ -73,7 +74,7 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
 
     @Override
     public void onBindViewHolder(MatchDetailAdapter.MyViewHolder holder, int position) {
-        MatchFullInfo.Player currentPlayer = players.get(position);
+        Player currentPlayer = players.get(position);
 
         long idItem0 = currentPlayer.getItem0();
         long idItem1 = currentPlayer.getItem1();
@@ -121,15 +122,15 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        hero -> setImageView(hero, holder),
+                        hero -> UtilDota.setImageView(hero.getImg(), R.drawable.avatar_unknown_medium, holder.imageView),
                         error -> Log.e(TAG, error.getLocalizedMessage()),
                         () -> Log.d(TAG, "onComplete")
                 );
     }
 
-    public void setImageView(Hero hero, MatchDetailAdapter.MyViewHolder holder){
+    /*public void setImageView(Hero hero, MatchDetailAdapter.MyViewHolder holder){
         Picasso.with(context).load(hero.getImg()).fit().into(holder.imageView);
-    }
+    }*/
 
     @Override
     public int getItemCount() {

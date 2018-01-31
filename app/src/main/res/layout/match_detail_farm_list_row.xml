@@ -28,7 +28,6 @@
                 android:id="@+id/hero_img"
                 android:layout_width="80dp"
                 android:layout_height="50dp"
-                android:src="@drawable/avatar_unknown_medium"
                 android:scaleType="centerCrop"/>
 
             <LinearLayout

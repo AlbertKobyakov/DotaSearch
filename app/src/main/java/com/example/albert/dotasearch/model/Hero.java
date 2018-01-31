@@ -14,7 +14,7 @@ public class Hero {
     @PrimaryKey
     @SerializedName("id")
     @Expose
-    private long id;
+    private int id;
     @SerializedName("name")
     @Expose
     private String name;
@@ -155,17 +155,12 @@ public class Hero {
     @Expose
     private long _1Win;
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
-    }
-
-    public Hero withId(long id) {
-        this.id = id;
-        return this;
     }
 
     public String getName() {

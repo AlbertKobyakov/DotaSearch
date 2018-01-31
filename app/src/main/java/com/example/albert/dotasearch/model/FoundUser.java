@@ -18,7 +18,7 @@ public class FoundUser implements Parcelable {
     private String personaname;
     @SerializedName("last_match_time")
     @Expose
-    private Object lastMatchTime;
+    private String lastMatchTime;
     @SerializedName("similarity")
     @Expose
     private double similarity;
@@ -72,7 +72,7 @@ public class FoundUser implements Parcelable {
         return personaname;
     }
 
-    public Object getLastMatchTime() {
+    public String getLastMatchTime() {
         return lastMatchTime;
     }
 
@@ -92,7 +92,7 @@ public class FoundUser implements Parcelable {
         this.personaname = personaname;
     }
 
-    public void setLastMatchTime(Object lastMatchTime) {
+    public void setLastMatchTime(String lastMatchTime) {
         this.lastMatchTime = lastMatchTime;
     }
 

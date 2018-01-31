@@ -37,7 +37,7 @@ public class StartActivity extends AppCompatActivity {
 
     private static final int LAYOUT = R.layout.activity_start;
     private static final String TAG = "StartActivity";
-    private static final String KEY = "995568B765FC5D3F7448225D67F51425";
+    private static final String KEY = "F1F5462B91733A2DFE3E51604517D8B1";
 
     public static AppDatabase db;
     private ConnectivityChangedReceiverTest connectivityReceiver;

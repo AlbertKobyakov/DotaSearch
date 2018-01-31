@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
@@ -12,14 +12,24 @@
     android:paddingTop="@dimen/row_padding_vertical">
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:id="@+id/imageView"/>
+        android:layout_height="50dp" />
 
     <TextView
         android:id="@+id/name_found_player"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/imageView" />
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="fgdfg" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/last_match_found_player"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="dfgdfg" />
+
+</LinearLayout>

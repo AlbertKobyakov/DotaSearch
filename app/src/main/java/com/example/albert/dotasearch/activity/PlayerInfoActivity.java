@@ -6,11 +6,18 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.TabsFragmentPlayerInfoAdapter;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 import butterknife.ButterKnife;
 
@@ -25,6 +32,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
     //@BindView(R.id.testText) TextView test;
     public static long accountId;
     public static String personalName;
+    public static String lastMatchStr;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,6 +43,10 @@ public class PlayerInfoActivity extends AppCompatActivity {
 
         accountId = getIntent().getLongExtra("accountId", 0);
         personalName = getIntent().getStringExtra("personalName");
+        lastMatchStr = getIntent().getStringExtra("lastMatchStr");
+
+        Toast.makeText(getApplicationContext(), lastMatchStr.length() + "", Toast.LENGTH_SHORT).show();
+
         initToolbar();
         initTabs();
     }

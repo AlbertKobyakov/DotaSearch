@@ -3,6 +3,7 @@ package com.example.albert.dotasearch.adapter;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.MatchFullInfo;
+import com.example.albert.dotasearch.model.Player;
 import com.example.albert.dotasearch.util.UtilDota;
 import com.squareup.picasso.Picasso;
 
@@ -30,7 +32,7 @@ public class MatchDetailFarmAdapter extends RecyclerView.Adapter<MatchDetailFarm
     public static final String TAG = "MatchDetailFarmAdapter";
     public static final int LAYOUT = R.layout.match_detail_farm_list_row;
 
-    public List<MatchFullInfo.Player> players;
+    public List<Player> players;
     public List<Item> items;
     public Context context;
 
@@ -52,7 +54,7 @@ public class MatchDetailFarmAdapter extends RecyclerView.Adapter<MatchDetailFarm
         }
     }
 
-    public MatchDetailFarmAdapter(List<MatchFullInfo.Player> players, List<Item> items, Context context) {
+    public MatchDetailFarmAdapter(List<Player> players, List<Item> items, Context context) {
         this.players = players;
         this.items = items;
         this.context = context;
@@ -68,7 +70,12 @@ public class MatchDetailFarmAdapter extends RecyclerView.Adapter<MatchDetailFarm
 
     @Override
     public void onBindViewHolder(MatchDetailFarmAdapter.MyViewHolder holder, int position) {
-        MatchFullInfo.Player currentPlayer = players.get(position);
+        Player currentPlayer = players.get(position);
+
+        String lastHits = String.valueOf(currentPlayer.getLastHits());
+        String denies = String.valueOf(currentPlayer.getDenies());
+        String goldPerMinute = String.valueOf(currentPlayer.getGoldPerMin());
+        String experiencePerMinute = String.valueOf(currentPlayer.getXpPerMin());
 
         if(currentPlayer.getRankTier() != 0){
             holder.playerRank.setText(UtilDota.getRankTier(currentPlayer.getRankTier()));
@@ -78,25 +85,25 @@ public class MatchDetailFarmAdapter extends RecyclerView.Adapter<MatchDetailFarm
             holder.playerName.setText(currentPlayer.getPersonaname());
         }
 
-        holder.playerLastHit.setText(currentPlayer.getLastHits() + "");
-        holder.playerDenies.setText(currentPlayer.getDenies() + "");
-        holder.playerGoldPerMinute.setText(currentPlayer.getGoldPerMin() + "");
-        holder.playerExperiencePerMinute.setText(currentPlayer.getXpPerMin() + "");
+        holder.playerLastHit.setText(lastHits);
+        holder.playerDenies.setText(denies);
+        holder.playerGoldPerMinute.setText(goldPerMinute);
+        holder.playerExperiencePerMinute.setText(experiencePerMinute);
 
         db.heroDao().getHeroByIdRx(players.get(position).getHeroId())
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        hero -> setImageView(hero, holder),
+                        hero -> UtilDota.setImageView(hero.getImg(), R.drawable.avatar_unknown_medium, holder.heroImage),
                         error -> Log.e(TAG, error.getLocalizedMessage()),
                         () -> Log.d(TAG, "onComplete")
                 );
     }
 
-    public void setImageView(Hero hero, MatchDetailFarmAdapter.MyViewHolder holder){
+    /*public void setImageView(Hero hero, MatchDetailFarmAdapter.MyViewHolder holder){
         Picasso.with(context).load(hero.getImg()).fit().into(holder.heroImage);
-    }
+    }*/
 
     @Override
     public int getItemCount() {

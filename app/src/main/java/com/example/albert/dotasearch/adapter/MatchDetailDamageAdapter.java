@@ -12,11 +12,10 @@ import android.widget.TextView;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
-import com.example.albert.dotasearch.model.MatchFullInfo;
+import com.example.albert.dotasearch.model.Player;
 import com.example.albert.dotasearch.util.UtilDota;
 import com.squareup.picasso.Picasso;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 import butterknife.BindView;
@@ -31,7 +30,7 @@ public class MatchDetailDamageAdapter extends RecyclerView.Adapter<MatchDetailDa
     public static final String TAG = "MatchDetailFarmAdapter";
     public static final int LAYOUT = R.layout.match_detail_damage_list_row;
 
-    public List<MatchFullInfo.Player> players;
+    public List<Player> players;
     public List<Item> items;
     public Context context;
 
@@ -52,7 +51,7 @@ public class MatchDetailDamageAdapter extends RecyclerView.Adapter<MatchDetailDa
         }
     }
 
-    public MatchDetailDamageAdapter(List<MatchFullInfo.Player> players, List<Item> items, Context context) {
+    public MatchDetailDamageAdapter(List<Player> players, List<Item> items, Context context) {
         this.players = players;
         this.items = items;
         this.context = context;
@@ -68,7 +67,7 @@ public class MatchDetailDamageAdapter extends RecyclerView.Adapter<MatchDetailDa
 
     @Override
     public void onBindViewHolder(MatchDetailDamageAdapter.MyViewHolder holder, int position) {
-        MatchFullInfo.Player currentPlayer = players.get(position);
+        Player currentPlayer = players.get(position);
 
         if(currentPlayer.getRankTier() != 0){
             holder.playerRank.setText(UtilDota.getRankTier(currentPlayer.getRankTier()));
@@ -91,15 +90,15 @@ public class MatchDetailDamageAdapter extends RecyclerView.Adapter<MatchDetailDa
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        hero -> setImageView(hero, holder),
+                        hero -> UtilDota.setImageView(hero.getImg(), R.drawable.avatar_unknown_medium, holder.heroImage),
                         error -> Log.e(TAG, error.getLocalizedMessage()),
                         () -> Log.d(TAG, "onComplete")
                 );
     }
 
-    public void setImageView(Hero hero, MatchDetailDamageAdapter.MyViewHolder holder){
+    /*public void setImageView(Hero hero, MatchDetailDamageAdapter.MyViewHolder holder){
         Picasso.with(context).load(hero.getImg()).fit().into(holder.heroImage);
-    }
+    }*/
 
     @Override
     public int getItemCount() {

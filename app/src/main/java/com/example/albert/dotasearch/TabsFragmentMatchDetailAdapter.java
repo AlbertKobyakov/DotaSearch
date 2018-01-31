@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TabsFragmentMatchDetailAdapter extends FragmentPagerAdapter {
-    private Map<Integer, AbstractTabFragment> tabs;
+    private Map<Integer, AbstractTabFragmentMatchDetail> tabs;
     private Context context;
 
     public TabsFragmentMatchDetailAdapter(FragmentManager fm, Context context) {

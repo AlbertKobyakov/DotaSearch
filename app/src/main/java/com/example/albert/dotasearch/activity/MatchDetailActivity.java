@@ -7,10 +7,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.TabsFragmentMatchDetailAdapter;
+import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.MatchFullInfo;
 import com.example.albert.dotasearch.util.UtilDota;
@@ -115,7 +117,7 @@ public class MatchDetailActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    private class MatchDetailAndItems{
+    private class MatchDetailAndItems {
         MatchFullInfo matchFullInfo;
         List<Item> items;
 
