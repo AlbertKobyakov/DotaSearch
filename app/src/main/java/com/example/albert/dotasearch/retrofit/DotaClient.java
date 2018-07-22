@@ -1,12 +1,14 @@
 package com.example.albert.dotasearch.retrofit;
 
-import com.example.albert.dotasearch.model.FoundUser;
+import com.example.albert.dotasearch.model.FoundPlayer;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.ItemsInfoWithSteam;
 import com.example.albert.dotasearch.model.MatchFullInfo;
 import com.example.albert.dotasearch.model.MatchShortInfo;
+import com.example.albert.dotasearch.model.PlayerInfo;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.model.TimeRefreshLeaderBoard;
+import com.example.albert.dotasearch.model.WinLose;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +28,12 @@ public interface DotaClient {
     Observable<List<ProPlayer>> getAllProPlayerRx();
 
     @GET("/api/search")
-    Call<ArrayList<FoundUser>> getFoundUsers(
+    Call<ArrayList<FoundPlayer>> getFoundUsers(
         @Query("q") String query
     );
 
     @GET("/api/search")
-    Observable<List<FoundUser>> getFoundUsersRx(
+    Observable<List<FoundPlayer>> getFoundPlayersRx(
             @Query("q") String query
     );
 
@@ -43,6 +45,16 @@ public interface DotaClient {
     @GET("/webapi/ILeaderboard/GetDivisionLeaderboard/v0001")
     Observable<TimeRefreshLeaderBoard> getLeaderBorderRx(
             @Query("division") String division
+    );
+
+    @GET("/api/players/{Id}")
+    Observable<PlayerInfo> getPlayerInfoById(
+            @Path("Id") long playerId
+    );
+
+    @GET("/api/players/{Id}/wl")
+    Observable<WinLose> getPlayerWinLoseById(
+            @Path("Id") long playerId
     );
 
     @GET("/api/players/{Id}/matches")

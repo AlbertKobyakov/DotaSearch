@@ -28,6 +28,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.example.albert.dotasearch.activity.StartActivity.db;
@@ -41,9 +43,9 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
     private MatchPlayerAdapter mAdapter;
     private List<MatchShortInfo> matchList;
     private List<Hero> heroList;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
+    @BindView(R.id.recycler_view) RecyclerView recyclerView;
 
     public static TabMatchesPlayer getInstance(Context context) {
         Bundle args = new Bundle();
@@ -80,11 +82,13 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
 
         Observable<GetHeroAndMatch> combine = Observable.zip(matches, heroes, GetHeroAndMatch::new);
 
-        combine.subscribe(
+        Disposable d1 = combine.subscribe(
                 this::setLocalArrays,
                 error -> Log.e(TAG, error.getLocalizedMessage()),
                 () -> setAdapterAndRecyclerView(matchList, heroList)
         );
+
+        compositeDisposable.add(d1);
 
         return view;
     }
@@ -113,6 +117,12 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
         Intent intent = new Intent(context, MatchDetailActivity.class);
         intent.putExtra("matchId", matchList.get(position).getMatchId());
         startActivity(intent);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        compositeDisposable.dispose();
     }
 
     class GetHeroAndMatch {

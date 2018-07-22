@@ -45,7 +45,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
         personalName = getIntent().getStringExtra("personalName");
         lastMatchStr = getIntent().getStringExtra("lastMatchStr");
 
-        Toast.makeText(getApplicationContext(), lastMatchStr.length() + "", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), lastMatchStr.length() + "", Toast.LENGTH_SHORT).show();
 
         initToolbar();
         initTabs();

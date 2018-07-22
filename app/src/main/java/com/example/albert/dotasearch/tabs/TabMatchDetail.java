@@ -27,7 +27,7 @@ public class TabMatchDetail extends AbstractTabFragmentMatchDetail {
         fragment.setmAdapterRadiant(new MatchDetailAdapter(fragment.getPlayersRadiant(), items, context));
         fragment.setmAdapterDire(new MatchDetailAdapter(fragment.getPlayersDire(), items, context));
 
-        fragment.setTitle(context.getString(R.string.tab_match_overview));
+        fragment.setTitle(context.getString(R.string.overview));
         return fragment;
     }
 

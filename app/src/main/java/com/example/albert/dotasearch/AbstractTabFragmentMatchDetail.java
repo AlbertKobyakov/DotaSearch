@@ -12,8 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.albert.dotasearch.adapter.MatchDetailAdapter;
-import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.Player;
 import com.example.albert.dotasearch.util.UtilDota;
 
@@ -22,16 +20,21 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+//import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
-import static com.example.albert.dotasearch.activity.MatchDetailActivity.items;
 import static com.example.albert.dotasearch.activity.MatchDetailActivity.matchFullInfo;
+import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public abstract class AbstractTabFragmentMatchDetail extends Fragment {
     private String title;
 
     private String TAG;
     private static final int LAYOUT = R.layout.fragment_match_detail;
-    private static final int SEDONDS_IN_MINUTE = 60;
+    private static final int SECONDS_IN_MINUTE = 60;
 
     private Unbinder unbinder;
 
@@ -51,6 +54,8 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
     protected Context context;
     protected View view;
 
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
 
@@ -58,12 +63,22 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
 
         int idGameMode = (int)matchFullInfo.getGameMode();
         int idLobbyType = (int)matchFullInfo.getLobbyType();
+        //int idLobbyType = 8;
 
         String gameMode = UtilDota.getGameModeById(idGameMode);
-        String lobbyType = UtilDota.getLobbyTypeById(idLobbyType);
+        //String lobbyType = UtilDota.getLobbyTypeById(idLobbyType);
 
-        long minutes = matchFullInfo.getDuration()/SEDONDS_IN_MINUTE;
-        long seconds = matchFullInfo.getDuration()-(minutes*SEDONDS_IN_MINUTE);
+        Disposable d1 = db.lobbyTypeDao().getLobbyTypeByIdRx(idLobbyType)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        lobbyType -> gameModeAndLobbyType.setText(getResources().getString(R.string.game_mode_and_lobby_type, gameMode, lobbyType.getName())
+                        ));
+
+        compositeDisposable.add(d1);
+
+        long minutes = matchFullInfo.getDuration()/ SECONDS_IN_MINUTE;
+        long seconds = matchFullInfo.getDuration()-(minutes* SECONDS_IN_MINUTE);
 
         long direScore = matchFullInfo.getDireScore();
         long radiantScore = matchFullInfo.getRadiantScore();
@@ -76,7 +91,7 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
             whoWin.setText(R.string.dire_victory);
         }
 
-        gameModeAndLobbyType.setText(getResources().getString(R.string.game_mode_and_lobby_type, gameMode, lobbyType));
+        //gameModeAndLobbyType.setText(getResources().getString(R.string.game_mode_and_lobby_type, gameMode, lobbyType));
 
         scoreAndDuration.setText(getResources().getString(R.string.score_and_duration, radiantScore, direScore, minutes, seconds));
 
@@ -88,6 +103,7 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        compositeDisposable.dispose();
         unbinder.unbind();
     }
 
@@ -129,17 +145,17 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
         this.title = title;
     }
 
-    public RecyclerView.Adapter getmAdapterRadiant() {
+    /*public RecyclerView.Adapter getmAdapterRadiant() {
         return mAdapterRadiant;
-    }
+    }*/
 
     public void setmAdapterRadiant(RecyclerView.Adapter mAdapterRadiant) {
         this.mAdapterRadiant = mAdapterRadiant;
     }
 
-    public RecyclerView.Adapter getmAdapterDire() {
+    /*public RecyclerView.Adapter getmAdapterDire() {
         return mAdapterDire;
-    }
+    }*/
 
     public void setmAdapterDire(RecyclerView.Adapter mAdapterDire) {
         this.mAdapterDire = mAdapterDire;

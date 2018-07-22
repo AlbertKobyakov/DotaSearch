@@ -1,14 +1,18 @@
 package com.example.albert.dotasearch.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class FoundUser implements Parcelable {
+@Entity
+public class FoundPlayer {
     @SerializedName("account_id")
     @Expose
+    @PrimaryKey
     private long accountId;
     @SerializedName("avatarfull")
     @Expose
@@ -22,43 +26,6 @@ public class FoundUser implements Parcelable {
     @SerializedName("similarity")
     @Expose
     private double similarity;
-
-    public FoundUser()
-    {
-
-    }
-
-    private FoundUser(Parcel in) {
-        accountId = in.readLong();
-        avatarfull = in.readString();
-        personaname = in.readString();
-        lastMatchTime = in.readString();
-        similarity = in.readDouble();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(accountId);
-        dest.writeString(avatarfull);
-        dest.writeString(personaname);
-        dest.writeString(lastMatchTime+"");
-        dest.writeDouble(similarity);
-    }
-
-    public static final Parcelable.Creator<FoundUser> CREATOR = new Parcelable.Creator<FoundUser>() {
-        public FoundUser createFromParcel(Parcel in) {
-            return new FoundUser(in);
-        }
-
-        public FoundUser[] newArray(int size) {
-            return new FoundUser[size];
-        }
-    };
 
     public long getAccountId() {
         return accountId;

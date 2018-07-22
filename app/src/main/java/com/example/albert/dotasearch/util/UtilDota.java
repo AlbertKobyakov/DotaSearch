@@ -8,11 +8,13 @@ import android.util.SparseArray;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.ItemsInfoWithSteam;
 import com.example.albert.dotasearch.model.Leaderboard;
+import com.example.albert.dotasearch.model.LobbyType;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.retrofit.DotaClient;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -21,6 +23,7 @@ import com.squareup.picasso.Picasso;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -202,22 +205,6 @@ public class UtilDota {
         }
     }
 
-    public List<ProPlayer> setProPlayerDefaultPersonalNameTeamNameAndAvatar(List<ProPlayer> proPlayers){
-        for(ProPlayer proPlayer : proPlayers){
-            if(proPlayer.getPersonaname() == null || proPlayer.getPersonaname().trim().length() == 0){
-                proPlayer.setPersonaname(context.getString(R.string.unknown));
-            }
-            if(proPlayer.getTeamName() == null || proPlayer.getTeamName().trim().length() == 0){
-                proPlayer.setTeamName(context.getString(R.string.unknown));
-            }
-            if(proPlayer.getAvatarmedium() == null){
-                proPlayer.setAvatarmedium("https://steamcdn-a.akamaihd.net/steamcommunity/public" +
-                        "/images/avatars/fe/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_medium.jpg");
-            }
-        }
-        return proPlayers;
-    }
-
     public static String getGameModeById(int id){
         SparseArray<String> gameModes = new SparseArray<>();
 
@@ -246,7 +233,7 @@ public class UtilDota {
         return gameModes.get(id);
     }
 
-    public static String getLobbyTypeById(int id){
+    /*public static String getLobbyTypeById(int id){
         SparseArray<String> lobbyTypes = new SparseArray<>();
 
         lobbyTypes.append(-1, "Invalid");
@@ -261,6 +248,26 @@ public class UtilDota {
         lobbyTypes.append(8, "1v1 Mid");
 
         return lobbyTypes.get(id);
+    }*/
+
+    public static List<LobbyType> getAllLobbyTypes(){
+        List<LobbyType> lobbyTypes = new ArrayList<>();
+
+        lobbyTypes.add(new LobbyType(-1, "Invalid"));
+        lobbyTypes.add(new LobbyType(0, "Normal"));
+        lobbyTypes.add(new LobbyType(1, "Practise"));
+        lobbyTypes.add(new LobbyType(2, "Tournament"));
+        lobbyTypes.add(new LobbyType(3, "Tutorial"));
+        lobbyTypes.add(new LobbyType(4, "Co-op with bots"));
+        lobbyTypes.add(new LobbyType(5, "Team match"));
+        lobbyTypes.add(new LobbyType(6, "Solo Queue"));
+        lobbyTypes.add(new LobbyType(7, "Ranked"));
+        lobbyTypes.add(new LobbyType(8, "1v1 Mid"));
+        lobbyTypes.add(new LobbyType(9, "Captains Mode"));
+
+        Log.d(TAG, "getAllLobbyTypes to be call");
+
+        return lobbyTypes;
     }
 
     public static String getRankTier(Integer id){
@@ -273,41 +280,48 @@ public class UtilDota {
         rankTiers.append(13, "Herald[3]");
         rankTiers.append(14, "Herald[4]");
         rankTiers.append(15, "Herald[5]");
+        rankTiers.append(16, "Herald[6]");
         rankTiers.append(20, "Guardian[0]");
         rankTiers.append(21, "Guardian[1]");
         rankTiers.append(22, "Guardian[2]");
         rankTiers.append(23, "Guardian[3]");
         rankTiers.append(24, "Guardian[4]");
         rankTiers.append(25, "Guardian[5]");
+        rankTiers.append(26, "Guardian[6]");
         rankTiers.append(30, "Crusader[0]");
         rankTiers.append(31, "Crusader[1]");
         rankTiers.append(32, "Crusader[2]");
         rankTiers.append(33, "Crusader[3]");
         rankTiers.append(34, "Crusader[4]");
         rankTiers.append(35, "Crusader[5]");
+        rankTiers.append(36, "Crusader[6]");
         rankTiers.append(40, "Archon[0]");
         rankTiers.append(41, "Archon[1]");
         rankTiers.append(42, "Archon[2]");
         rankTiers.append(43, "Archon[3]");
         rankTiers.append(44, "Archon[4]");
         rankTiers.append(45, "Archon[5]");
+        rankTiers.append(46, "Archon[6]");
         rankTiers.append(50, "Legend[0]");
         rankTiers.append(51, "Legend[1]");
         rankTiers.append(52, "Legend[2]");
         rankTiers.append(53, "Legend[3]");
         rankTiers.append(54, "Legend[4]");
         rankTiers.append(55, "Legend[5]");
+        rankTiers.append(56, "Legend[6]");
         rankTiers.append(61, "Ancient[1]");
         rankTiers.append(62, "Ancient[2]");
         rankTiers.append(63, "Ancient[3]");
         rankTiers.append(64, "Ancient[4]");
         rankTiers.append(65, "Ancient[5]");
+        rankTiers.append(66, "Ancient[6]");
         rankTiers.append(70, "Divine[0]");
         rankTiers.append(71, "Divine[1]");
         rankTiers.append(72, "Divine[2]");
         rankTiers.append(73, "Divine[3]");
         rankTiers.append(74, "Divine[4]");
         rankTiers.append(75, "Divine[5]");
+        rankTiers.append(76, "Divine[6]");
 
         return rankTiers.get(id);
     }
@@ -323,58 +337,14 @@ public class UtilDota {
         return result;
     }
 
-    public static void setImageView(String url, int defaultImage, ImageView imageView){
-        Picasso.with(context).load(url).error(defaultImage).fit().into(imageView);
+    public static void setImageView(String url, int defaultImage, ImageView imageView, Context context){
+        //Picasso.with(context).load(url).error(defaultImage).fit().into(imageView);
+        Glide.with(context)
+                .load(url)
+                .error(defaultImage)
+                .fitCenter()
+                .into(imageView);
     }
 
-    public static String generateLastMatchTime(String lastMatch){
-        String result;
-        if(!lastMatch.equals("null")){
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
 
-            Calendar lastMatchTime = Calendar.getInstance();
-            try {
-                lastMatchTime.setTime(format.parse(lastMatch));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            Calendar now = Calendar.getInstance();
-
-            long second = 1000;
-            long minute = second * 60;
-            long hour = minute * 60;
-            long day = hour*24;
-            long month = day * 30;
-            long year = month * 12;
-
-            long diff = now.getTimeInMillis() - lastMatchTime.getTimeInMillis();
-
-            Log.d(TAG, diff + "");
-            if(diff/year == 0){
-                if(diff/month == 0){
-                    if(diff/day == 0){
-                        if(diff/hour == 0){
-                            if(diff/minute < 60){
-                                result = diff/year + "less 1 minute ago";
-                            } else {
-                                result = diff/year + " minute ago";
-                            }
-                        } else {
-                            result = diff/hour + " hour ago";
-                        }
-                    } else {
-                        result = diff/day + " day ago";
-                    }
-                } else {
-                    result = diff/month + " month ago";
-                }
-            } else {
-                result = diff/year + " year ago";
-            }
-        } else {
-            result = "";
-        }
-        return result;
-    }
 }

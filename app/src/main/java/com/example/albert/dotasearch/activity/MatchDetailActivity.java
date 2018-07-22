@@ -25,6 +25,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
 
@@ -42,6 +44,8 @@ public class MatchDetailActivity extends AppCompatActivity {
     public static MatchFullInfo matchFullInfo;
     public static List<Item> items;
     public static Map<Long, Item> itemsMap;
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public void setLocalMatchFullInfoAndItems(MatchDetailAndItems matchDetailAndItems){
         matchFullInfo = matchDetailAndItems.matchFullInfo;
@@ -86,11 +90,13 @@ public class MatchDetailActivity extends AppCompatActivity {
             }
         });
 
-        matchDetailAndItemsObservableZip.subscribe(
+        Disposable d1 = matchDetailAndItemsObservableZip.subscribe(
                 this::setLocalMatchFullInfoAndItems,
                 error -> Log.e(TAG, error.getLocalizedMessage()),
                 this::initTabs
         );
+
+        compositeDisposable.add(d1);
     }
 
     private void initToolbar() {
@@ -117,11 +123,17 @@ public class MatchDetailActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeDisposable.dispose();
+    }
+
     private class MatchDetailAndItems {
         MatchFullInfo matchFullInfo;
         List<Item> items;
 
-        public MatchDetailAndItems(MatchFullInfo matchFullInfo, List<Item> items) {
+        private MatchDetailAndItems(MatchFullInfo matchFullInfo, List<Item> items) {
             this.matchFullInfo = matchFullInfo;
             this.items = items;
         }

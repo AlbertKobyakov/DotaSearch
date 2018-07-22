@@ -33,6 +33,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.example.albert.dotasearch.activity.StartActivity.db;
@@ -45,6 +47,7 @@ public class TabProPlayers extends AbstractTabFragment {
     private Unbinder unbinder;
     public static List<ProPlayer> proPlayers = new ArrayList<>();
     public ProPlayerAdapter mAdapter;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.text_view_no_internet) TextView textViewNotInternet;
@@ -71,11 +74,13 @@ public class TabProPlayers extends AbstractTabFragment {
 
         unbinder = ButterKnife.bind(this, view);
 
-        db.proPlayerDao()
+        Disposable d1 = db.proPlayerDao()
                 .getAllRx()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::setAdapterAndRecyclerView);
+
+        compositeDisposable.add(d1);
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(view.getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -129,5 +134,6 @@ public class TabProPlayers extends AbstractTabFragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        compositeDisposable.dispose();
     }
 }

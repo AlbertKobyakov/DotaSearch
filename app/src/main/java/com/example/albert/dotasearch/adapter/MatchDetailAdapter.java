@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
@@ -17,6 +18,7 @@ import com.example.albert.dotasearch.model.Player;
 import com.example.albert.dotasearch.util.UtilDota;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -76,6 +78,9 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
     public void onBindViewHolder(MatchDetailAdapter.MyViewHolder holder, int position) {
         Player currentPlayer = players.get(position);
 
+        List<String> urlList = new ArrayList<>();
+        List<ImageView> imageViewList = new ArrayList<>();
+
         long idItem0 = currentPlayer.getItem0();
         long idItem1 = currentPlayer.getItem1();
         long idItem2 = currentPlayer.getItem2();
@@ -91,19 +96,42 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         Log.e(TAG, currentPlayer.getItem0() + " id" + " position: " + position);
         Log.e(TAG, currentPlayer.toString());
 
-        String urlItem0 = itemsMap.get(idItem0).getItemUrl();
+        /*String urlItem0 = itemsMap.get(idItem0).getItemUrl();
         String urlItem1 = itemsMap.get(idItem1).getItemUrl();
         String urlItem2 = itemsMap.get(idItem2).getItemUrl();
         String urlItem3 = itemsMap.get(idItem3).getItemUrl();
         String urlItem4 = itemsMap.get(idItem4).getItemUrl();
-        String urlItem5 = itemsMap.get(idItem5).getItemUrl();
+        String urlItem5 = itemsMap.get(idItem5).getItemUrl();*/
 
-        Picasso.with(context).load(urlItem0).error(R.drawable.item_background).fit().into(holder.imageViewItem0);
+        urlList.add(itemsMap.get(idItem0).getItemUrl());
+        urlList.add(itemsMap.get(idItem1).getItemUrl());
+        urlList.add(itemsMap.get(idItem2).getItemUrl());
+        urlList.add(itemsMap.get(idItem3).getItemUrl());
+        urlList.add(itemsMap.get(idItem4).getItemUrl());
+        urlList.add(itemsMap.get(idItem5).getItemUrl());
+
+        imageViewList.add(holder.imageViewItem0);
+        imageViewList.add(holder.imageViewItem1);
+        imageViewList.add(holder.imageViewItem2);
+        imageViewList.add(holder.imageViewItem3);
+        imageViewList.add(holder.imageViewItem4);
+        imageViewList.add(holder.imageViewItem5);
+
+        /*Picasso.with(context).load(urlItem0).error(R.drawable.item_background).fit().into(holder.imageViewItem0);
         Picasso.with(context).load(urlItem1).error(R.drawable.item_background).fit().into(holder.imageViewItem1);
         Picasso.with(context).load(urlItem2).error(R.drawable.item_background).fit().into(holder.imageViewItem2);
         Picasso.with(context).load(urlItem3).error(R.drawable.item_background).fit().into(holder.imageViewItem3);
         Picasso.with(context).load(urlItem4).error(R.drawable.item_background).fit().into(holder.imageViewItem4);
-        Picasso.with(context).load(urlItem5).error(R.drawable.item_background).fit().into(holder.imageViewItem5);
+        Picasso.with(context).load(urlItem5).error(R.drawable.item_background).fit().into(holder.imageViewItem5);*/
+
+        for (int i = 0; i < imageViewList.size(); i++) {
+            Glide.with(context)
+                    .load(urlList.get(i))
+                    .placeholder(R.drawable.item_background)
+                    .fitCenter()
+                    .into(imageViewList.get(i));
+            //Picasso.with(context).load(urlList.get(i)).error(R.drawable.item_background).fit().into(imageViewList.get(i));
+        }
 
         if(currentPlayer.getRankTier() != 0){
             holder.playerRank.setText(UtilDota.getRankTier(currentPlayer.getRankTier()));
@@ -122,10 +150,11 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        hero -> UtilDota.setImageView(hero.getImg(), R.drawable.avatar_unknown_medium, holder.imageView),
+                        hero -> UtilDota.setImageView(hero.getImg(), R.drawable.avatar_unknown_medium, holder.imageView, context),
                         error -> Log.e(TAG, error.getLocalizedMessage()),
                         () -> Log.d(TAG, "onComplete")
                 );
+
     }
 
     /*public void setImageView(Hero hero, MatchDetailAdapter.MyViewHolder holder){
@@ -135,6 +164,14 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
     @Override
     public int getItemCount() {
         return players.size();
+    }
+
+    public void setHeroImageView(String url, int defaultImage, ImageView imageView){
+        Glide.with(context)
+                .load(url)
+                .error(defaultImage)
+                .fitCenter()
+                .into(imageView);
     }
 }
 

@@ -2,31 +2,22 @@ package com.example.albert.dotasearch.tabs;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.support.design.widget.TabLayout;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
-import com.example.albert.dotasearch.activity.MainActivity;
-import com.example.albert.dotasearch.retrofit.DotaClient;
 import com.example.albert.dotasearch.R;
-import com.example.albert.dotasearch.activity.FoundUserActivity;
-import com.example.albert.dotasearch.model.FoundUser;
+import com.example.albert.dotasearch.activity.FoundPlayerActivity;
+import com.example.albert.dotasearch.model.FoundPlayer;
 import com.example.albert.dotasearch.util.UtilDota;
 
 import java.util.ArrayList;
@@ -36,22 +27,29 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.Cache;
-import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+
+import static com.example.albert.dotasearch.activity.FoundPlayerActivity.foundPlayers;
+import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public class TabSearch extends AbstractTabFragment {
     private final static int LAYOUT = R.layout.fragment_search;
     private final static String TAG = "TabSearch";
 
     private Unbinder unbinder;
+    public Context context;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    String editText;
 
     @BindView(R.id.btn_search) Button btnSearch;
     @BindView(R.id.search_edit) EditText searchEditText;
@@ -64,8 +62,9 @@ public class TabSearch extends AbstractTabFragment {
 
         final View view = inflater.inflate(LAYOUT, container, false);
 
-        unbinder = ButterKnife.bind(this, view);
+        context = view.getContext();
 
+        unbinder = ButterKnife.bind(this, view);
 
         return view;
     }
@@ -96,39 +95,74 @@ public class TabSearch extends AbstractTabFragment {
 
     @OnClick(R.id.btn_search)
     public void onClick(final View v) {
-        final String editText = searchEditText.getText().toString();
+        editText = searchEditText.getText().toString();
         if(editText.trim().length() == 0){
             Toast.makeText(v.getContext(), "Вы не ввели не 1 символа ((", Toast.LENGTH_LONG).show();
         } else {
             btnSearch.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
 
-            UtilDota.initRetrofitRx().getFoundUsersRx(editText)
+            /*Disposable d1 = Completable.fromAction(() -> db.foundPlayerDao().deleteAllFoundPlayer())
+                    .andThen(
+                            UtilDota.initRetrofitRx().getFoundPlayersRx(editText)
+                    )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                            foundUsers -> apiSuccess(foundUsers, v),
-                            error -> apiError(error, v));
+                            this::storeFoundPlayersToBD,
+                            this::handleError,
+                            this::goToFoundPlayerActivity
+                    );*/
+
+            UtilDota.initRetrofitRx().getFoundPlayersRx(editText)
+                    .flatMap(foundPlayers -> {
+                        db.foundPlayerDao().deleteAllFoundPlayer();
+                        db.foundPlayerDao().insertAll(foundPlayers);
+                        return Observable.fromIterable(foundPlayers);
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            response -> Log.d(TAG, response.getPersonaname()),
+                            this::handleError,
+                            this::goToFoundPlayerActivity
+                    );
+
+
+            /*UtilDota.initRetrofitRx().getFoundPlayersRx(editText)
+                    .flatMap(foundPlayers -> Completable.fromAction(
+                            () -> db.foundPlayerDao().deleteAllFoundPlayer())
+                            .andThen(
+                                    Completable.fromAction(() -> db.foundPlayerDao().insertAll(foundPlayers))
+                            ).toObservable())
+                    //.ignoreElements()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            System.out::println,
+                            this::handleError,
+                            this::goToFoundPlayerActivity
+                    );*/
         }
+
     }
 
-    public void apiError(Throwable t, View v){
+    public void handleError(Throwable t){
         btnSearch.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
-        Log.e(TAG, "apiError: " + t.getMessage() + " " + t.getLocalizedMessage());
-        Toast.makeText(v.getContext(), t.getMessage() + " " + 44, Toast.LENGTH_LONG).show();
+        Log.e(TAG, "handleError: " + t.getMessage() + " " + t.getLocalizedMessage());
+        //Toast.makeText(v.getContext(), t.getMessage() + " " + 44, Toast.LENGTH_LONG).show();
     }
 
-    public void apiSuccess(List<FoundUser> foundUsers, View v){
-        Log.e(TAG, "apiSuccess");
-        Intent intent = new Intent(v.getContext(), FoundUserActivity.class);
-        ArrayList<FoundUser> repos = new ArrayList<>(foundUsers);
-        intent.putExtra("com.example.albert.dotasearch.model.FoundUser", repos);
+    public void goToFoundPlayerActivity(){
+        Log.d(TAG, "goToFoundPlayerActivity");
+        Intent intent = new Intent(context, FoundPlayerActivity.class);
         startActivity(intent);
     }
 
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        compositeDisposable.dispose();
     }
 }

@@ -27,6 +27,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class TabRanking extends AbstractTabFragment {
@@ -40,6 +42,7 @@ public class TabRanking extends AbstractTabFragment {
 
     private Unbinder unbinder;
     private String division;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public static TabRanking getInstance(Context context) {
         Bundle args = new Bundle();
@@ -99,7 +102,7 @@ public class TabRanking extends AbstractTabFragment {
 
     public void getLeaderBoardApiAndStoreToBd(String division){
 
-        UtilDota.initRetrofitRxDota2Ru().getLeaderBorderRx(division)
+        Disposable d1 = UtilDota.initRetrofitRxDota2Ru().getLeaderBorderRx(division)
                 .map(timeRefreshLeaderBoard -> addPositionToLeaderboard(timeRefreshLeaderBoard.getLeaderboard()))
                 .doOnNext(UtilDota::storeLeaderboardInDB)
                 .subscribeOn(Schedulers.io())
@@ -108,6 +111,8 @@ public class TabRanking extends AbstractTabFragment {
                         timeRefreshLeaderBoard -> goToRankingActivity(),
                         error -> Log.e(TAG, error.getLocalizedMessage())
                 );
+
+        compositeDisposable.add(d1);
     }
 
     public List<Leaderboard> addPositionToLeaderboard(List<Leaderboard> leaderboards){
@@ -123,5 +128,6 @@ public class TabRanking extends AbstractTabFragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        compositeDisposable.dispose();
     }
 }

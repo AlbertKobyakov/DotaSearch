@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.tabs.TabProPlayers;
@@ -75,7 +77,21 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
         }
 
         if(proPlayer.getAvatarmedium() != null){
-            Picasso.with(context).load(proPlayer.getAvatarmedium()).fit().into(holder.imageView);
+            //Picasso.with(context).load(proPlayer.getAvatarmedium()).fit().into(holder.imageView);
+            Glide.with(context)
+                    .load(proPlayer.getAvatarmedium())
+                    //.diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .fitCenter()
+                    .into(holder.imageView);
+        } /*else {
+            //Picasso.with(holder.imageView.getContext()).cancelRequest(holder.imageView);
+            Picasso.with(context).load(R.drawable.avatar_unknown_medium).into(holder.imageView);
+        }*/ else {
+            //Glide.clear(holder.imageView);
+            Glide.with(context)
+                    .load(R.drawable.avatar_unknown_medium)
+                    .fitCenter()
+                    .into(holder.imageView);
         }
     }
 

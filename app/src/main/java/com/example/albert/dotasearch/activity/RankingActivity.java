@@ -24,6 +24,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.example.albert.dotasearch.activity.StartActivity.db;
@@ -38,6 +40,8 @@ public class RankingActivity extends AppCompatActivity {
     private String division;
     private String divisionTranslate;
     public Unbinder unbinder;
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -55,14 +59,16 @@ public class RankingActivity extends AppCompatActivity {
 
         initToolbar();
 
-        db.leaderboardDao().getAllRx()
+        Disposable d1 = db.leaderboardDao().getAllRx()
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        leaderboards -> setRecyclerViewAdapter(leaderboards),
+                        this::setRecyclerViewAdapter,
                         error -> Log.e(TAG, error.getLocalizedMessage())
                 );
+
+        compositeDisposable.add(d1);
     }
 
     public void setRecyclerViewAdapter(List<Leaderboard> leaderboards){
@@ -128,18 +134,10 @@ public class RankingActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    public List<Leaderboard> setPositionLeaderboard(List<Leaderboard> leaderboards){
-        int position = 1;
-
-        for (Leaderboard leaderboard : leaderboards){
-            leaderboard.setPosition(position++);
-        }
-        return leaderboards;
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unbinder.unbind();
+        compositeDisposable.dispose();
     }
 }
