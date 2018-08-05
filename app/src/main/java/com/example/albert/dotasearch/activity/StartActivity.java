@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.Hero;
@@ -62,8 +63,7 @@ public class StartActivity extends AppCompatActivity {
         intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(connectivityReceiver, intentFilter);
 
-        db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "Dota.db").build();
+        db = App.get().getDB();
     }
 
     @Override
@@ -173,7 +173,10 @@ public class StartActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            NetworkInfo activeNetwork = null;
+            if (cm != null) {
+                activeNetwork = cm.getActiveNetworkInfo();
+            }
             if(activeNetwork != null && activeNetwork.isConnected()){
                 Log.e(TAG, "Data connected");
                 textViewLoading.setText("Загрузка...");

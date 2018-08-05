@@ -1,5 +1,6 @@
 package com.example.albert.dotasearch.activity;
 
+import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,9 +16,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.adapter.FoundPlayerAdapter;
+import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.FoundPlayer;
 
 import java.util.List;
@@ -29,12 +32,12 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.example.albert.dotasearch.activity.StartActivity.db;
-
 public class FoundPlayerActivity extends AppCompatActivity {
 
     public static final String TAG = "FoundPlayerActivity";
     public static final int LAYOUT = R.layout.found_player_activity;
+
+    public AppDatabase db;
 
     public static List<FoundPlayer> foundPlayers;
     private FoundPlayerAdapter mAdapter;
@@ -48,9 +51,15 @@ public class FoundPlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(LAYOUT);
 
+        db = App.get().getDB();
+
         ButterKnife.bind(this);
 
         initToolbar();
+
+        System.out.println("DB = " + db);
+        /*db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "Dota.db").build();*/
 
         Disposable d1 = db.foundPlayerDao()
                 .getAllRx()

@@ -10,8 +10,10 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.TabsFragmentMatchDetailAdapter;
+import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.MatchFullInfo;
@@ -30,8 +32,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.example.albert.dotasearch.activity.StartActivity.db;
-
 public class MatchDetailActivity extends AppCompatActivity {
 
     public static final String TAG = "MatchDetailActivity";
@@ -39,6 +39,8 @@ public class MatchDetailActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.viewPager) ViewPager viewPager;
+
+    public AppDatabase db;
 
     public static long matchId;
     public static MatchFullInfo matchFullInfo;
@@ -63,6 +65,8 @@ public class MatchDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(LAYOUT);
+
+        db = App.get().getDB();
 
         Log.d(TAG, "onCreate");
 

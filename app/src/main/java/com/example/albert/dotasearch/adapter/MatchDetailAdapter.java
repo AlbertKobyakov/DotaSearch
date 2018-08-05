@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
@@ -24,10 +25,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.example.albert.dotasearch.activity.MatchDetailActivity.itemsMap;
-import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.MyViewHolder>{
 
@@ -38,6 +40,7 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
     public List<Item> items;
     public Context context;
 
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.player_name) TextView playerName;
@@ -145,7 +148,7 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
 
         holder.playerKda.setText(context.getResources().getString(R.string.kda, countKill, countDeath, countAssists));
 
-        db.heroDao().getHeroByIdRx(players.get(position).getHeroId())
+        Disposable dis = App.get().getDB().heroDao().getHeroByIdRx(players.get(position).getHeroId())
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -155,6 +158,7 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
                         () -> Log.d(TAG, "onComplete")
                 );
 
+        compositeDisposable.add(dis);
     }
 
     /*public void setImageView(Hero hero, MatchDetailAdapter.MyViewHolder holder){
@@ -172,6 +176,12 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
                 .error(defaultImage)
                 .fitCenter()
                 .into(imageView);
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        compositeDisposable.dispose();
     }
 }
 

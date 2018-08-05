@@ -9,7 +9,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
+import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.ItemsInfoWithSteam;
@@ -34,12 +36,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public class UtilDota {
 
     private final static int CACHE_SIZE_BYTES = 1024 * 1024 * 2;
     private final static String TAG = "UtilDota";
+
+    private static AppDatabase db = App.get().getDB();
 
     private static Context context;
 

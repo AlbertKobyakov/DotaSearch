@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.MatchDetailActivity;
@@ -32,7 +33,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.example.albert.dotasearch.activity.StartActivity.db;
 import static com.example.albert.dotasearch.activity.PlayerInfoActivity.accountId;
 
 public class TabMatchesPlayer  extends AbstractTabFragment {
@@ -51,14 +51,14 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
         Bundle args = new Bundle();
         TabMatchesPlayer fragment = new TabMatchesPlayer();
         fragment.setArguments(args);
-        fragment.setContext(context);
+        //fragment.setContext(context);
         fragment.setTitle(context.getString(R.string.tab_matches_player));
         return fragment;
     }
 
-    public void setContext(Context context) {
+   /* public void setContext(Context context) {
         this.context = context;
-    }
+    }*/
 
     @Nullable
     @Override
@@ -70,12 +70,12 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
         ButterKnife.bind(this, view);
 
         Observable<List<MatchShortInfo>> matches = UtilDota.initRetrofitRx()
-                .getMatchesPlayerRx(accountId, 20)
+                .getMatchesPlayerRx(accountId/*, 20*/)
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        Observable<List<Hero>> heroes = db.heroDao().getAllRx()
+        Observable<List<Hero>> heroes = App.get().getDB().heroDao().getAllRx()
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -99,13 +99,13 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
     }
 
     public void setAdapterAndRecyclerView(List<MatchShortInfo> matches, List<Hero> heroes) {
-        mAdapter = new MatchPlayerAdapter(matches, heroes, view.getContext());
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext());
+        mAdapter = new MatchPlayerAdapter(matches, heroes, getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(context, recyclerView, new RecyclerTouchListener.ClickListener() {
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 toMatchDetailActivity(position);
@@ -114,7 +114,7 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
     }
 
     public void toMatchDetailActivity(int position){
-        Intent intent = new Intent(context, MatchDetailActivity.class);
+        Intent intent = new Intent(getActivity(), MatchDetailActivity.class);
         intent.putExtra("matchId", matchList.get(position).getMatchId());
         startActivity(intent);
     }

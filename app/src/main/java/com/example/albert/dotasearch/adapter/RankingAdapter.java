@@ -5,8 +5,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.activity.RankingActivity;
 import com.example.albert.dotasearch.model.Leaderboard;
@@ -18,6 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHolder> {
+
     //private List<ProPlayer> proPlayers;
     private List<Leaderboard> leaderboardsCopy;
     public Context context;
@@ -27,6 +30,7 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHo
         @BindView(R.id.position_text) TextView position;
         @BindView(R.id.name_player) TextView name;
         @BindView(R.id.team_player) TextView team;
+        @BindView(R.id.country_flag) ImageView countryFlag;
 
 
         MyViewHolder(View view) {
@@ -55,14 +59,31 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHo
     public void onBindViewHolder(RankingAdapter.MyViewHolder holder, int position) {
         Leaderboard leaderboard = RankingActivity.leaderboards.get(position);
         long teamId = leaderboard.getTeamId();
+        String teamTag = leaderboard.getTeamTag();
 
         holder.position.setText(leaderboard.getPosition()+"");
         holder.name.setText(leaderboard.getName());
 
-        if(teamId == 0){
+        /*if(teamId == 0){
             holder.team.setText("Нет команды");
         } else {
             holder.team.setText(leaderboard.getTeamId() + "");
+        }*/
+
+        if(leaderboard.getTeamTag() != null){
+            holder.team.setText(leaderboard.getTeamTag());
+        } else {
+            holder.team.setText("Нет команды");
+        }
+
+        if(leaderboard.getCountry() != null){
+            Glide.with(context)
+                    .load("https://www.countryflags.io/" + leaderboard.getCountry() + "/flat/64.png")
+                    .error(R.drawable.avatar_unknown_medium)
+                    .fitCenter()
+                    .into(holder.countryFlag);
+        } else {
+            Glide.clear(holder.countryFlag);
         }
     }
 

@@ -65,6 +65,12 @@ public interface DotaClient {
 
     @GET("/api/players/{Id}/matches")
     Single<List<MatchShortInfo>> getMatchesPlayerRx(
+            @Path("Id") long playerId/*,
+            @Query("limit") int limit*/
+    );
+
+    @GET("/api/players/{Id}/matches")
+    Single<List<MatchShortInfo>> getMatchesPlayerRx(
             @Path("Id") long playerId,
             @Query("limit") int limit
     );

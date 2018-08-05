@@ -1,8 +1,10 @@
 package com.example.albert.dotasearch;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,8 +12,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.albert.dotasearch.activity.FoundPlayerActivity;
+import com.example.albert.dotasearch.activity.PlayerInfoActivity;
+import com.example.albert.dotasearch.database.AppDatabase;
+import com.example.albert.dotasearch.model.FoundPlayer;
 import com.example.albert.dotasearch.model.Player;
 import com.example.albert.dotasearch.util.UtilDota;
 
@@ -27,7 +35,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.example.albert.dotasearch.activity.MatchDetailActivity.matchFullInfo;
-import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public abstract class AbstractTabFragmentMatchDetail extends Fragment {
     private String title;
@@ -37,6 +44,8 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
     private static final int SECONDS_IN_MINUTE = 60;
 
     private Unbinder unbinder;
+
+    public AppDatabase db;
 
     private RecyclerView.Adapter mAdapterRadiant;
     private RecyclerView.Adapter mAdapterDire;
@@ -57,6 +66,9 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        db = App.get().getDB();
+
         view = inflater.inflate(LAYOUT, container, false);
 
         unbinder = ButterKnife.bind(this, view);
@@ -113,12 +125,29 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
         recyclerViewRadiant.setItemAnimator(new DefaultItemAnimator());
         recyclerViewRadiant.setNestedScrollingEnabled(false);
         recyclerViewRadiant.setAdapter(mAdapterRadiant);
+        setItemTouchListener(recyclerViewRadiant, playersRadiant);
 
         RecyclerView.LayoutManager mLayoutManagerDire = new LinearLayoutManager(view.getContext());
         recyclerViewDire.setLayoutManager(mLayoutManagerDire);
         recyclerViewDire.setItemAnimator(new DefaultItemAnimator());
         recyclerViewDire.setNestedScrollingEnabled(false);
         recyclerViewDire.setAdapter(mAdapterDire);
+        setItemTouchListener(recyclerViewDire, playersDire);
+    }
+
+    public void setItemTouchListener(RecyclerView recyclerView, List<Player> playerListView){
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(context, recyclerView, (view, position) -> {
+                if(playerListView.get(position).getAccountId() != 0){
+                    Intent intent = new Intent(context, PlayerInfoActivity.class);
+                    intent.putExtra("accountId", playerListView.get(position).getAccountId());
+                    intent.putExtra("personalName", playerListView.get(position).getPersonaname());
+                    intent.putExtra("lastMatchStr", playerListView.get(position).getLastLogin());
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                } else {
+                    Snackbar.make(view, R.string.profile_hidden, Snackbar.LENGTH_SHORT).show();
+                }
+        }));
     }
 
     public List<Player> getPlayers() {

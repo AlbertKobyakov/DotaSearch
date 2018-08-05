@@ -261,7 +261,7 @@ public class Player {
     private Object name;
     @SerializedName("last_login")
     @Expose
-    private Object lastLogin;
+    private String lastLogin;
     @SerializedName("radiant_win")
     @Expose
     private boolean radiantWin;
@@ -1007,11 +1007,11 @@ public class Player {
         this.name = name;
     }
 
-    public Object getLastLogin() {
+    public String getLastLogin() {
         return lastLogin;
     }
 
-    public void setLastLogin(Object lastLogin) {
+    public void setLastLogin(String lastLogin) {
         this.lastLogin = lastLogin;
     }
 

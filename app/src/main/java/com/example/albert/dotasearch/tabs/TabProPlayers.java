@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.MainActivity;
@@ -36,8 +37,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-
-import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public class TabProPlayers extends AbstractTabFragment {
 
@@ -74,7 +73,7 @@ public class TabProPlayers extends AbstractTabFragment {
 
         unbinder = ButterKnife.bind(this, view);
 
-        Disposable d1 = db.proPlayerDao()
+        Disposable d1 = App.get().getDB().proPlayerDao()
                 .getAllRx()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -82,17 +81,9 @@ public class TabProPlayers extends AbstractTabFragment {
 
         compositeDisposable.add(d1);
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(view.getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                ProPlayer proPlayer = proPlayers.get(position);
-                Toast.makeText(view.getContext(), proPlayer.getAccountId() + " is selected!", Toast.LENGTH_SHORT).show();
-            }
-
-            /*@Override
-            public void onLongClick(View view, int position) {
-                Toast.makeText(view.getContext(), "Delete is selected?", Toast.LENGTH_SHORT).show();
-            }*/
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(view.getContext(), recyclerView, (view, position) -> {
+            ProPlayer proPlayer = proPlayers.get(position);
+            Toast.makeText(view.getContext(), proPlayer.getAccountId() + " is selected!", Toast.LENGTH_SHORT).show();
         }));
         return view;
     }

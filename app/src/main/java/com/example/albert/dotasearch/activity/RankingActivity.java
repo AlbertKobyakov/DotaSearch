@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.adapter.RankingAdapter;
 import com.example.albert.dotasearch.model.Leaderboard;
@@ -27,8 +28,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-
-import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public class RankingActivity extends AppCompatActivity {
 
@@ -59,7 +58,7 @@ public class RankingActivity extends AppCompatActivity {
 
         initToolbar();
 
-        Disposable d1 = db.leaderboardDao().getAllRx()
+        Disposable d1 = App.get().getDB().leaderboardDao().getAllRx()
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

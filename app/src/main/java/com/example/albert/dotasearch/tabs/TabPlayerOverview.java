@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.MatchDetailActivity;
@@ -39,7 +40,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.example.albert.dotasearch.activity.PlayerInfoActivity.accountId;
-import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public class TabPlayerOverview extends AbstractTabFragment {
 
@@ -65,7 +65,6 @@ public class TabPlayerOverview extends AbstractTabFragment {
         Bundle args = new Bundle();
         TabPlayerOverview fragment = new TabPlayerOverview();
         fragment.setArguments(args);
-        fragment.setContext(context);
         fragment.setTitle(context.getString(R.string.overview));
         return fragment;
     }
@@ -105,7 +104,7 @@ public class TabPlayerOverview extends AbstractTabFragment {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        Observable<List<Hero>> heroes = db.heroDao().getAllRx()
+        Observable<List<Hero>> heroes = App.get().getDB().heroDao().getAllRx()
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -133,10 +132,10 @@ public class TabPlayerOverview extends AbstractTabFragment {
         long leaderBoard = playerInfo.getLeaderboardRank();
 
         if(soloMmr != 0){
-            playerSoloMMR.setText(context.getResources().getString(R.string.solo_mmr, soloMmr));
+            playerSoloMMR.setText(getActivity().getResources().getString(R.string.solo_mmr, soloMmr));
         }
 
-        Picasso.with(context).load(urlPlayerImg).into(playerImg);
+        Picasso.with(getActivity()).load(urlPlayerImg).into(playerImg);
         playerName.setText(playerPersonalName);
         setRankTier(rankTier, leaderBoard);
     }
@@ -183,7 +182,7 @@ public class TabPlayerOverview extends AbstractTabFragment {
                     nameGeneralImg = "rank_icon_" + first + "a";
                 }
 
-                int id = context.getResources().getIdentifier(nameGeneralImg, "drawable", context.getPackageName());
+                int id = getActivity().getResources().getIdentifier(nameGeneralImg, "drawable", context.getPackageName());
                 playerRankTierImage.setImageResource(id);
 
             } else {
@@ -191,8 +190,8 @@ public class TabPlayerOverview extends AbstractTabFragment {
                 String nameStar = "rank_star_" + second;
 
                 Log.d(TAG, "Img : " + nameGeneralImg + " " + second);
-                int id = context.getResources().getIdentifier(nameGeneralImg, "drawable", context.getPackageName());
-                int idStar = context.getResources().getIdentifier(nameStar, "drawable", context.getPackageName());
+                int id = getActivity().getResources().getIdentifier(nameGeneralImg, "drawable", getActivity().getPackageName());
+                int idStar = getActivity().getResources().getIdentifier(nameStar, "drawable", getActivity().getPackageName());
 
                 playerRankTierImage.setImageResource(id);
                 playerRankTierStarImage.setImageResource(idStar);
@@ -246,13 +245,13 @@ public class TabPlayerOverview extends AbstractTabFragment {
     }
 
     public void setAdapterAndRecyclerView() {
-        mAdapter = new PlayerOverviewAdapter(matchList, heroList, view.getContext());
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext());
+        mAdapter = new PlayerOverviewAdapter(matchList, heroList, getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(context, recyclerView, new RecyclerTouchListener.ClickListener() {
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 toMatchDetailActivity(position);
@@ -261,7 +260,7 @@ public class TabPlayerOverview extends AbstractTabFragment {
     }
 
     public void toMatchDetailActivity(int position){
-        Intent intent = new Intent(context, MatchDetailActivity.class);
+        Intent intent = new Intent(getActivity(), MatchDetailActivity.class);
         intent.putExtra("matchId", matchList.get(position).getMatchId());
         startActivity(intent);
     }

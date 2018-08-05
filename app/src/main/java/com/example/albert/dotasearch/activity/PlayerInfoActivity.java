@@ -74,7 +74,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
 
         viewPager.setOffscreenPageLimit(2);
 
-        TabsFragmentPlayerInfoAdapter adapter = new TabsFragmentPlayerInfoAdapter(getSupportFragmentManager(), getApplicationContext());
+        TabsFragmentPlayerInfoAdapter adapter = new TabsFragmentPlayerInfoAdapter(getSupportFragmentManager(), this);
         viewPager.setAdapter(adapter);
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);
@@ -87,12 +87,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         //enable search to toolbar
         //toolbar.inflateMenu(R.menu.menu_fragment);

@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.activity.FoundPlayerActivity;
 import com.example.albert.dotasearch.model.FoundPlayer;
@@ -27,20 +28,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.Completable;
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.example.albert.dotasearch.activity.FoundPlayerActivity.foundPlayers;
-import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public class TabSearch extends AbstractTabFragment {
     private final static int LAYOUT = R.layout.fragment_search;
@@ -116,8 +108,8 @@ public class TabSearch extends AbstractTabFragment {
 
             UtilDota.initRetrofitRx().getFoundPlayersRx(editText)
                     .flatMap(foundPlayers -> {
-                        db.foundPlayerDao().deleteAllFoundPlayer();
-                        db.foundPlayerDao().insertAll(foundPlayers);
+                        App.get().getDB().foundPlayerDao().deleteAllFoundPlayer();
+                        App.get().getDB().foundPlayerDao().insertAll(foundPlayers);
                         return Observable.fromIterable(foundPlayers);
                     })
                     .subscribeOn(Schedulers.io())

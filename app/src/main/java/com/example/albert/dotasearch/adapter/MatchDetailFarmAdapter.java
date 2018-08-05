@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
@@ -23,9 +24,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-
-import static com.example.albert.dotasearch.activity.StartActivity.db;
 
 public class MatchDetailFarmAdapter extends RecyclerView.Adapter<MatchDetailFarmAdapter.MyViewHolder>{
 
@@ -35,7 +36,7 @@ public class MatchDetailFarmAdapter extends RecyclerView.Adapter<MatchDetailFarm
     public List<Player> players;
     public List<Item> items;
     public Context context;
-
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.player_name) TextView playerName;
@@ -90,7 +91,7 @@ public class MatchDetailFarmAdapter extends RecyclerView.Adapter<MatchDetailFarm
         holder.playerGoldPerMinute.setText(goldPerMinute);
         holder.playerExperiencePerMinute.setText(experiencePerMinute);
 
-        db.heroDao().getHeroByIdRx(players.get(position).getHeroId())
+        Disposable dis = App.get().getDB().heroDao().getHeroByIdRx(players.get(position).getHeroId())
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -99,6 +100,8 @@ public class MatchDetailFarmAdapter extends RecyclerView.Adapter<MatchDetailFarm
                         error -> Log.e(TAG, error.getLocalizedMessage()),
                         () -> Log.d(TAG, "onComplete")
                 );
+
+        compositeDisposable.add(dis);
     }
 
     /*public void setImageView(Hero hero, MatchDetailFarmAdapter.MyViewHolder holder){
@@ -108,6 +111,12 @@ public class MatchDetailFarmAdapter extends RecyclerView.Adapter<MatchDetailFarm
     @Override
     public int getItemCount() {
         return players.size();
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        compositeDisposable.dispose();
     }
 }
 
