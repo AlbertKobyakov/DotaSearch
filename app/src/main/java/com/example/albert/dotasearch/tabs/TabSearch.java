@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,11 +17,7 @@ import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.activity.FoundPlayerActivity;
-import com.example.albert.dotasearch.model.FoundPlayer;
 import com.example.albert.dotasearch.util.UtilDota;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +26,7 @@ import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 
@@ -94,19 +90,7 @@ public class TabSearch extends AbstractTabFragment {
             btnSearch.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
 
-            /*Disposable d1 = Completable.fromAction(() -> db.foundPlayerDao().deleteAllFoundPlayer())
-                    .andThen(
-                            UtilDota.initRetrofitRx().getFoundPlayersRx(editText)
-                    )
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            this::storeFoundPlayersToBD,
-                            this::handleError,
-                            this::goToFoundPlayerActivity
-                    );*/
-
-            UtilDota.initRetrofitRx().getFoundPlayersRx(editText)
+            Disposable dis = UtilDota.initRetrofitRx().getFoundPlayersRx(editText)
                     .flatMap(foundPlayers -> {
                         App.get().getDB().foundPlayerDao().deleteAllFoundPlayer();
                         App.get().getDB().foundPlayerDao().insertAll(foundPlayers);
@@ -120,21 +104,7 @@ public class TabSearch extends AbstractTabFragment {
                             this::goToFoundPlayerActivity
                     );
 
-
-            /*UtilDota.initRetrofitRx().getFoundPlayersRx(editText)
-                    .flatMap(foundPlayers -> Completable.fromAction(
-                            () -> db.foundPlayerDao().deleteAllFoundPlayer())
-                            .andThen(
-                                    Completable.fromAction(() -> db.foundPlayerDao().insertAll(foundPlayers))
-                            ).toObservable())
-                    //.ignoreElements()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            System.out::println,
-                            this::handleError,
-                            this::goToFoundPlayerActivity
-                    );*/
+            compositeDisposable.add(dis);
         }
 
     }

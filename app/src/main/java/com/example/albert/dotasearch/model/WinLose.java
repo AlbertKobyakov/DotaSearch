@@ -28,4 +28,11 @@ public class WinLose {
         this.lose = lose;
     }
 
+    @Override
+    public String toString() {
+        return "WinLose{" +
+                "win=" + win +
+                ", lose=" + lose +
+                '}';
+    }
 }

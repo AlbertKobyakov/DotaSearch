@@ -1,6 +1,5 @@
 package com.example.albert.dotasearch.activity;
 
-import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -92,11 +91,8 @@ public class FoundPlayerActivity extends AppCompatActivity {
             public void onClick(View view, int position) {
                 FoundPlayer foundPlayer = foundPlayers.get(position);
 
-                Intent intent = new Intent(FoundPlayerActivity.this, PlayerInfoActivity.class);
-                intent.putExtra("accountId", foundPlayer.getAccountId());
-                intent.putExtra("personalName", foundPlayer.getPersonaname());
-                intent.putExtra("lastMatchStr", foundPlayer.getLastMatchTime());
-                startActivity(intent);
+                //getHeaderPlayerInfoByNetwork(foundPlayer);
+                goToPlayerInfoActivity(foundPlayer);
             }
 
             /*@Override
@@ -104,6 +100,15 @@ public class FoundPlayerActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Delete is selected?", Toast.LENGTH_SHORT).show();
             }*/
         }));
+    }
+
+
+    public void goToPlayerInfoActivity(FoundPlayer foundPlayer){
+        Intent intent = new Intent(FoundPlayerActivity.this, PlayerInfoActivity.class);
+        intent.putExtra("accountId", foundPlayer.getAccountId());
+        intent.putExtra("personalName", foundPlayer.getPersonaname());
+        intent.putExtra("lastMatchStr", foundPlayer.getLastMatchTime());
+        startActivity(intent);
     }
 
     @Override

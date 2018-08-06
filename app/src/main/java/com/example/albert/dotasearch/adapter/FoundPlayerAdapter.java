@@ -13,8 +13,6 @@ import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.activity.FoundPlayerActivity;
 import com.example.albert.dotasearch.model.FoundPlayer;
-import com.example.albert.dotasearch.util.UtilDota;
-import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -93,7 +91,7 @@ public class FoundPlayerAdapter extends RecyclerView.Adapter<FoundPlayerAdapter.
         notifyDataSetChanged();
     }
 
-    public static String generateLastMatchTime(String lastMatch){
+    private static String generateLastMatchTime(String lastMatch){
         String result;
         if(lastMatch != null){
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());

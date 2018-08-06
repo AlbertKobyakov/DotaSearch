@@ -20,6 +20,7 @@ import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.MatchDetailActivity;
 import com.example.albert.dotasearch.adapter.PlayerOverviewAdapter;
+import com.example.albert.dotasearch.model.HeaderPlayerContainsWinLoseAndPlayerInfo;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.model.PlayerInfo;
@@ -33,10 +34,13 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.example.albert.dotasearch.activity.PlayerInfoActivity.accountId;
@@ -51,15 +55,24 @@ public class TabPlayerOverview extends AbstractTabFragment {
     private List<Hero> heroList;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.player_img) ImageView playerImg;
-    @BindView(R.id.player_rank_tier_image) ImageView playerRankTierImage;
-    @BindView(R.id.player_rank_tier_image_star) ImageView playerRankTierStarImage;
-    @BindView(R.id.player_name) TextView playerName;
-    @BindView(R.id.win_rate_value) TextView playerWinRate;
-    @BindView(R.id.record_value) TextView playerRecord;
-    @BindView(R.id.solo_mmr_value) TextView playerSoloMMR;
-    @BindView(R.id.last_match_value) TextView playerLastMatch;
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
+    @BindView(R.id.player_img)
+    ImageView playerImg;
+    @BindView(R.id.player_rank_tier_image)
+    ImageView playerRankTierImage;
+    @BindView(R.id.player_rank_tier_image_star)
+    ImageView playerRankTierStarImage;
+    @BindView(R.id.player_name)
+    TextView playerName;
+    @BindView(R.id.win_rate_value)
+    TextView playerWinRate;
+    @BindView(R.id.record_value)
+    TextView playerRecord;
+    @BindView(R.id.solo_mmr_value)
+    TextView playerSoloMMR;
+    @BindView(R.id.last_match_value)
+    TextView playerLastMatch;
 
     public static TabPlayerOverview getInstance(Context context) {
         Bundle args = new Bundle();
@@ -82,21 +95,7 @@ public class TabPlayerOverview extends AbstractTabFragment {
 
         ButterKnife.bind(this, view);
 
-        Disposable d1 = UtilDota.initRetrofitRx().getPlayerInfoById(accountId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        this::setPlayerSoloMMRNameImgAndRankTier,
-                        this::errorHandling
-                );
-
-        Disposable d2 = UtilDota.initRetrofitRx().getPlayerWinLoseById(accountId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        this::setPlayerRecordAndWinRate,
-                        this::errorHandling
-                );
+        setHeader();
 
         Observable<List<MatchShortInfo>> matches = UtilDota.initRetrofitRx()
                 .getMatchesPlayerRx(accountId, 20)
@@ -109,29 +108,79 @@ public class TabPlayerOverview extends AbstractTabFragment {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        Observable<GetHeroAndMatch> combine = Observable.zip(matches, heroes, GetHeroAndMatch::new);
+        Observable<HeroAndMatch> combine = Observable.zip(matches, heroes, HeroAndMatch::new);
 
         Disposable d3 = combine.subscribe(
                 this::setLocalArrays,
-                this::errorHandling,
+                Throwable::printStackTrace,
                 this::setAdapterAndRecyclerView
         );
-
-        compositeDisposable.add(d1);
-        compositeDisposable.add(d2);
         compositeDisposable.add(d3);
 
         return view;
     }
 
-    public void setPlayerSoloMMRNameImgAndRankTier(PlayerInfo playerInfo){
+    public Observable<HeaderPlayerContainsWinLoseAndPlayerInfo> getHeaderPlayerInfoByNetwork(){
+        Observable<PlayerInfo> playerInfo = UtilDota.initRetrofitRx()
+                .getPlayerInfoById(accountId)
+                .subscribeOn(Schedulers.io());
+
+        Observable<WinLose> winLose = UtilDota.initRetrofitRx()
+                .getPlayerWinLoseById(accountId)
+                .subscribeOn(Schedulers.io());
+
+        return Observable.zip(
+                playerInfo,
+                winLose,
+                (playerInfo1, winLose1) -> new HeaderPlayerContainsWinLoseAndPlayerInfo(playerInfo1, winLose1, accountId));
+    }
+
+    public void setHeader(){
+        Disposable dis1 = Maybe.fromCallable(() -> App.get().getDB().headerPlayerInfoDao()
+                .getHeaderPlayerInfoByIdRx(accountId))
+                .toObservable()
+                .defaultIfEmpty(new HeaderPlayerContainsWinLoseAndPlayerInfo(new PlayerInfo(), new WinLose(), 0))
+                .flatMap(new Function<HeaderPlayerContainsWinLoseAndPlayerInfo, ObservableSource<HeaderPlayerContainsWinLoseAndPlayerInfo>>() {
+                             @Override
+                             public ObservableSource<HeaderPlayerContainsWinLoseAndPlayerInfo> apply(HeaderPlayerContainsWinLoseAndPlayerInfo headerPlayerContainsWinLoseAndPlayerInfo) throws Exception {
+                                 if(headerPlayerContainsWinLoseAndPlayerInfo.playerId == 0){
+                                     return getHeaderPlayerInfoByNetwork();
+                                 } else {
+                                     return Observable.just(headerPlayerContainsWinLoseAndPlayerInfo);
+                                 }
+                             }
+                         }
+                ).flatMap(new Function<HeaderPlayerContainsWinLoseAndPlayerInfo, ObservableSource<HeaderPlayerContainsWinLoseAndPlayerInfo>>() {
+                    @Override
+                    public ObservableSource<HeaderPlayerContainsWinLoseAndPlayerInfo> apply(HeaderPlayerContainsWinLoseAndPlayerInfo headerPlayerContainsWinLoseAndPlayerInfo) throws Exception {
+                        deleteAllHeaderAndInsetCurrent(headerPlayerContainsWinLoseAndPlayerInfo);
+                        return Observable.just(headerPlayerContainsWinLoseAndPlayerInfo);
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(user -> {
+                                System.out.println(user + "444");
+                                setPlayerSoloMMRNameImgAndRankTier(user.getPlayerInfo());
+                                setPlayerRecordAndWinRate(user.getWinLose());
+                            },
+                        Throwable::printStackTrace);
+        compositeDisposable.add(dis1);
+    }
+
+    public void deleteAllHeaderAndInsetCurrent(HeaderPlayerContainsWinLoseAndPlayerInfo header){
+        App.get().getDB().headerPlayerInfoDao().deleteAll();
+        App.get().getDB().headerPlayerInfoDao().insert(header);
+    }
+
+    public void setPlayerSoloMMRNameImgAndRankTier(PlayerInfo playerInfo) {
         long soloMmr = playerInfo.getSoloCompetitiveRank();
         String urlPlayerImg = playerInfo.getProfile().getAvatarfull();
         String playerPersonalName = playerInfo.getProfile().getPersonaname();
         long rankTier = playerInfo.getRankTier();
         long leaderBoard = playerInfo.getLeaderboardRank();
 
-        if(soloMmr != 0){
+        if (soloMmr != 0) {
             playerSoloMMR.setText(getActivity().getResources().getString(R.string.solo_mmr, soloMmr));
         }
 
@@ -140,43 +189,43 @@ public class TabPlayerOverview extends AbstractTabFragment {
         setRankTier(rankTier, leaderBoard);
     }
 
-    public void setPlayerRecordAndWinRate(WinLose winLose){
+    public void setPlayerRecordAndWinRate(WinLose winLose) {
         long win = winLose.getWin();
         long lose = winLose.getLose();
         String record = win + " - " + lose;
-        double winRateNotRound = ((win*1.0)/(lose+win))*100;
+        double winRateNotRound = ((win * 1.0) / (lose + win)) * 100;
 
         playerRecord.setText(record);
         playerWinRate.setText(getWinRate(winRateNotRound));
     }
 
-    public void errorHandling(Throwable throwable){
+    public void errorHandling(Throwable throwable) {
         Log.e(TAG, throwable.getLocalizedMessage());
     }
 
-    public String getWinRate(double winRateNotRound){
+    public String getWinRate(double winRateNotRound) {
         DecimalFormat df = new DecimalFormat("#.##");
         return df.format(winRateNotRound) + "%";
     }
 
-    public void setLocalArrays(GetHeroAndMatch getHeroAndMatch){
-        matchList = getHeroAndMatch.matches;
-        heroList = getHeroAndMatch.heroes;
+    public void setLocalArrays(HeroAndMatch heroAndMatch) {
+        matchList = heroAndMatch.matches;
+        heroList = heroAndMatch.heroes;
 
         playerLastMatch.setText(generateLastMatchTime(matchList.get(0).getStartTime()));
     }
 
-    public void setRankTier(long rank, long leaderBoard){
-        if(rank != 0){
-            long first = rank/10;
-            long second = rank - (first*10);
+    public void setRankTier(long rank, long leaderBoard) {
+        if (rank != 0) {
+            long first = rank / 10;
+            long second = rank - (first * 10);
 
-            if(first == 7 && second == 6){
+            if (first == 7 && second == 6) {
 
                 String nameGeneralImg;
-                if(leaderBoard <= 10){
+                if (leaderBoard <= 10) {
                     nameGeneralImg = "rank_icon_" + first + "c";
-                } else if(leaderBoard <= 100){
+                } else if (leaderBoard <= 100) {
                     nameGeneralImg = "rank_icon_" + first + "b";
                 } else {
                     nameGeneralImg = "rank_icon_" + first + "a";
@@ -199,44 +248,44 @@ public class TabPlayerOverview extends AbstractTabFragment {
         }
     }
 
-    public String generateLastMatchTime(long lastMatch){
+    public String generateLastMatchTime(long lastMatch) {
         String result;
-        if(lastMatch != 0){
+        if (lastMatch != 0) {
 
             Calendar lastMatchTime = Calendar.getInstance();
-            lastMatchTime.setTimeInMillis(lastMatch*1000);
+            lastMatchTime.setTimeInMillis(lastMatch * 1000);
 
             Calendar now = Calendar.getInstance();
 
             long second = 1000;
             long minute = second * 60;
             long hour = minute * 60;
-            long day = hour*24;
+            long day = hour * 24;
             long month = day * 30;
             long year = month * 12;
 
             long diff = now.getTimeInMillis() - lastMatchTime.getTimeInMillis();
 
-            if(diff/year == 0){
-                if(diff/month == 0){
-                    if(diff/day == 0){
-                        if(diff/hour == 0){
-                            if(diff/minute < 60){
+            if (diff / year == 0) {
+                if (diff / month == 0) {
+                    if (diff / day == 0) {
+                        if (diff / hour == 0) {
+                            if (diff / minute < 60) {
                                 result = "less hour ago";
                             } else {
-                                result = diff/year + " minute ago";
+                                result = diff / year + " minute ago";
                             }
                         } else {
-                            result = diff/hour + " hour ago";
+                            result = diff / hour + " hour ago";
                         }
                     } else {
-                        result = diff/day + " day ago";
+                        result = diff / day + " day ago";
                     }
                 } else {
-                    result = diff/month + " month ago";
+                    result = diff / month + " month ago";
                 }
             } else {
-                result = diff/year + " year ago";
+                result = diff / year + " year ago";
             }
         } else {
             result = "";
@@ -259,7 +308,7 @@ public class TabPlayerOverview extends AbstractTabFragment {
         }));
     }
 
-    public void toMatchDetailActivity(int position){
+    public void toMatchDetailActivity(int position) {
         Intent intent = new Intent(getActivity(), MatchDetailActivity.class);
         intent.putExtra("matchId", matchList.get(position).getMatchId());
         startActivity(intent);
@@ -271,11 +320,11 @@ public class TabPlayerOverview extends AbstractTabFragment {
         compositeDisposable.dispose();
     }
 
-    class GetHeroAndMatch {
+    class HeroAndMatch {
         List<MatchShortInfo> matches;
         List<Hero> heroes;
 
-        private GetHeroAndMatch(List<MatchShortInfo> matches, List<Hero> heroes) {
+        private HeroAndMatch(List<MatchShortInfo> matches, List<Hero> heroes) {
             this.matches = matches;
             this.heroes = heroes;
         }

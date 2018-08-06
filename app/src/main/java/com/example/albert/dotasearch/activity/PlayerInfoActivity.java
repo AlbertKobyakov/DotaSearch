@@ -6,18 +6,11 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.TabsFragmentPlayerInfoAdapter;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 
 import butterknife.ButterKnife;
 
@@ -46,6 +39,8 @@ public class PlayerInfoActivity extends AppCompatActivity {
         lastMatchStr = getIntent().getStringExtra("lastMatchStr");
 
         //Toast.makeText(getApplicationContext(), lastMatchStr.length() + "", Toast.LENGTH_SHORT).show();
+
+        Toast.makeText(this, accountId + " ", Toast.LENGTH_SHORT).show();
 
         initToolbar();
         initTabs();
@@ -92,4 +87,6 @@ public class PlayerInfoActivity extends AppCompatActivity {
         //enable search to toolbar
         //toolbar.inflateMenu(R.menu.menu_fragment);
     }
+
+
 }
