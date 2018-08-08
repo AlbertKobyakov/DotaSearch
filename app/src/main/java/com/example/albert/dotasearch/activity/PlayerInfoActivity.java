@@ -22,7 +22,6 @@ public class PlayerInfoActivity extends AppCompatActivity {
     private ViewPager viewPager;
     public Toolbar toolbar;
 
-    //@BindView(R.id.testText) TextView test;
     public static long accountId;
     public static String personalName;
     public static String lastMatchStr;
@@ -38,8 +37,6 @@ public class PlayerInfoActivity extends AppCompatActivity {
         personalName = getIntent().getStringExtra("personalName");
         lastMatchStr = getIntent().getStringExtra("lastMatchStr");
 
-        //Toast.makeText(getApplicationContext(), lastMatchStr.length() + "", Toast.LENGTH_SHORT).show();
-
         Toast.makeText(this, accountId + " ", Toast.LENGTH_SHORT).show();
 
         initToolbar();
@@ -51,18 +48,6 @@ public class PlayerInfoActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_for_player_info, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_search:
-                Toast.makeText(this, "EMail", Toast.LENGTH_LONG).show();
-                break;
-            default:
-                break;
-        }
-        return true;
-    }*/
 
     private void initTabs() {
         viewPager = findViewById(R.id.viewPager);

@@ -1,5 +1,8 @@
 package com.example.albert.dotasearch.tabs;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,7 +28,9 @@ import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.model.PlayerInfo;
 import com.example.albert.dotasearch.model.WinLose;
+import com.example.albert.dotasearch.modelfactory.FactoryForPlayerInfoViewModel;
 import com.example.albert.dotasearch.util.UtilDota;
+import com.example.albert.dotasearch.viewModel.PlayerInfoViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -86,6 +91,25 @@ public class TabPlayerOverview extends AbstractTabFragment {
         this.context = context;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        PlayerInfoViewModel viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoViewModel(accountId)).get(PlayerInfoViewModel.class);
+        LiveData<List<MatchShortInfo>> matches = viewModel.getMatches();
+        matches.observe(getActivity(), new Observer<List<MatchShortInfo>>() {
+            @Override
+            public void onChanged(@Nullable List<MatchShortInfo> matchShortInfos) {
+                heroList = viewModel.getHeroes();
+                if(matchShortInfos != null && matchShortInfos.size() >= 20){
+                    matchList = matchShortInfos.subList(0, 20);
+                }
+
+                setAdapterAndRecyclerView();
+                System.out.println(matchShortInfos);
+            }
+        });
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -96,26 +120,6 @@ public class TabPlayerOverview extends AbstractTabFragment {
         ButterKnife.bind(this, view);
 
         setHeader();
-
-        Observable<List<MatchShortInfo>> matches = UtilDota.initRetrofitRx()
-                .getMatchesPlayerRx(accountId, 20)
-                .toObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        Observable<List<Hero>> heroes = App.get().getDB().heroDao().getAllRx()
-                .toObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        Observable<HeroAndMatch> combine = Observable.zip(matches, heroes, HeroAndMatch::new);
-
-        Disposable d3 = combine.subscribe(
-                this::setLocalArrays,
-                Throwable::printStackTrace,
-                this::setAdapterAndRecyclerView
-        );
-        compositeDisposable.add(d3);
 
         return view;
     }

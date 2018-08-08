@@ -1,5 +1,8 @@
 package com.example.albert.dotasearch.tabs;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,27 +14,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
-import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.MatchDetailActivity;
 import com.example.albert.dotasearch.adapter.MatchPlayerAdapter;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.MatchShortInfo;
-import com.example.albert.dotasearch.util.UtilDota;
+import com.example.albert.dotasearch.modelfactory.FactoryForPlayerInfoViewModel;
+import com.example.albert.dotasearch.viewModel.PlayerInfoViewModel;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 import static com.example.albert.dotasearch.activity.PlayerInfoActivity.accountId;
 
@@ -51,14 +49,26 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
         Bundle args = new Bundle();
         TabMatchesPlayer fragment = new TabMatchesPlayer();
         fragment.setArguments(args);
-        //fragment.setContext(context);
         fragment.setTitle(context.getString(R.string.tab_matches_player));
         return fragment;
     }
 
-   /* public void setContext(Context context) {
-        this.context = context;
-    }*/
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        PlayerInfoViewModel viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoViewModel(accountId)).get(PlayerInfoViewModel.class);
+        LiveData<List<MatchShortInfo>> matches = viewModel.getMatches();
+        matches.observe(getActivity(), new Observer<List<MatchShortInfo>>() {
+            @Override
+            public void onChanged(@Nullable List<MatchShortInfo> matchShortInfos) {
+                heroList = viewModel.getHeroes();
+                matchList = matchShortInfos;
+
+                setAdapterAndRecyclerView(matchList, heroList);
+                System.out.println(matchShortInfos);
+            }
+        });
+    }
 
     @Nullable
     @Override
@@ -68,27 +78,6 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
         Log.e(TAG, "onCreateView");
 
         ButterKnife.bind(this, view);
-
-        Observable<List<MatchShortInfo>> matches = UtilDota.initRetrofitRx()
-                .getMatchesPlayerRx(accountId/*, 20*/)
-                .toObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        Observable<List<Hero>> heroes = App.get().getDB().heroDao().getAllRx()
-                .toObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        Observable<GetHeroAndMatch> combine = Observable.zip(matches, heroes, GetHeroAndMatch::new);
-
-        Disposable d1 = combine.subscribe(
-                this::setLocalArrays,
-                error -> Log.e(TAG, error.getLocalizedMessage()),
-                () -> setAdapterAndRecyclerView(matchList, heroList)
-        );
-
-        compositeDisposable.add(d1);
 
         return view;
     }
