@@ -112,7 +112,7 @@ public class MatchDetailActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                MatchDetailActivity.super.onBackPressed();
             }
         });
     }

@@ -1,8 +1,6 @@
 package com.example.albert.dotasearch.tabs;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,16 +20,16 @@ import com.example.albert.dotasearch.activity.MatchDetailActivity;
 import com.example.albert.dotasearch.adapter.MatchPlayerAdapter;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.MatchShortInfo;
-import com.example.albert.dotasearch.modelfactory.FactoryForPlayerInfoViewModel;
-import com.example.albert.dotasearch.viewModel.PlayerInfoViewModel;
+import com.example.albert.dotasearch.model.PlayerOverviewCombine;
 
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static com.example.albert.dotasearch.activity.PlayerInfoActivity.accountId;
+import static com.example.albert.dotasearch.tabs.TabPlayerOverview.viewModel;
 
 public class TabMatchesPlayer  extends AbstractTabFragment {
 
@@ -40,7 +38,7 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
 
     private MatchPlayerAdapter mAdapter;
     private List<MatchShortInfo> matchList;
-    private List<Hero> heroList;
+    private Map<Integer, Hero> heroList;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
@@ -56,16 +54,14 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        PlayerInfoViewModel viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoViewModel(accountId)).get(PlayerInfoViewModel.class);
-        LiveData<List<MatchShortInfo>> matches = viewModel.getMatches();
-        matches.observe(getActivity(), new Observer<List<MatchShortInfo>>() {
-            @Override
-            public void onChanged(@Nullable List<MatchShortInfo> matchShortInfos) {
-                heroList = viewModel.getHeroes();
+        heroList = viewModel.getHeroes();
+        System.out.println(heroList);
+        LiveData<PlayerOverviewCombine> playerFullInfo = viewModel.getPlayerFullInfo();
+        playerFullInfo.observe(getActivity(), playerOverviewCombine -> {
+            if(playerOverviewCombine != null){
+                List<MatchShortInfo> matchShortInfos = playerOverviewCombine.getMatches();
                 matchList = matchShortInfos;
-
-                setAdapterAndRecyclerView(matchList, heroList);
-                System.out.println(matchShortInfos);
+                mAdapter.setData(matchShortInfos, heroList);
             }
         });
     }
@@ -79,30 +75,24 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
 
         ButterKnife.bind(this, view);
 
+        setAdapterAndRecyclerView();
+
         return view;
     }
 
-    public void setLocalArrays(GetHeroAndMatch getHeroAndMatch){
-        matchList = getHeroAndMatch.matches;
-        heroList = getHeroAndMatch.heroes;
-    }
-
-    public void setAdapterAndRecyclerView(List<MatchShortInfo> matches, List<Hero> heroes) {
-        mAdapter = new MatchPlayerAdapter(matches, heroes, getActivity());
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(mLayoutManager);
+    public void setAdapterAndRecyclerView() {
+        mAdapter = new MatchPlayerAdapter(getActivity());
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                toMatchDetailActivity(position);
-            }
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, (view, position) -> {
+            toMatchDetailActivity(position);
         }));
     }
 
     public void toMatchDetailActivity(int position){
+        Log.e("position", position + "");
         Intent intent = new Intent(getActivity(), MatchDetailActivity.class);
         intent.putExtra("matchId", matchList.get(position).getMatchId());
         startActivity(intent);
@@ -112,15 +102,5 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
     public void onDestroyView() {
         super.onDestroyView();
         compositeDisposable.dispose();
-    }
-
-    class GetHeroAndMatch {
-        List<MatchShortInfo> matches;
-        List<Hero> heroes;
-
-        public GetHeroAndMatch(List<MatchShortInfo> matches, List<Hero> heroes) {
-            this.matches = matches;
-            this.heroes = heroes;
-        }
     }
 }

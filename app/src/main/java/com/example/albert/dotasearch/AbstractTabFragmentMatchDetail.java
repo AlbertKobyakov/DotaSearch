@@ -9,17 +9,14 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.albert.dotasearch.activity.FoundPlayerActivity;
 import com.example.albert.dotasearch.activity.PlayerInfoActivity;
 import com.example.albert.dotasearch.database.AppDatabase;
-import com.example.albert.dotasearch.model.FoundPlayer;
 import com.example.albert.dotasearch.model.Player;
 import com.example.albert.dotasearch.util.UtilDota;
 
@@ -28,7 +25,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-//import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -75,10 +71,8 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
 
         int idGameMode = (int)matchFullInfo.getGameMode();
         int idLobbyType = (int)matchFullInfo.getLobbyType();
-        //int idLobbyType = 8;
 
         String gameMode = UtilDota.getGameModeById(idGameMode);
-        //String lobbyType = UtilDota.getLobbyTypeById(idLobbyType);
 
         Disposable d1 = db.lobbyTypeDao().getLobbyTypeByIdRx(idLobbyType)
                 .subscribeOn(Schedulers.io())
@@ -102,8 +96,6 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
         } else {
             whoWin.setText(R.string.dire_victory);
         }
-
-        //gameModeAndLobbyType.setText(getResources().getString(R.string.game_mode_and_lobby_type, gameMode, lobbyType));
 
         scoreAndDuration.setText(getResources().getString(R.string.score_and_duration, radiantScore, direScore, minutes, seconds));
 
@@ -138,11 +130,12 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
     public void setItemTouchListener(RecyclerView recyclerView, List<Player> playerListView){
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(context, recyclerView, (view, position) -> {
                 if(playerListView.get(position).getAccountId() != 0){
+                    Log.e("44444444", "444444444444441");
                     Intent intent = new Intent(context, PlayerInfoActivity.class);
                     intent.putExtra("accountId", playerListView.get(position).getAccountId());
                     intent.putExtra("personalName", playerListView.get(position).getPersonaname());
                     intent.putExtra("lastMatchStr", playerListView.get(position).getLastLogin());
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
                     Snackbar.make(view, R.string.profile_hidden, Snackbar.LENGTH_SHORT).show();
@@ -173,18 +166,10 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
     public void setTitle(String title) {
         this.title = title;
     }
-
-    /*public RecyclerView.Adapter getmAdapterRadiant() {
-        return mAdapterRadiant;
-    }*/
-
+    
     public void setmAdapterRadiant(RecyclerView.Adapter mAdapterRadiant) {
         this.mAdapterRadiant = mAdapterRadiant;
     }
-
-    /*public RecyclerView.Adapter getmAdapterDire() {
-        return mAdapterDire;
-    }*/
 
     public void setmAdapterDire(RecyclerView.Adapter mAdapterDire) {
         this.mAdapterDire = mAdapterDire;

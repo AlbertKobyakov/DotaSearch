@@ -4,7 +4,6 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
 import com.example.albert.dotasearch.dao.FoundPlayerDao;
-import com.example.albert.dotasearch.dao.HeaderPlayerContainsWinLoseAndPlayerInfoDao;
 import com.example.albert.dotasearch.dao.HeroDao;
 import com.example.albert.dotasearch.dao.ItemDao;
 import com.example.albert.dotasearch.dao.LeaderboardDao;
@@ -12,7 +11,6 @@ import com.example.albert.dotasearch.dao.LobbyTypeDao;
 import com.example.albert.dotasearch.dao.MatchShortInfoDao;
 import com.example.albert.dotasearch.dao.ProPlayerDao;
 import com.example.albert.dotasearch.model.FoundPlayer;
-import com.example.albert.dotasearch.model.HeaderPlayerContainsWinLoseAndPlayerInfo;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.Leaderboard;
@@ -27,7 +25,6 @@ import com.example.albert.dotasearch.model.ProPlayer;
         Item.class,
         FoundPlayer.class,
         LobbyType.class,
-        HeaderPlayerContainsWinLoseAndPlayerInfo.class,
         MatchShortInfo.class
 }, version = 1)
 
@@ -38,6 +35,5 @@ import com.example.albert.dotasearch.model.ProPlayer;
         public abstract ItemDao itemDao();
         public abstract FoundPlayerDao foundPlayerDao();
         public abstract LobbyTypeDao lobbyTypeDao();
-        public abstract HeaderPlayerContainsWinLoseAndPlayerInfoDao headerPlayerInfoDao();
         public abstract MatchShortInfoDao matchShortInfoDao();
 }

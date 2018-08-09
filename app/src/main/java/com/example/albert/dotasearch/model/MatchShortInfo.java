@@ -55,6 +55,16 @@ public class MatchShortInfo {
     @Expose
     private long partySize;
 
+    private long playerId;
+
+    public long getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(long playerId) {
+        this.playerId = playerId;
+    }
+
     public long getMatchId() {
         return matchId;
     }
@@ -179,6 +189,8 @@ public class MatchShortInfo {
     public String toString() {
         return "MatchShortInfo{" +
                 "matchId=" + matchId +
+                ", heroId=" + heroId +
+                ", playerId=" + playerId +
                 '}';
     }
 }

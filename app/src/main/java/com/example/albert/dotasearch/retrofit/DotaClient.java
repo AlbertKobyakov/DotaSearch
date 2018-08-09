@@ -1,5 +1,7 @@
 package com.example.albert.dotasearch.retrofit;
 
+import android.arch.lifecycle.LiveData;
+
 import com.example.albert.dotasearch.model.FoundPlayer;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.ItemsInfoWithSteam;
@@ -48,12 +50,12 @@ public interface DotaClient {
     );
 
     @GET("/api/players/{Id}")
-    Observable<PlayerInfo> getPlayerInfoById(
+    Single<PlayerInfo> getPlayerInfoById(
             @Path("Id") long playerId
     );
 
     @GET("/api/players/{Id}/wl")
-    Observable<WinLose> getPlayerWinLoseById(
+    Single<WinLose> getPlayerWinLoseById(
             @Path("Id") long playerId
     );
 
@@ -65,6 +67,12 @@ public interface DotaClient {
 
     @GET("/api/players/{Id}/matches")
     Single<List<MatchShortInfo>> getMatchesPlayerRx(
+            @Path("Id") long playerId/*,
+            @Query("limit") int limit*/
+    );
+
+    @GET("/api/players/{Id}/matches")
+    Single<LiveData<List<MatchShortInfo>>> getMatchesPlayerRxLive(
             @Path("Id") long playerId/*,
             @Query("limit") int limit*/
     );

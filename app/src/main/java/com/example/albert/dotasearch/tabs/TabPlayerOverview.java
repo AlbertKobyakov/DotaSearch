@@ -18,35 +18,27 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
-import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.MatchDetailActivity;
 import com.example.albert.dotasearch.adapter.PlayerOverviewAdapter;
-import com.example.albert.dotasearch.model.HeaderPlayerContainsWinLoseAndPlayerInfo;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.model.PlayerInfo;
+import com.example.albert.dotasearch.model.PlayerOverviewCombine;
 import com.example.albert.dotasearch.model.WinLose;
 import com.example.albert.dotasearch.modelfactory.FactoryForPlayerInfoViewModel;
-import com.example.albert.dotasearch.util.UtilDota;
 import com.example.albert.dotasearch.viewModel.PlayerInfoViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
 import static com.example.albert.dotasearch.activity.PlayerInfoActivity.accountId;
 
@@ -57,8 +49,10 @@ public class TabPlayerOverview extends AbstractTabFragment {
 
     private PlayerOverviewAdapter mAdapter;
     private List<MatchShortInfo> matchList;
-    private List<Hero> heroList;
+    private Map<Integer, Hero> heroList;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+    public static PlayerInfoViewModel viewModel;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -93,19 +87,35 @@ public class TabPlayerOverview extends AbstractTabFragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        PlayerInfoViewModel viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoViewModel(accountId)).get(PlayerInfoViewModel.class);
-        LiveData<List<MatchShortInfo>> matches = viewModel.getMatches();
-        matches.observe(getActivity(), new Observer<List<MatchShortInfo>>() {
-            @Override
-            public void onChanged(@Nullable List<MatchShortInfo> matchShortInfos) {
-                heroList = viewModel.getHeroes();
-                if(matchShortInfos != null && matchShortInfos.size() >= 20){
-                    matchList = matchShortInfos.subList(0, 20);
-                }
 
-                setAdapterAndRecyclerView();
-                System.out.println(matchShortInfos);
+        super.onCreate(savedInstanceState);
+
+        viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoViewModel(accountId)).get(PlayerInfoViewModel.class);
+        heroList = viewModel.getHeroes();
+        LiveData<PlayerOverviewCombine> playerFullInfo = viewModel.getPlayerFullInfo();
+        playerFullInfo.observe(getActivity(), new Observer<PlayerOverviewCombine>() {
+            @Override
+            public void onChanged(@Nullable PlayerOverviewCombine playerOverviewCombine) {
+                if(playerOverviewCombine != null) {
+                    List<MatchShortInfo> matchShortInfos = playerOverviewCombine.getMatches();
+                    PlayerInfo playerInfo = playerOverviewCombine.getPlayerInfo();
+                    WinLose winLose = playerOverviewCombine.getWinLose();
+
+                    playerLastMatch.setText(generateLastMatchTime(matchShortInfos.get(0).getStartTime()));
+
+                    setPlayerSoloMMRNameImgAndRankTier(playerInfo);
+                    setPlayerRecordAndWinRate(winLose);
+
+                    if (matchShortInfos.size() >= 20) {
+                        matchList = matchShortInfos.subList(0, 20);
+                        mAdapter.setData(matchList, heroList);
+                        System.out.println(matchShortInfos);
+                    } else if (matchShortInfos.size() >= 1) {
+                        matchList = matchShortInfos;
+                        mAdapter.setData(matchList, heroList);
+                        System.out.println(matchShortInfos);
+                    }
+                }
             }
         });
     }
@@ -119,62 +129,25 @@ public class TabPlayerOverview extends AbstractTabFragment {
 
         ButterKnife.bind(this, view);
 
-        setHeader();
+        setAdapterAndRecyclerView();
 
         return view;
     }
 
-    public Observable<HeaderPlayerContainsWinLoseAndPlayerInfo> getHeaderPlayerInfoByNetwork(){
-        Observable<PlayerInfo> playerInfo = UtilDota.initRetrofitRx()
-                .getPlayerInfoById(accountId)
-                .subscribeOn(Schedulers.io());
 
-        Observable<WinLose> winLose = UtilDota.initRetrofitRx()
-                .getPlayerWinLoseById(accountId)
-                .subscribeOn(Schedulers.io());
+    public void setAdapterAndRecyclerView() {
+        mAdapter = new PlayerOverviewAdapter(getActivity());
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
 
-        return Observable.zip(
-                playerInfo,
-                winLose,
-                (playerInfo1, winLose1) -> new HeaderPlayerContainsWinLoseAndPlayerInfo(playerInfo1, winLose1, accountId));
-    }
-
-    public void setHeader(){
-        Disposable dis1 = Maybe.fromCallable(() -> App.get().getDB().headerPlayerInfoDao()
-                .getHeaderPlayerInfoByIdRx(accountId))
-                .toObservable()
-                .defaultIfEmpty(new HeaderPlayerContainsWinLoseAndPlayerInfo(new PlayerInfo(), new WinLose(), 0))
-                .flatMap(new Function<HeaderPlayerContainsWinLoseAndPlayerInfo, ObservableSource<HeaderPlayerContainsWinLoseAndPlayerInfo>>() {
-                             @Override
-                             public ObservableSource<HeaderPlayerContainsWinLoseAndPlayerInfo> apply(HeaderPlayerContainsWinLoseAndPlayerInfo headerPlayerContainsWinLoseAndPlayerInfo) throws Exception {
-                                 if(headerPlayerContainsWinLoseAndPlayerInfo.playerId == 0){
-                                     return getHeaderPlayerInfoByNetwork();
-                                 } else {
-                                     return Observable.just(headerPlayerContainsWinLoseAndPlayerInfo);
-                                 }
-                             }
-                         }
-                ).flatMap(new Function<HeaderPlayerContainsWinLoseAndPlayerInfo, ObservableSource<HeaderPlayerContainsWinLoseAndPlayerInfo>>() {
-                    @Override
-                    public ObservableSource<HeaderPlayerContainsWinLoseAndPlayerInfo> apply(HeaderPlayerContainsWinLoseAndPlayerInfo headerPlayerContainsWinLoseAndPlayerInfo) throws Exception {
-                        deleteAllHeaderAndInsetCurrent(headerPlayerContainsWinLoseAndPlayerInfo);
-                        return Observable.just(headerPlayerContainsWinLoseAndPlayerInfo);
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(user -> {
-                                System.out.println(user + "444");
-                                setPlayerSoloMMRNameImgAndRankTier(user.getPlayerInfo());
-                                setPlayerRecordAndWinRate(user.getWinLose());
-                            },
-                        Throwable::printStackTrace);
-        compositeDisposable.add(dis1);
-    }
-
-    public void deleteAllHeaderAndInsetCurrent(HeaderPlayerContainsWinLoseAndPlayerInfo header){
-        App.get().getDB().headerPlayerInfoDao().deleteAll();
-        App.get().getDB().headerPlayerInfoDao().insert(header);
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Log.e("4444", position + " " + view);
+                toMatchDetailActivity(position);
+            }
+        }));
     }
 
     public void setPlayerSoloMMRNameImgAndRankTier(PlayerInfo playerInfo) {
@@ -210,13 +183,6 @@ public class TabPlayerOverview extends AbstractTabFragment {
     public String getWinRate(double winRateNotRound) {
         DecimalFormat df = new DecimalFormat("#.##");
         return df.format(winRateNotRound) + "%";
-    }
-
-    public void setLocalArrays(HeroAndMatch heroAndMatch) {
-        matchList = heroAndMatch.matches;
-        heroList = heroAndMatch.heroes;
-
-        playerLastMatch.setText(generateLastMatchTime(matchList.get(0).getStartTime()));
     }
 
     public void setRankTier(long rank, long leaderBoard) {
@@ -297,24 +263,11 @@ public class TabPlayerOverview extends AbstractTabFragment {
         return result;
     }
 
-    public void setAdapterAndRecyclerView() {
-        mAdapter = new PlayerOverviewAdapter(matchList, heroList, getActivity());
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
-
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                toMatchDetailActivity(position);
-            }
-        }));
-    }
-
     public void toMatchDetailActivity(int position) {
+        Log.e("44444444", "444444444444442");
         Intent intent = new Intent(getActivity(), MatchDetailActivity.class);
         intent.putExtra("matchId", matchList.get(position).getMatchId());
+        //intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
     }
 
@@ -322,15 +275,5 @@ public class TabPlayerOverview extends AbstractTabFragment {
     public void onDestroyView() {
         super.onDestroyView();
         compositeDisposable.dispose();
-    }
-
-    class HeroAndMatch {
-        List<MatchShortInfo> matches;
-        List<Hero> heroes;
-
-        private HeroAndMatch(List<MatchShortInfo> matches, List<Hero> heroes) {
-            this.matches = matches;
-            this.heroes = heroes;
-        }
     }
 }

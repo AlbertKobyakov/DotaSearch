@@ -4,32 +4,39 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.example.albert.dotasearch.model.Hero;
-import com.example.albert.dotasearch.model.MatchShortInfo;
+import com.example.albert.dotasearch.model.PlayerOverviewCombine;
 import com.example.albert.dotasearch.repository.PlayerInfoRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PlayerInfoViewModel extends ViewModel {
-    PlayerInfoRepository repository;
-    LiveData<List<MatchShortInfo>> matches;
-    List<Hero> heroes;
+    private PlayerInfoRepository repository;
+    private Map<Integer, Hero> heroes;
+    private LiveData<PlayerOverviewCombine> playerFullInfo;
+
+
+    public LiveData<PlayerOverviewCombine> getPlayerFullInfo() {
+        return playerFullInfo;
+    }
 
     public PlayerInfoViewModel(long accountId) {
         repository = new PlayerInfoRepository(accountId);
-        insertMatches();
-        matches = repository.getAllMatches();
-        heroes = repository.getAllHeroes();
+        heroes = sortHeroes(repository.getAllHeroes());
+        playerFullInfo = repository.getLiveDataPlayerFullInfo();
     }
 
-    public LiveData<List<MatchShortInfo>> getMatches() {
-        return matches;
-    }
-
-    private void insertMatches(){
-        repository.insertAllMatchesPlayerToRoom();
-    }
-
-    public List<Hero> getHeroes() {
+    public Map<Integer, Hero> getHeroes() {
         return heroes;
+    }
+
+    public Map<Integer, Hero> sortHeroes(List<Hero> heroes){
+        Map<Integer, Hero> sortedHeroes = new HashMap<>();
+        for(int i = 0; i < heroes.size(); i++){
+            System.out.println("id = " + heroes.get(i).getId() + " HERO = " + heroes.get(i));
+            sortedHeroes.put(heroes.get(i).getId(), heroes.get(i));
+        }
+        return sortedHeroes;
     }
 }
