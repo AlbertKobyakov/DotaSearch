@@ -96,7 +96,7 @@ public class TabPlayerOverview extends AbstractTabFragment {
         playerFullInfo.observe(getActivity(), new Observer<PlayerOverviewCombine>() {
             @Override
             public void onChanged(@Nullable PlayerOverviewCombine playerOverviewCombine) {
-                if(playerOverviewCombine != null) {
+                if(playerOverviewCombine != null && playerOverviewCombine.getMatches().size() > 0) {
                     List<MatchShortInfo> matchShortInfos = playerOverviewCombine.getMatches();
                     PlayerInfo playerInfo = playerOverviewCombine.getPlayerInfo();
                     WinLose winLose = playerOverviewCombine.getWinLose();
@@ -136,7 +136,7 @@ public class TabPlayerOverview extends AbstractTabFragment {
 
 
     public void setAdapterAndRecyclerView() {
-        mAdapter = new PlayerOverviewAdapter(getActivity());
+        mAdapter = new PlayerOverviewAdapter(getContext());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);

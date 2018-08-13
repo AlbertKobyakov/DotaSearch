@@ -6,7 +6,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="260dp"
-        android:src="@drawable/ranked"
+        android:src="@drawable/item_background"
         android:id="@+id/imageView"/>
 
     <RadioGroup

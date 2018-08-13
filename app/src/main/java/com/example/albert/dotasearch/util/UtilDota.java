@@ -208,7 +208,7 @@ public class UtilDota {
         }
     }
 
-    public static String getGameModeById(int id){
+    public static String getGameModeById(long id){
         SparseArray<String> gameModes = new SparseArray<>();
 
         gameModes.append(0, "None");
@@ -233,10 +233,10 @@ public class UtilDota {
         gameModes.append(21, "1v1 Mid Only");
         gameModes.append(22, "All Pick");
 
-        return gameModes.get(id);
+        return gameModes.get((int)id);
     }
 
-    /*public static String getLobbyTypeById(int id){
+    public static String getLobbyTypeById(long id){
         SparseArray<String> lobbyTypes = new SparseArray<>();
 
         lobbyTypes.append(-1, "Invalid");
@@ -250,8 +250,8 @@ public class UtilDota {
         lobbyTypes.append(7, "Ranked");
         lobbyTypes.append(8, "1v1 Mid");
 
-        return lobbyTypes.get(id);
-    }*/
+        return lobbyTypes.get((int)id);
+    }
 
     public static List<LobbyType> getAllLobbyTypes(){
         List<LobbyType> lobbyTypes = new ArrayList<>();
@@ -345,7 +345,7 @@ public class UtilDota {
         Glide.with(context)
                 .load(url)
                 .error(defaultImage)
-                .fitCenter()
+                .centerCrop()
                 .into(imageView);
     }
 

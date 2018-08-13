@@ -1,8 +1,14 @@
 package com.example.albert.dotasearch.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
@@ -22,10 +29,15 @@ import com.example.albert.dotasearch.adapter.FoundPlayerAdapter;
 import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.FoundPlayer;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -35,6 +47,11 @@ public class FoundPlayerActivity extends AppCompatActivity {
 
     public static final String TAG = "FoundPlayerActivity";
     public static final int LAYOUT = R.layout.found_player_activity;
+    private FoundPlayerActivity.ConnectivityChangedReceiverTest connectivityReceiver;
+    private IntentFilter intentFilter;
+
+    private FoundPlayer foundPlayer;
+    private String query;
 
     public AppDatabase db;
 
@@ -44,21 +61,25 @@ public class FoundPlayerActivity extends AppCompatActivity {
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.text_toolbar_parallax_1) TextView textToolbarParallax1;
+    @BindView(R.id.text_toolbar_parallax_2) TextView textToolbarParallax2;
+    @BindView(R.id.text_toolbar_parallax_3) TextView textToolbarParallax3;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(LAYOUT);
 
-        db = App.get().getDB();
-
         ButterKnife.bind(this);
 
-        initToolbar();
+        query = getIntent().getStringExtra("query");
 
-        System.out.println("DB = " + db);
-        /*db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "Dota.db").build();*/
+        db = App.get().getDB();
+
+        connectivityReceiver = new ConnectivityChangedReceiverTest();
+        intentFilter = new IntentFilter();
+
+        initToolbar();
 
         Disposable d1 = db.foundPlayerDao()
                 .getAllRx()
@@ -79,6 +100,9 @@ public class FoundPlayerActivity extends AppCompatActivity {
     }
 
     public void setAdapterAndRecyclerView(){
+        textToolbarParallax2.setText(getResources().getString(R.string.found, query));
+        textToolbarParallax3.setText(getResources().getString(R.string.result_search_query, foundPlayers.size()));
+
         mAdapter = new FoundPlayerAdapter(foundPlayers, FoundPlayerActivity.this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -86,19 +110,29 @@ public class FoundPlayerActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
+        recyclerView.setNestedScrollingEnabled(false);
+
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                FoundPlayer foundPlayer = foundPlayers.get(position);
+                foundPlayer = foundPlayers.get(position);
 
-                //getHeaderPlayerInfoByNetwork(foundPlayer);
-                goToPlayerInfoActivity(foundPlayer);
+                /*intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+                registerReceiver(connectivityReceiver, intentFilter);*/
+
+                Disposable dis = hasInternetConnection().subscribe(
+                        isInternet -> {
+                            if (isInternet) {
+                                goToPlayerInfoActivity(foundPlayer);
+                            } else {
+                                Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
+                            }
+                        },
+                        err -> System.out.println(err.getLocalizedMessage())
+                );
+
+                compositeDisposable.add(dis);
             }
-
-            /*@Override
-            public void onLongClick(View view, int position) {
-                Toast.makeText(getApplicationContext(), "Delete is selected?", Toast.LENGTH_SHORT).show();
-            }*/
         }));
     }
 
@@ -153,5 +187,48 @@ public class FoundPlayerActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.dispose();
+    }
+
+    private class ConnectivityChangedReceiverTest extends BroadcastReceiver {
+
+        public static final String TAG = "ConnectivyReceiver";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = null;
+            if (cm != null) {
+                activeNetwork = cm.getActiveNetworkInfo();
+            }
+
+            if(activeNetwork != null && activeNetwork.isConnected()){
+                goToPlayerInfoActivity(foundPlayer);
+                Log.e(TAG, "Data connected");
+
+            } else {
+                Log.e(TAG, "Data not connected");
+                Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    Single<Boolean> hasInternetConnection() {
+        return Single.fromCallable(() -> {
+            try {
+                // Connect to Google DNS to check for connection
+                int timeoutMs = 1500;
+                Socket socket = new Socket();
+                InetSocketAddress socketAddress = new InetSocketAddress("8.8.8.8", 53);
+
+                socket.connect(socketAddress, timeoutMs);
+                socket.close();
+
+                return true;
+            } catch (IOException io) {
+                return false;
+            }
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }

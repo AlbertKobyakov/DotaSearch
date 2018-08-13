@@ -15,6 +15,7 @@ import com.example.albert.dotasearch.model.PlayerOverviewCombine;
 import com.example.albert.dotasearch.model.WinLose;
 import com.example.albert.dotasearch.util.UtilDota;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -37,6 +38,7 @@ public class PlayerInfoRepository {
     }
 
     public LiveData<PlayerOverviewCombine> getLiveDataPlayerFullInfo(){
+
         Single<PlayerInfo> playerInfo = UtilDota.initRetrofitRx()
                 .getPlayerInfoById(accountId)
                 .subscribeOn(Schedulers.io());

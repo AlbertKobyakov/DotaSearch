@@ -97,13 +97,11 @@ public class PlayerOverviewAdapter extends RecyclerView.Adapter<PlayerOverviewAd
                     .load(heroImg)
                     .fitCenter()
                     .into(holder.imageView);
-        } else {
-            Log.d(TAG, "empty");
         }
     }
 
     public void setData(List<MatchShortInfo> match, Map<Integer, Hero> heroes) {
-        matchesCopy = match;
+        this.matchesCopy = match;
         this.heroes = heroes;
         notifyDataSetChanged();
     }

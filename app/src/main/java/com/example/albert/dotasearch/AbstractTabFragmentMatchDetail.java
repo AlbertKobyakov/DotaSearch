@@ -135,7 +135,6 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
                     intent.putExtra("accountId", playerListView.get(position).getAccountId());
                     intent.putExtra("personalName", playerListView.get(position).getPersonaname());
                     intent.putExtra("lastMatchStr", playerListView.get(position).getLastLogin());
-                    //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
                     Snackbar.make(view, R.string.profile_hidden, Snackbar.LENGTH_SHORT).show();
@@ -166,7 +165,7 @@ public abstract class AbstractTabFragmentMatchDetail extends Fragment {
     public void setTitle(String title) {
         this.title = title;
     }
-    
+
     public void setmAdapterRadiant(RecyclerView.Adapter mAdapterRadiant) {
         this.mAdapterRadiant = mAdapterRadiant;
     }

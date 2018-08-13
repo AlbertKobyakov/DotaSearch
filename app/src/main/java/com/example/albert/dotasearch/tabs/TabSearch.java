@@ -101,7 +101,7 @@ public class TabSearch extends AbstractTabFragment {
                     .subscribe(
                             response -> Log.d(TAG, response.getPersonaname()),
                             this::handleError,
-                            this::goToFoundPlayerActivity
+                            () -> goToFoundPlayerActivity(editText)
                     );
 
             compositeDisposable.add(dis);
@@ -116,9 +116,10 @@ public class TabSearch extends AbstractTabFragment {
         //Toast.makeText(v.getContext(), t.getMessage() + " " + 44, Toast.LENGTH_LONG).show();
     }
 
-    public void goToFoundPlayerActivity(){
+    public void goToFoundPlayerActivity(String query){
         Log.d(TAG, "goToFoundPlayerActivity");
         Intent intent = new Intent(context, FoundPlayerActivity.class);
+        intent.putExtra("query", query);
         startActivity(intent);
     }
 
