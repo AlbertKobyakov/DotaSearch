@@ -3,6 +3,7 @@ package com.example.albert.dotasearch.viewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
+import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.PlayerOverviewCombine;
 import com.example.albert.dotasearch.repository.PlayerInfoRepository;
@@ -15,6 +16,8 @@ public class PlayerInfoViewModel extends ViewModel {
     private PlayerInfoRepository repository;
     private Map<Integer, Hero> heroes;
     private LiveData<PlayerOverviewCombine> playerFullInfo;
+    private LiveData<Boolean> isFavoritePlayer;
+    private long accountId;
 
 
     public LiveData<PlayerOverviewCombine> getPlayerFullInfo() {
@@ -25,6 +28,12 @@ public class PlayerInfoViewModel extends ViewModel {
         repository = new PlayerInfoRepository(accountId);
         heroes = sortHeroes(repository.getAllHeroes());
         playerFullInfo = repository.getLiveDataPlayerFullInfo();
+        this.accountId = accountId;
+        isFavoritePlayer = repository.isPlayerFavoriteById(accountId);
+    }
+
+    public LiveData<Boolean> getIsFavoritePlayer() {
+        return isFavoritePlayer;
     }
 
     public Map<Integer, Hero> getHeroes() {
@@ -38,5 +47,21 @@ public class PlayerInfoViewModel extends ViewModel {
             sortedHeroes.put(heroes.get(i).getId(), heroes.get(i));
         }
         return sortedHeroes;
+    }
+
+    public long getAccountId() {
+        return accountId;
+    }
+
+    public void insertPlayerToFavoriteList(FavoritePlayer favoritePlayer){
+        repository.insertPlayerToFavoriteList(favoritePlayer);
+    }
+
+    public void deletePlayerWithFavoriteList(long accountId){
+        repository.deletePlayerWithFavoriteList(accountId);
+    }
+
+    public void getPlayerFavoriteById(long accountId){
+        repository.isPlayerFavoriteById(accountId);
     }
 }

@@ -3,6 +3,7 @@ package com.example.albert.dotasearch.database;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
+import com.example.albert.dotasearch.dao.FavoritePlayerDao;
 import com.example.albert.dotasearch.dao.FoundPlayerDao;
 import com.example.albert.dotasearch.dao.HeroDao;
 import com.example.albert.dotasearch.dao.ItemDao;
@@ -10,6 +11,7 @@ import com.example.albert.dotasearch.dao.LeaderboardDao;
 import com.example.albert.dotasearch.dao.LobbyTypeDao;
 import com.example.albert.dotasearch.dao.MatchShortInfoDao;
 import com.example.albert.dotasearch.dao.ProPlayerDao;
+import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.model.FoundPlayer;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
@@ -25,7 +27,8 @@ import com.example.albert.dotasearch.model.ProPlayer;
         Item.class,
         FoundPlayer.class,
         LobbyType.class,
-        MatchShortInfo.class
+        MatchShortInfo.class,
+        FavoritePlayer.class
 }, version = 1)
 
     public abstract class AppDatabase extends RoomDatabase {
@@ -36,4 +39,5 @@ import com.example.albert.dotasearch.model.ProPlayer;
         public abstract FoundPlayerDao foundPlayerDao();
         public abstract LobbyTypeDao lobbyTypeDao();
         public abstract MatchShortInfoDao matchShortInfoDao();
+        public abstract FavoritePlayerDao favoritePlayerDao();
 }

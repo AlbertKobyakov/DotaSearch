@@ -29,8 +29,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static com.example.albert.dotasearch.tabs.TabPlayerOverview.viewModel;
-
 public class TabMatchesPlayer  extends AbstractTabFragment {
 
     private static final String TAG = "TabMatchesPlayer";
@@ -54,7 +52,7 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        heroList = viewModel.getHeroes();
+        /*heroList = viewModel.getHeroes();
         System.out.println(heroList);
         LiveData<PlayerOverviewCombine> playerFullInfo = viewModel.getPlayerFullInfo();
         playerFullInfo.observe(getActivity(), playerOverviewCombine -> {
@@ -63,7 +61,7 @@ public class TabMatchesPlayer  extends AbstractTabFragment {
                 matchList = matchShortInfos;
                 mAdapter.setData(matchShortInfos, heroList);
             }
-        });
+        });*/
     }
 
     @Nullable

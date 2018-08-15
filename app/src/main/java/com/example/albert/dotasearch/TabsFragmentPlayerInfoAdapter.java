@@ -15,7 +15,21 @@ public class TabsFragmentPlayerInfoAdapter extends FragmentPagerAdapter {
     private Map<Integer, AbstractTabFragment> tabs;
     private Context context;
 
-    public TabsFragmentPlayerInfoAdapter(FragmentManager fm, Context context) {
+    @Override
+    public Fragment getItem(int position) {
+        return null;
+    }
+
+    @Override
+    public int getCount() {
+        return 0;
+    }
+
+    public TabsFragmentPlayerInfoAdapter(FragmentManager fm) {
+        super(fm);
+    }
+
+    /*public TabsFragmentPlayerInfoAdapter(FragmentManager fm, Context context) {
         super(fm);
 
         this.context = context;
@@ -42,5 +56,5 @@ public class TabsFragmentPlayerInfoAdapter extends FragmentPagerAdapter {
         tabs = new HashMap<>();
         tabs.put(0, TabPlayerOverview.getInstance(context));
         tabs.put(1, TabMatchesPlayer.getInstance(context));
-    }
+    }*/
 }

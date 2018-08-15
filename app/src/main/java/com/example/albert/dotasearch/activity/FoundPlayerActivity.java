@@ -30,7 +30,6 @@ import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.FoundPlayer;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.List;
@@ -47,8 +46,6 @@ public class FoundPlayerActivity extends AppCompatActivity {
 
     public static final String TAG = "FoundPlayerActivity";
     public static final int LAYOUT = R.layout.found_player_activity;
-    private FoundPlayerActivity.ConnectivityChangedReceiverTest connectivityReceiver;
-    private IntentFilter intentFilter;
 
     private FoundPlayer foundPlayer;
     private String query;
@@ -75,9 +72,6 @@ public class FoundPlayerActivity extends AppCompatActivity {
         query = getIntent().getStringExtra("query");
 
         db = App.get().getDB();
-
-        connectivityReceiver = new ConnectivityChangedReceiverTest();
-        intentFilter = new IntentFilter();
 
         initToolbar();
 
@@ -106,19 +100,13 @@ public class FoundPlayerActivity extends AppCompatActivity {
         mAdapter = new FoundPlayerAdapter(foundPlayers, FoundPlayerActivity.this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
-        //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
-
-        recyclerView.setNestedScrollingEnabled(false);
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 foundPlayer = foundPlayers.get(position);
-
-                /*intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-                registerReceiver(connectivityReceiver, intentFilter);*/
 
                 Disposable dis = hasInternetConnection().subscribe(
                         isInternet -> {
@@ -141,7 +129,7 @@ public class FoundPlayerActivity extends AppCompatActivity {
         Intent intent = new Intent(FoundPlayerActivity.this, PlayerInfoActivity.class);
         intent.putExtra("accountId", foundPlayer.getAccountId());
         intent.putExtra("personalName", foundPlayer.getPersonaname());
-        intent.putExtra("lastMatchStr", foundPlayer.getLastMatchTime());
+        intent.putExtra("urlPlayer", foundPlayer.getAvatarfull());
         startActivity(intent);
     }
 
@@ -187,29 +175,6 @@ public class FoundPlayerActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.dispose();
-    }
-
-    private class ConnectivityChangedReceiverTest extends BroadcastReceiver {
-
-        public static final String TAG = "ConnectivyReceiver";
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = null;
-            if (cm != null) {
-                activeNetwork = cm.getActiveNetworkInfo();
-            }
-
-            if(activeNetwork != null && activeNetwork.isConnected()){
-                goToPlayerInfoActivity(foundPlayer);
-                Log.e(TAG, "Data connected");
-
-            } else {
-                Log.e(TAG, "Data not connected");
-                Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
-            }
-        }
     }
 
     Single<Boolean> hasInternetConnection() {

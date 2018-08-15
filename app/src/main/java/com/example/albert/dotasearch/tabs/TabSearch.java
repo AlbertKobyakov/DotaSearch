@@ -1,9 +1,14 @@
 package com.example.albert.dotasearch.tabs;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +21,15 @@ import android.widget.Toast;
 import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
+import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.FoundPlayerActivity;
+import com.example.albert.dotasearch.activity.PlayerInfoActivity;
+import com.example.albert.dotasearch.adapter.FavoritePlayersAdapter;
+import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.util.UtilDota;
+import com.example.albert.dotasearch.viewModel.FavoritePlayersViewModel;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,14 +46,19 @@ public class TabSearch extends AbstractTabFragment {
     private final static int LAYOUT = R.layout.fragment_search;
     private final static String TAG = "TabSearch";
 
+    public FavoritePlayersViewModel mWordViewModel;
+
     private Unbinder unbinder;
     public Context context;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     String editText;
+    private FavoritePlayersAdapter mAdapter;
+    private List<FavoritePlayer> favoritePlayerList;
 
     @BindView(R.id.btn_search) Button btnSearch;
     @BindView(R.id.search_edit) EditText searchEditText;
     @BindView(R.id.progress_bar) ProgressBar progressBar;
+    @BindView(R.id.recycler_view_favorite) RecyclerView recyclerViewFavorite;
 
     @Nullable
     @Override
@@ -54,7 +71,43 @@ public class TabSearch extends AbstractTabFragment {
 
         unbinder = ButterKnife.bind(this, view);
 
+        setAdapterAndRecyclerView();
+
+        mWordViewModel = ViewModelProviders.of(this).get(FavoritePlayersViewModel.class);
+
+        mWordViewModel.getmAllWords().observe(this, new Observer<List<FavoritePlayer>>() {
+            @Override
+            public void onChanged(@Nullable List<FavoritePlayer> favoritePlayers) {
+                if (favoritePlayers != null && favoritePlayers.size() > 0) {
+                    favoritePlayerList = favoritePlayers;
+                    mAdapter.setData(favoritePlayers);
+                }
+            }
+        });
+
         return view;
+    }
+
+    public void setAdapterAndRecyclerView() {
+        mAdapter = new FavoritePlayersAdapter(getActivity());
+        recyclerViewFavorite.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerViewFavorite.setItemAnimator(new DefaultItemAnimator());
+        recyclerViewFavorite.setAdapter(mAdapter);
+
+        recyclerViewFavorite.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerViewFavorite, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                goToPlayerInfoActivity(favoritePlayerList.get(position));
+            }
+        }));
+    }
+
+    public void goToPlayerInfoActivity(FavoritePlayer favoritePlayer){
+        Intent intent = new Intent(getContext(), PlayerInfoActivity.class);
+        intent.putExtra("accountId", favoritePlayer.getAccountId());
+        intent.putExtra("personalName", favoritePlayer.getPersonaname());
+        intent.putExtra("urlPlayer", favoritePlayer.getAvatarfull());
+        startActivity(intent);
     }
 
     @Override
