@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,31 +17,32 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
-import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.FoundPlayerActivity;
 import com.example.albert.dotasearch.activity.PlayerInfoActivity;
 import com.example.albert.dotasearch.adapter.FavoritePlayersAdapter;
 import com.example.albert.dotasearch.model.FavoritePlayer;
-import com.example.albert.dotasearch.util.UtilDota;
+import com.example.albert.dotasearch.model.FoundPlayer;
 import com.example.albert.dotasearch.viewModel.FavoritePlayersViewModel;
+import com.example.albert.dotasearch.viewModel.SearchViewModel;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-
 
 public class TabSearch extends AbstractTabFragment {
     private final static int LAYOUT = R.layout.fragment_search;
@@ -51,9 +53,10 @@ public class TabSearch extends AbstractTabFragment {
     private Unbinder unbinder;
     public Context context;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
-    String editText;
+    private String query;
     private FavoritePlayersAdapter mAdapter;
     private List<FavoritePlayer> favoritePlayerList;
+    private SearchViewModel viewModel;
 
     @BindView(R.id.btn_search) Button btnSearch;
     @BindView(R.id.search_edit) EditText searchEditText;
@@ -85,6 +88,19 @@ public class TabSearch extends AbstractTabFragment {
             }
         });
 
+        viewModel = ViewModelProviders.of(this).get(SearchViewModel.class);
+        viewModel.getFoundPlayers().observe(this, new Observer<List<FoundPlayer>>() {
+            @Override
+            public void onChanged(@Nullable List<FoundPlayer> foundPlayers) {
+                if(foundPlayers != null && foundPlayers.size() > 0){
+                    Log.d(TAG, foundPlayers.get(0).getPersonaname());
+                    if(query != null){
+                        goToFoundPlayerActivity(query);
+                    }
+
+                }
+            }
+        });
         return view;
     }
 
@@ -97,7 +113,18 @@ public class TabSearch extends AbstractTabFragment {
         recyclerViewFavorite.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerViewFavorite, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                goToPlayerInfoActivity(favoritePlayerList.get(position));
+                Disposable dis = hasInternetConnection().subscribe(
+                        isInternet -> {
+                            if (isInternet) {
+                                goToPlayerInfoActivity(favoritePlayerList.get(position));
+                            } else {
+                                Snackbar.make(view, getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
+                            }
+                        },
+                        err -> System.out.println(err.getLocalizedMessage())
+                );
+
+                compositeDisposable.add(dis);
             }
         }));
     }
@@ -136,37 +163,29 @@ public class TabSearch extends AbstractTabFragment {
 
     @OnClick(R.id.btn_search)
     public void onClick(final View v) {
-        editText = searchEditText.getText().toString();
-        if(editText.trim().length() == 0){
-            Toast.makeText(v.getContext(), "Вы не ввели не 1 символа ((", Toast.LENGTH_LONG).show();
+        query = searchEditText.getText().toString();
+        if(query.trim().length() == 0 || query.trim().length() < 3){
+            Snackbar.make(v, "Запрос должен состоять минимум из 3 символов", Snackbar.LENGTH_SHORT).show();
         } else {
             btnSearch.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
 
-            Disposable dis = UtilDota.initRetrofitRx().getFoundPlayersRx(editText)
-                    .flatMap(foundPlayers -> {
-                        App.get().getDB().foundPlayerDao().deleteAllFoundPlayer();
-                        App.get().getDB().foundPlayerDao().insertAll(foundPlayers);
-                        return Observable.fromIterable(foundPlayers);
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            response -> Log.d(TAG, response.getPersonaname()),
-                            this::handleError,
-                            () -> goToFoundPlayerActivity(editText)
-                    );
+            Disposable dis = hasInternetConnection().subscribe(
+                    isInternet -> {
+                        if (isInternet) {
+                            viewModel.searchRequest(query);
+                        } else {
+                            Snackbar.make(v, getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
+                            btnSearch.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+                    },
+                    err -> System.out.println(err.getLocalizedMessage())
+            );
 
             compositeDisposable.add(dis);
         }
 
-    }
-
-    public void handleError(Throwable t){
-        btnSearch.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.INVISIBLE);
-        Log.e(TAG, "handleError: " + t.getMessage() + " " + t.getLocalizedMessage());
-        //Toast.makeText(v.getContext(), t.getMessage() + " " + 44, Toast.LENGTH_LONG).show();
     }
 
     public void goToFoundPlayerActivity(String query){
@@ -180,5 +199,25 @@ public class TabSearch extends AbstractTabFragment {
         super.onDestroyView();
         unbinder.unbind();
         compositeDisposable.dispose();
+    }
+
+    Single<Boolean> hasInternetConnection() {
+        return Single.fromCallable(() -> {
+            try {
+                // Connect to Google DNS to check for connection
+                int timeoutMs = 1500;
+                Socket socket = new Socket();
+                InetSocketAddress socketAddress = new InetSocketAddress("8.8.8.8", 53);
+
+                socket.connect(socketAddress, timeoutMs);
+                socket.close();
+
+                return true;
+            } catch (IOException io) {
+                return false;
+            }
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }

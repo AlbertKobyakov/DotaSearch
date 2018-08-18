@@ -35,7 +35,7 @@ public interface DotaClient {
     );
 
     @GET("/api/search")
-    Observable<List<FoundPlayer>> getFoundPlayersRx(
+    Single<List<FoundPlayer>> getFoundPlayersRx(
             @Query("q") String query
     );
 
