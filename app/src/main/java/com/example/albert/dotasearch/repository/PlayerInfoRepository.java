@@ -11,8 +11,10 @@ import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.MatchShortInfo;
+import com.example.albert.dotasearch.model.PlayerHero;
 import com.example.albert.dotasearch.model.PlayerInfo;
 import com.example.albert.dotasearch.model.PlayerOverviewCombine;
+import com.example.albert.dotasearch.model.Pros;
 import com.example.albert.dotasearch.model.WinLose;
 import com.example.albert.dotasearch.util.UtilDota;
 
@@ -35,6 +37,9 @@ public class PlayerInfoRepository {
     private MutableLiveData<PlayerOverviewCombine> playerFullInfo;
     private MutableLiveData<List<FavoritePlayer>> favoritePlayers;
     private MutableLiveData<Boolean> isFavoritePlayer;
+    private MutableLiveData<List<MatchShortInfo>> matches;
+    private MutableLiveData<List<Pros>> pros;
+    private MutableLiveData<List<PlayerHero>> playerHeroes;
 
     public PlayerInfoRepository(long accountId) {
         this.accountId = accountId;
@@ -55,14 +60,14 @@ public class PlayerInfoRepository {
                     .getPlayerWinLoseById(accountId)
                     .subscribeOn(Schedulers.io());
 
-            Single<List<MatchShortInfo>> allMatches = UtilDota.initRetrofitRx()
+            /*Single<List<MatchShortInfo>> allMatches = UtilDota.initRetrofitRx()
                     .getMatchesPlayerRx(accountId)
-                    .subscribeOn(Schedulers.io());
+                    .subscribeOn(Schedulers.io());*/
             Disposable disposable = Single.zip(
                     playerInfo,
                     winLose,
-                    allMatches,
-                    (playerInfo1, winLose1, allMatches1) -> new PlayerOverviewCombine(playerInfo1, winLose1, allMatches1, accountId))
+                    //allMatches,
+                    (playerInfo1, winLose1/*, allMatches1*/) -> new PlayerOverviewCombine(playerInfo1, winLose1, /*allMatches1,*/ accountId))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             playerOverviewCombine -> playerFullInfo.setValue(playerOverviewCombine),
@@ -137,22 +142,57 @@ public class PlayerInfoRepository {
 
     }
 
-    /*public LiveData<List<FavoritePlayer>> getAllFavoritePlayers(){
-        if(favoritePlayers == null){
-            favoritePlayers = new MutableLiveData<>();
+    public LiveData<List<PlayerHero>> getPlayerHeroes(){
+        if(playerHeroes == null){
+            playerHeroes = new MutableLiveData<>();
         }
 
-        Disposable disposable = db.favoritePlayerDao().getAllRx()
+        Disposable disposable = UtilDota.initRetrofitRx()
+                .getPlayerHeroes(accountId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        favoritePlayersTemp -> favoritePlayers.setValue(favoritePlayersTemp),
+                        playerHeroesResponse -> playerHeroes.setValue(playerHeroesResponse),
                         err -> Log.e(TAG, err.getLocalizedMessage())
                 );
 
-        return favoritePlayers;
+        return playerHeroes;
+    }
 
-    }*/
+    public LiveData<List<Pros>> getPros(){
+        Log.d(TAG, "NETWORK REQUEST");
+        if(pros == null){
+            pros = new MutableLiveData<>();
+        }
+
+        Disposable disposable = UtilDota.initRetrofitRx()
+                .getPlayerPros(accountId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        prosResponse -> pros.setValue(prosResponse),
+                        err -> Log.e(TAG, err.getLocalizedMessage())
+                );
+
+        return pros;
+    }
+
+    public LiveData<List<MatchShortInfo>> getMatches(){
+        if(matches == null){
+            matches = new MutableLiveData<>();
+        }
+
+        Disposable disposable = UtilDota.initRetrofitRx()
+                .getMatchesPlayerRx(accountId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        matchShortInfos -> matches.setValue(matchShortInfos),
+                        err -> Log.e(TAG, err.getLocalizedMessage())
+                );
+
+        return matches;
+    }
 
     private static class getHeroesAsyncTask extends AsyncTask<Void, Void, List<Hero>>{
         HeroDao daoAsync;

@@ -66,28 +66,28 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
 
         if(proPlayer.getName() != null && proPlayer.getName().trim().length() > 0){
             holder.nameProPlayer.setText(proPlayer.getName());
+        } else {
+            holder.nameProPlayer.setText(context.getResources().getString(R.string.unknown));
         }
 
         if(proPlayer.getPersonaname() != null && proPlayer.getPersonaname().trim().length() > 0){
             holder.personalNameProPlayer.setText(proPlayer.getPersonaname());
+        } else {
+            holder.personalNameProPlayer.setText(context.getResources().getString(R.string.unknown));
         }
 
         if(proPlayer.getTeamName() != null && proPlayer.getTeamName().trim().length() > 0){
             holder.teamNameProPlayer.setText(proPlayer.getTeamName());
+        } else {
+            holder.teamNameProPlayer.setText(context.getResources().getString(R.string.unknown));
         }
 
         if(proPlayer.getAvatarmedium() != null){
-            //Picasso.with(context).load(proPlayer.getAvatarmedium()).fit().into(holder.imageView);
             Glide.with(context)
                     .load(proPlayer.getAvatarmedium())
-                    //.diskCacheStrategy(DiskCacheStrategy.ALL)
                     .fitCenter()
                     .into(holder.imageView);
-        } /*else {
-            //Picasso.with(holder.imageView.getContext()).cancelRequest(holder.imageView);
-            Picasso.with(context).load(R.drawable.avatar_unknown_medium).into(holder.imageView);
-        }*/ else {
-            //Glide.clear(holder.imageView);
+        } else {
             Glide.with(context)
                     .load(R.drawable.avatar_unknown_medium)
                     .fitCenter()

@@ -1,18 +1,18 @@
 package com.example.albert.dotasearch.retrofit;
 
-import android.arch.lifecycle.LiveData;
-
 import com.example.albert.dotasearch.model.FoundPlayer;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.ItemsInfoWithSteam;
 import com.example.albert.dotasearch.model.MatchFullInfo;
 import com.example.albert.dotasearch.model.MatchShortInfo;
+import com.example.albert.dotasearch.model.PlayerHero;
 import com.example.albert.dotasearch.model.PlayerInfo;
 import com.example.albert.dotasearch.model.ProPlayer;
+import com.example.albert.dotasearch.model.Pros;
+import com.example.albert.dotasearch.model.Team;
 import com.example.albert.dotasearch.model.TimeRefreshLeaderBoard;
 import com.example.albert.dotasearch.model.WinLose;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -30,18 +30,8 @@ public interface DotaClient {
     Observable<List<ProPlayer>> getAllProPlayerRx();
 
     @GET("/api/search")
-    Call<ArrayList<FoundPlayer>> getFoundUsers(
-        @Query("q") String query
-    );
-
-    @GET("/api/search")
     Single<List<FoundPlayer>> getFoundPlayersRx(
             @Query("q") String query
-    );
-
-    @GET("/webapi/ILeaderboard/GetDivisionLeaderboard/v0001")
-    Call<TimeRefreshLeaderBoard> getLeaderBorder(
-        @Query("division") String division
     );
 
     @GET("/webapi/ILeaderboard/GetDivisionLeaderboard/v0001")
@@ -51,6 +41,16 @@ public interface DotaClient {
 
     @GET("/api/players/{Id}")
     Single<PlayerInfo> getPlayerInfoById(
+            @Path("Id") long playerId
+    );
+
+    @GET("/api/players/{Id}/pros")
+    Single<List<Pros>> getPlayerPros(
+            @Path("Id") long playerId
+    );
+
+    @GET("/api/players/{Id}/heroes")
+    Single<List<PlayerHero>> getPlayerHeroes(
             @Path("Id") long playerId
     );
 
@@ -71,41 +71,6 @@ public interface DotaClient {
             @Query("limit") int limit*/
     );
 
-    @GET("/api/players/{Id}/matches")
-    Single<LiveData<List<MatchShortInfo>>> getMatchesPlayerRxLive(
-            @Path("Id") long playerId/*,
-            @Query("limit") int limit*/
-    );
-
-    @GET("/api/players/{Id}/matches")
-    Single<List<MatchShortInfo>> getMatchesPlayerRx(
-            @Path("Id") long playerId,
-            @Query("limit") int limit
-    );
-
-    @GET("/api/players/{Id}/matches")
-    Call<List<MatchShortInfo>> getMatchesPlayer(
-        @Path("Id") long playerId,
-        @Query("limit") int limit,
-        @Query("win") int win
-    );
-
-    @GET("/api/players/{Id}/matches")
-    Observable<List<MatchShortInfo>> getListMatchesPlayerReact(
-        @Path("Id") long playerId,
-        @Query("limit") int limit
-    );
-
-    @GET("/api/players/{Id}/matches")
-    Observable<List<MatchShortInfo>> getListWinMatchesPlayerReact(
-            @Path("Id") long playerId,
-            @Query("limit") int limit,
-            @Query("win") int win
-    );
-
-    @GET("/api/heroStats")
-    Single<List<Hero>> getAllHeroes();
-
     @GET("/api/heroStats")
     Observable<List<Hero>> getAllHeroesRx();
 
@@ -119,5 +84,6 @@ public interface DotaClient {
             @Query("key") String key
     );
 
-
+    @GET("/api/teams")
+    Single<Team> getAllTeams();
 }

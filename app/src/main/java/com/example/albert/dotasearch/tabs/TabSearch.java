@@ -11,6 +11,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import me.toptas.fancyshowcase.FancyShowCaseView;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 public class TabSearch extends AbstractTabFragment {
     private final static int LAYOUT = R.layout.fragment_search;
@@ -81,7 +86,7 @@ public class TabSearch extends AbstractTabFragment {
         mWordViewModel.getmAllWords().observe(this, new Observer<List<FavoritePlayer>>() {
             @Override
             public void onChanged(@Nullable List<FavoritePlayer> favoritePlayers) {
-                if (favoritePlayers != null && favoritePlayers.size() > 0) {
+                if (favoritePlayers != null) {
                     favoritePlayerList = favoritePlayers;
                     mAdapter.setData(favoritePlayers);
                 }
@@ -101,6 +106,46 @@ public class TabSearch extends AbstractTabFragment {
                 }
             }
         });
+
+        new MaterialShowcaseView.Builder(getActivity())
+                .setTarget(recyclerViewFavorite)
+                .setDismissOnTouch(true)
+                .setContentText("This is some amazing feature you should know about")
+                .setDelay(2000) // optional but starting animations immediately in onCreate can make them choppy
+                //.singleUse("111") // provide a unique ID used to ensure it is only shown once
+                .setMaskColour(R.color.lose)
+                .useFadeAnimation()
+                .show();
+
+        /*new FancyShowCaseView.Builder(getActivity())
+                .focusOn(recyclerViewFavorite)
+                .title("Focus on View")
+                //.showOnce("2")
+                .titleGravity(Gravity.BOTTOM)
+                .backgroundColor(R.color.win)
+
+                .build()
+                .show();*/
+
+        // sequence example
+        /*ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(2000); // half second between each showcase view
+
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), "1");
+
+        sequence.setConfig(config);
+
+        sequence.addSequenceItem(btnSearch,
+                "This is button one", "GOT IT");
+
+        sequence.addSequenceItem(searchEditText,
+                "This is button two", "GOT IT");
+
+        sequence.addSequenceItem(recyclerViewFavorite,
+                "This is button three", "GOT IT");
+
+        sequence.start();*/
+
         return view;
     }
 

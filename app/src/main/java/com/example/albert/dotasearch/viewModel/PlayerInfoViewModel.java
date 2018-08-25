@@ -5,12 +5,17 @@ import android.arch.lifecycle.ViewModel;
 
 import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.model.Hero;
+import com.example.albert.dotasearch.model.MatchShortInfo;
+import com.example.albert.dotasearch.model.PlayerHero;
 import com.example.albert.dotasearch.model.PlayerOverviewCombine;
+import com.example.albert.dotasearch.model.Pros;
 import com.example.albert.dotasearch.repository.PlayerInfoRepository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.reactivex.Single;
 
 public class PlayerInfoViewModel extends ViewModel {
     private PlayerInfoRepository repository;
@@ -18,7 +23,13 @@ public class PlayerInfoViewModel extends ViewModel {
     private LiveData<PlayerOverviewCombine> playerFullInfo;
     private LiveData<Boolean> isFavoritePlayer;
     private long accountId;
+    private LiveData<List<MatchShortInfo>> matches;
+    private LiveData<List<Pros>> pros;
+    private LiveData<List<PlayerHero>> playerHeroes;
 
+    public LiveData<List<Pros>> getPros() {
+        return pros;
+    }
 
     public LiveData<PlayerOverviewCombine> getPlayerFullInfo() {
         return playerFullInfo;
@@ -30,14 +41,25 @@ public class PlayerInfoViewModel extends ViewModel {
         playerFullInfo = repository.getLiveDataPlayerFullInfo();
         this.accountId = accountId;
         isFavoritePlayer = repository.isPlayerFavoriteById(accountId);
+        matches = repository.getMatches();
+        pros = repository.getPros();
+        playerHeroes = repository.getPlayerHeroes();
     }
 
     public LiveData<Boolean> getIsFavoritePlayer() {
         return isFavoritePlayer;
     }
 
+    public LiveData<List<MatchShortInfo>> getMatches() {
+        return matches;
+    }
+
     public Map<Integer, Hero> getHeroes() {
         return heroes;
+    }
+
+    public LiveData<List<PlayerHero>> getPlayerHeroes() {
+        return playerHeroes;
     }
 
     public Map<Integer, Hero> sortHeroes(List<Hero> heroes){

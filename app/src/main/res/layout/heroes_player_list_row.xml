@@ -27,33 +27,37 @@
 
             <ImageView
                 android:layout_width="80dp"
-                android:layout_height="50dp"
-                android:id="@+id/imageView"/>
+                android:layout_height="60dp"
+                android:id="@+id/hero_image"/>
+
             <TextView
-                android:id="@+id/match_hero"
+                android:id="@+id/last_played_hero"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="2"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:id="@+id/games_hero"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_weight="1"/>
 
             <TextView
-                android:id="@+id/match_result"
+                android:id="@+id/winrate_hero"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_weight="1"/>
 
             <TextView
-                android:id="@+id/match_duration"
+                android:id="@+id/winrate_hero_percent"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:id="@+id/match_kda"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_weight="1"/>
         </LinearLayout>
 

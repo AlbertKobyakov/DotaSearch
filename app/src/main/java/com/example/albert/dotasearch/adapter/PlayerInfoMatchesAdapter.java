@@ -19,9 +19,9 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PlayerOverviewAdapter extends RecyclerView.Adapter<PlayerOverviewAdapter.MyViewHolder> {
+public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMatchesAdapter.MyViewHolder> {
 
-    private static final String TAG = "PlayerOverviewAdapter";
+    private static final String TAG = "PlayerMatchesAdapter";
     private static final int LAYOUT = R.layout.match_player_list_row;
 
 
@@ -48,35 +48,39 @@ public class PlayerOverviewAdapter extends RecyclerView.Adapter<PlayerOverviewAd
         }
     }
 
-    public PlayerOverviewAdapter(Context context) {
+    public PlayerInfoMatchesAdapter(Context context) {
         this.context = context;
     }
 
 
     @Override
-    public PlayerOverviewAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PlayerInfoMatchesAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(LAYOUT, parent, false);
 
-        return new PlayerOverviewAdapter.MyViewHolder(itemView);
+        return new PlayerInfoMatchesAdapter.MyViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(PlayerOverviewAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(PlayerInfoMatchesAdapter.MyViewHolder holder, int position) {
 
         if (matchesCopy != null) {
             MatchShortInfo matchShortInfo = matchesCopy.get(position);
+
+            int heroId = (int) matchShortInfo.getHeroId();
 
             long minutes = matchShortInfo.getDuration() / 60;
             long seconds = matchShortInfo.getDuration() - (minutes * 60);
 
             String heroName;
-            String heroImg;
+            String heroImg = "";
 
-            int heroId = (int) matchShortInfo.getHeroId();
-
-            heroImg = heroes.get(heroId).getImg();
-            heroName = heroes.get(heroId).getLocalizedName();
+            if(heroes.get(heroId) != null){
+                heroImg = heroes.get(heroId).getImg();
+                heroName = heroes.get(heroId).getLocalizedName();
+            } else {
+                heroName = context.getResources().getString(R.string.unknown);
+            }
 
             holder.kda.setText(context.getResources().getString(R.string.kda, matchShortInfo.getKills(), matchShortInfo.getDeaths(), matchShortInfo.getAssists()));
 
@@ -94,6 +98,7 @@ public class PlayerOverviewAdapter extends RecyclerView.Adapter<PlayerOverviewAd
 
             Glide.with(context)
                     .load(heroImg)
+                    .error(R.drawable.avatar_unknown_medium)
                     .fitCenter()
                     .into(holder.imageView);
         }
