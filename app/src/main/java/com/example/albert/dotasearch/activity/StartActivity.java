@@ -1,6 +1,5 @@
 package com.example.albert.dotasearch.activity;
 
-import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -137,7 +136,7 @@ public class StartActivity extends AppCompatActivity {
     public void checkDefaultInfoInDB(){
         Observable<List<Item>> data1 = db.itemDao().getAllRx().toObservable();
         Observable<List<Hero>> data2 = db.heroDao().getAllRx().toObservable();
-        Observable<List<ProPlayer>> data3 = db.proPlayerDao().getAllRx().toObservable();
+        Observable<List<ProPlayer>> data3 = db.proPlayerDao().getAllRx1().toObservable();
         Observable<List<LobbyType>> data4 = db.lobbyTypeDao().getAllRx().toObservable();
         Observable<Boolean> zip = Observable.zip(data1, data2, data3, data4, new Function4<List<Item>, List<Hero>, List<ProPlayer>, List<LobbyType>, Boolean>() {
             @Override

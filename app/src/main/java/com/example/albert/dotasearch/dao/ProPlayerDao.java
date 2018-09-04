@@ -1,5 +1,6 @@
 package com.example.albert.dotasearch.dao;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -19,7 +20,10 @@ public interface ProPlayerDao {
     List<ProPlayer> getAll();
 
     @Query("SELECT * FROM proplayer")
-    Single<List<ProPlayer>> getAllRx();
+    LiveData<List<ProPlayer>> getAllRx();
+
+    @Query("SELECT * FROM proplayer")
+    Single<List<ProPlayer>> getAllRx1();
 
     @Insert
     void insertAll(List<ProPlayer> proPlayer);

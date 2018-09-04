@@ -1,14 +1,14 @@
 package com.example.albert.dotasearch.tabs;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,12 +20,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
-import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
-import com.example.albert.dotasearch.activity.MainActivity;
 import com.example.albert.dotasearch.adapter.ProPlayerAdapter;
 import com.example.albert.dotasearch.model.ProPlayer;
+import com.example.albert.dotasearch.viewModel.ProPlayersViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +32,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class TabProPlayers extends AbstractTabFragment {
 
@@ -44,12 +40,15 @@ public class TabProPlayers extends AbstractTabFragment {
     private static final String TAG = "TabProPlayers";
 
     private Unbinder unbinder;
-    public static List<ProPlayer> proPlayers = new ArrayList<>();
+    public List<ProPlayer> proPlayers;
+    private List<ProPlayer> proPlayersTemp;
     public ProPlayerAdapter mAdapter;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.text_view_no_internet) TextView textViewNotInternet;
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
+    @BindView(R.id.text_view_no_internet)
+    TextView textViewNotInternet;
 
     public static TabProPlayers getInstance(Context context) {
         Bundle args = new Bundle();
@@ -67,23 +66,33 @@ public class TabProPlayers extends AbstractTabFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        Log.e(TAG, "onCreateView");
         setHasOptionsMenu(true);
         view = inflater.inflate(LAYOUT, container, false);
 
         unbinder = ButterKnife.bind(this, view);
 
-        Disposable d1 = App.get().getDB().proPlayerDao()
-                .getAllRx()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::setAdapterAndRecyclerView);
+        setAdapterAndRecyclerView();
 
-        compositeDisposable.add(d1);
+        ProPlayersViewModel viewModel = ViewModelProviders.of(this).get(ProPlayersViewModel.class);
+        viewModel.getProPlayers().observe(this, new Observer<List<ProPlayer>>() {
+            @Override
+            public void onChanged(@Nullable List<ProPlayer> proPlayersResponse) {
+                if (proPlayersResponse != null) {
+                    proPlayers = proPlayersResponse;
+                    mAdapter.setData(proPlayers);
+                }
+                Log.d(TAG, proPlayers.size() + "");
+
+            }
+        });
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(view.getContext(), recyclerView, (view, position) -> {
-            ProPlayer proPlayer = proPlayers.get(position);
-            Toast.makeText(view.getContext(), proPlayer.getAccountId() + " is selected!", Toast.LENGTH_SHORT).show();
+            if (proPlayersTemp == null) {
+                Toast.makeText(view.getContext(), proPlayers.get(position).getAccountId() + " is selected!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(view.getContext(), proPlayersTemp.get(position).getAccountId() + " is selected!", Toast.LENGTH_SHORT).show();
+            }
         }));
         return view;
     }
@@ -95,28 +104,26 @@ public class TabProPlayers extends AbstractTabFragment {
 
         MenuItem item = menu.findItem(R.id.menu_search);
 
-        SearchView searchView = (SearchView)item.getActionView();
+        SearchView searchView = (SearchView) item.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mAdapter.filter(query);
+                filter(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mAdapter.filter(newText);
+                filter(newText);
                 return false;
             }
         });
     }
 
-    public void setAdapterAndRecyclerView(List<ProPlayer> proPlayers){
+    public void setAdapterAndRecyclerView() {
         Log.e(TAG, "setAdapterAndRecyclerView");
-        TabProPlayers.proPlayers = proPlayers;
-        mAdapter = new ProPlayerAdapter(proPlayers, view.getContext());
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext());
-        recyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new ProPlayerAdapter(getActivity());
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
     }
@@ -126,5 +133,27 @@ public class TabProPlayers extends AbstractTabFragment {
         super.onDestroyView();
         unbinder.unbind();
         compositeDisposable.dispose();
+    }
+
+    public void filter(String text) {
+        proPlayersTemp = new ArrayList<>();
+
+        if (text.isEmpty()) {
+            Log.d(TAG, "empty" + proPlayers.size());
+            proPlayersTemp = proPlayers;
+        } else {
+            text = text.toLowerCase();
+            for (ProPlayer item : proPlayers) {
+                if (item.getPersonaname() != null && item.getName() != null && item.getTeamName() != null) {
+                    if (item.getPersonaname().toLowerCase().contains(text)
+                            || item.getName().toLowerCase().contains(text)
+                            || item.getTeamName().toLowerCase().contains(text)) {
+                        proPlayersTemp.add(item);
+                    }
+                }
+            }
+        }
+
+        mAdapter.setData(proPlayersTemp);
     }
 }

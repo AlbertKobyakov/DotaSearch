@@ -46,14 +46,15 @@ public class FavoritePlayersAdapter extends RecyclerView.Adapter<FavoritePlayers
             holder.namePlayer.setText(favoritePlayer.getPersonaname());
             Glide.with(context)
                     .load(favoritePlayer.getAvatarfull())
+                    .error(R.drawable.avatar_unknown_medium)
                     .fitCenter()
                     .into(holder.imagePlayer);
-
-
         } else {
             holder.namePlayer.setText("список избранных пользователей пуст");
         }
     }
+
+
 
     public void setData(List<FavoritePlayer> favoritePlayers) {
         this.favoritePlayers = favoritePlayers;

@@ -7,6 +7,7 @@ import com.example.albert.dotasearch.model.MatchFullInfo;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.model.PlayerHero;
 import com.example.albert.dotasearch.model.PlayerInfo;
+import com.example.albert.dotasearch.model.ProMatch;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.model.Pros;
 import com.example.albert.dotasearch.model.Team;
@@ -28,6 +29,12 @@ public interface DotaClient {
 
     @GET("/api/proPlayers/")
     Observable<List<ProPlayer>> getAllProPlayerRx();
+
+    @GET("/api/teams/")
+    Single<List<Team>> getAllProTeam();
+
+    @GET("/api/promatches/")
+    Single<List<ProMatch>> getAllProMatch();
 
     @GET("/api/search")
     Single<List<FoundPlayer>> getFoundPlayersRx(

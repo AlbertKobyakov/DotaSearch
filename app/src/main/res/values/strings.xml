@@ -70,4 +70,5 @@
     <string name="result_search_query">найденно %1$d совпадений</string>
     <string name="by_query">По запросу:</string>
     <string name="found">\"%1$s\"</string>
+    <string name="favorite_players">Избранные игроки:</string>
 </resources>

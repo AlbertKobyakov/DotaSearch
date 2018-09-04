@@ -2,6 +2,7 @@ package com.example.albert.dotasearch.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,6 +113,7 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
 
     @Override
     public int getItemCount() {
+        Log.e(TAG, "kkk1111k");
         if (matchesCopy != null) {
             return matchesCopy.size();
         } else {

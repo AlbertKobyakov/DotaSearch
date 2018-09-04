@@ -48,4 +48,13 @@ public class FavoritePlayer {
     public void setPersonaname(String personaname) {
         this.personaname = personaname;
     }
+
+    @Override
+    public String toString() {
+        return "FavoritePlayer{" +
+                "accountId=" + accountId +
+                ", avatarfull='" + avatarfull + '\'' +
+                ", personaname='" + personaname + '\'' +
+                '}';
+    }
 }

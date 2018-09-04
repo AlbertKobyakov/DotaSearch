@@ -2,6 +2,7 @@ package com.example.albert.dotasearch.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,13 +10,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.albert.dotasearch.R;
+import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.tabs.TabProPlayers;
-import com.squareup.picasso.Picasso;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +26,7 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
     public static final String TAG = "ProPlayerAdapter";
     public static final int LAYOUT = R.layout.pro_player_list_row;
 
-
-    private List<ProPlayer> proPlayersCopy;
+    private List<ProPlayer> proPlayers;
     public Context context;
 
 
@@ -47,9 +45,13 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
     }
 
 
-    public ProPlayerAdapter(List<ProPlayer> proPlayerList, Context context) {
-        this.proPlayersCopy = new ArrayList<>(proPlayerList);
+    public ProPlayerAdapter(Context context) {
         this.context = context;
+    }
+
+    public void setData(List<ProPlayer> proPlayersList) {
+        proPlayers = new ArrayList<>(proPlayersList);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -62,62 +64,72 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
 
     @Override
     public void onBindViewHolder(ProPlayerAdapter.MyViewHolder holder, int position) {
-        ProPlayer proPlayer = TabProPlayers.proPlayers.get(position);
+        Log.e(TAG, proPlayers.size() + " lll");
+        if(proPlayers != null){
+            ProPlayer proPlayer = proPlayers.get(position);
 
-        if(proPlayer.getName() != null && proPlayer.getName().trim().length() > 0){
-            holder.nameProPlayer.setText(proPlayer.getName());
-        } else {
-            holder.nameProPlayer.setText(context.getResources().getString(R.string.unknown));
-        }
+            if(proPlayer.getName() != null && proPlayer.getName().trim().length() > 0){
+                holder.nameProPlayer.setText(proPlayer.getName());
+            } else {
+                holder.nameProPlayer.setText(context.getResources().getString(R.string.unknown));
+            }
 
-        if(proPlayer.getPersonaname() != null && proPlayer.getPersonaname().trim().length() > 0){
-            holder.personalNameProPlayer.setText(proPlayer.getPersonaname());
-        } else {
-            holder.personalNameProPlayer.setText(context.getResources().getString(R.string.unknown));
-        }
+            if(proPlayer.getPersonaname() != null && proPlayer.getPersonaname().trim().length() > 0){
+                holder.personalNameProPlayer.setText(proPlayer.getPersonaname());
+            } else {
+                holder.personalNameProPlayer.setText(context.getResources().getString(R.string.unknown));
+            }
 
-        if(proPlayer.getTeamName() != null && proPlayer.getTeamName().trim().length() > 0){
-            holder.teamNameProPlayer.setText(proPlayer.getTeamName());
-        } else {
-            holder.teamNameProPlayer.setText(context.getResources().getString(R.string.unknown));
-        }
+            if(proPlayer.getTeamName() != null && proPlayer.getTeamName().trim().length() > 0){
+                holder.teamNameProPlayer.setText(proPlayer.getTeamName());
+            } else {
+                holder.teamNameProPlayer.setText(context.getResources().getString(R.string.unknown));
+            }
 
-        if(proPlayer.getAvatarmedium() != null){
-            Glide.with(context)
-                    .load(proPlayer.getAvatarmedium())
-                    .fitCenter()
-                    .into(holder.imageView);
-        } else {
-            Glide.with(context)
-                    .load(R.drawable.avatar_unknown_medium)
-                    .fitCenter()
-                    .into(holder.imageView);
+            if(proPlayer.getAvatarmedium() != null){
+                Glide.with(context)
+                        .load(proPlayer.getAvatarmedium())
+                        .fitCenter()
+                        .into(holder.imageView);
+            } else {
+                Glide.with(context)
+                        .load(R.drawable.avatar_unknown_medium)
+                        .fitCenter()
+                        .into(holder.imageView);
+            }
         }
     }
 
     @Override
     public int getItemCount() {
-        return TabProPlayers.proPlayers.size();
+
+        Log.e(TAG, (proPlayers != null) + "kkkk");
+        if(proPlayers != null){
+            return proPlayers.size();
+        } else {
+            return 0;
+        }
+
     }
 
     public void filter(String text) {
-        TabProPlayers.proPlayers.clear();
+        List<ProPlayer> proPlayersTemp = new ArrayList<>();
+
         if(text.isEmpty()){
-            TabProPlayers.proPlayers = new ArrayList<>(proPlayersCopy);
-        } else{
+            Log.d(TAG, "empty" + proPlayers.size());
+            proPlayersTemp = proPlayers;
+        } else {
             text = text.toLowerCase();
-            for(ProPlayer item: proPlayersCopy){
+            for(ProPlayer item: proPlayers){
                 if(item.getPersonaname() != null && item.getName() != null && item.getTeamName() != null){
-                    if(
-                        item.getPersonaname().toLowerCase().contains(text)
-                        || item.getName().toLowerCase().contains(text)
-                        || item.getTeamName().toLowerCase().contains(text)
-                    ){
-                        TabProPlayers.proPlayers.add(item);
+                    if(item.getPersonaname().toLowerCase().contains(text)
+                            || item.getName().toLowerCase().contains(text)
+                            || item.getTeamName().toLowerCase().contains(text)){
+                        proPlayersTemp.add(item);
                     }
                 }
             }
         }
-        notifyDataSetChanged();
+        setData(proPlayersTemp);
     }
 }
