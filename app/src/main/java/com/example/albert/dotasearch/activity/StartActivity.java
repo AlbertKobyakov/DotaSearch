@@ -33,7 +33,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function3;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function4;
 import io.reactivex.schedulers.Schedulers;
 
@@ -47,8 +47,10 @@ public class StartActivity extends AppCompatActivity {
     private ConnectivityChangedReceiverTest connectivityReceiver;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    @BindView(R.id.loading) TextView textViewLoading;
-    @BindView(R.id.btn_exit) Button btnExit;
+    @BindView(R.id.loading)
+    TextView textViewLoading;
+    @BindView(R.id.btn_exit)
+    Button btnExit;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,44 +70,52 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if(connectivityReceiver != null){
+        if (connectivityReceiver != null) {
             unregisterReceiver(connectivityReceiver);
             connectivityReceiver = null;
             Log.e(TAG, "unregisterReceiver");
         }
     }
 
-    public void loadMainActivity(boolean run){
-        if(run){
+    public void loadMainActivity(boolean run) {
+        if (run) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
         }
     }
 
-    public void getDataFromApiAndSaveToBD(boolean loadMainActivity){
+    public void getDataFromApiAndSaveToBD(boolean loadMainActivity) {
         Observable<List<Hero>> heroApi = UtilDota.initRetrofitRx()
                 .getAllHeroesRx()
                 .doOnNext(UtilDota::storeHeroesInDB); //сохраняю в бд
 
-        Observable<List<ProPlayer>> proPlayerApi = UtilDota.initRetrofitRx()
+        /*Observable<List<ProPlayer>> proPlayerApi = UtilDota.initRetrofitRx()
                 .getAllProPlayerRx()
-                .doOnNext(UtilDota::storeProPlayersInDB); //сохраняю в бд
+                .doOnNext(UtilDota::storeProPlayersInDB); //сохраняю в бд*/
 
         Observable<ItemsInfoWithSteam> itemsSteamApi = UtilDota.initRetrofitRxSteame()
                 .getItemInfoSteamRx(KEY)
                 .doOnNext(UtilDota::storeItemsSteamInDB); //сохраняю в бд
 
-        Observable<Boolean> loadDefaultDataWithApi = Observable.zip(heroApi, proPlayerApi, itemsSteamApi, new Function3<List<Hero>, List<ProPlayer>, ItemsInfoWithSteam, Boolean>() {
+        /*Observable<Boolean> loadDefaultDataWithApi = Observable.zip(heroApi*//*, proPlayerApi*//*, itemsSteamApi, new Function3<List<Hero>, *//*List<ProPlayer>,*//* ItemsInfoWithSteam, Boolean>() {
                     @Override
                     public Boolean apply(List<Hero> heroes, List<ProPlayer> proPlayers, ItemsInfoWithSteam itemsInfoWithSteam) throws Exception {
                         return heroes.size() > 0 && itemsInfoWithSteam.getResult().getItems().size() > 0 && proPlayers.size() > 0;
                     }
-                });
+                });*/
+
+        Observable<Boolean> loadDefaultDataWithApi = Observable.zip(heroApi, itemsSteamApi, new BiFunction<List<Hero>, ItemsInfoWithSteam, Boolean>() {
+            @Override
+            public Boolean apply(List<Hero> heroes, ItemsInfoWithSteam itemsInfoWithSteam) throws Exception {
+                Log.d(TAG, (heroes.size() > 0) + " " + (itemsInfoWithSteam.getResult().getItems().size() > 0));
+                return heroes.size() > 0 && itemsInfoWithSteam.getResult().getItems().size() > 0;
+            }
+        });
 
         Disposable d1 = loadDefaultDataWithApi
                 .map(bool -> {
-                    if(loadMainActivity) {
+                    if (loadMainActivity) {
                         Log.d(TAG, "insert lobbyType");
                         db.lobbyTypeDao().insertAll(UtilDota.getAllLobbyTypes());
                     }
@@ -116,16 +126,18 @@ public class StartActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         b -> Log.e("onNext", "Success"),
-                        error -> Log.e("onError", error.getLocalizedMessage() + "3"),
+                        error -> {
+                            Log.e(TAG, error.getLocalizedMessage() + "3");
+                            error.printStackTrace();
+                        },
                         () -> loadMainActivity(loadMainActivity)
                 );
 
         compositeDisposable.add(d1);
-
     }
 
-    public void runMainActivityAndLoadDefaultData(Boolean success){
-        if(success){
+    public void runMainActivityAndLoadDefaultData(Boolean success) {
+        if (success) {
             getDataFromApiAndSaveToBD(false);
             loadMainActivity(true);
         } else {
@@ -133,15 +145,15 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    public void checkDefaultInfoInDB(){
+    public void checkDefaultInfoInDB() {
         Observable<List<Item>> data1 = db.itemDao().getAllRx().toObservable();
         Observable<List<Hero>> data2 = db.heroDao().getAllRx().toObservable();
         Observable<List<ProPlayer>> data3 = db.proPlayerDao().getAllRx1().toObservable();
         Observable<List<LobbyType>> data4 = db.lobbyTypeDao().getAllRx().toObservable();
         Observable<Boolean> zip = Observable.zip(data1, data2, data3, data4, new Function4<List<Item>, List<Hero>, List<ProPlayer>, List<LobbyType>, Boolean>() {
             @Override
-            public Boolean apply(List<Item> items, List<Hero> heroes, List<ProPlayer> proPlayers, List<LobbyType> lobbyTypes) throws Exception {
-                return items.size() > 0 && heroes.size() > 0 && proPlayers.size() > 0 && lobbyTypes.size() > 0;
+            public Boolean apply(List<Item> items, List<Hero> heroes, List<ProPlayer> proPlayers, List<LobbyType> lobbyTypes) {
+                return items.size() > 0 && heroes.size() > 0 && lobbyTypes.size() > 0;
             }
         });
 
@@ -157,11 +169,10 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //compositeDisposable.dispose();
     }
 
     @OnClick(R.id.btn_exit)
-    public void onClick(View view){
+    public void onClick(View view) {
         finish();
     }
 
@@ -171,15 +182,15 @@ public class StartActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetwork = null;
             if (cm != null) {
                 activeNetwork = cm.getActiveNetworkInfo();
             }
-            if(activeNetwork != null && activeNetwork.isConnected()){
+            if (activeNetwork != null && activeNetwork.isConnected()) {
                 Log.e(TAG, "Data connected");
                 textViewLoading.setText("Загрузка...");
-                if(btnExit.getVisibility() == View.VISIBLE){
+                if (btnExit.getVisibility() == View.VISIBLE) {
                     btnExit.setVisibility(View.INVISIBLE);
                 }
 

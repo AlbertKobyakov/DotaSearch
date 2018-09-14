@@ -1,6 +1,7 @@
 package com.example.albert.dotasearch.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Pros;
 
@@ -32,12 +34,8 @@ public class PlayerProsAdapter extends RecyclerView.Adapter<PlayerProsAdapter.My
         TextView proTeam;
         @BindView(R.id.pro_all_matches)
         TextView proAllMatches;
-        /*@BindView(R.id.matches_with)
-        TextView matchesWith;*/
         @BindView(R.id.matches_with_win)
         TextView matchesWithWin;
-        /*@BindView(R.id.matches_against)
-        TextView matchesAgainst;*/
         @BindView(R.id.matches_against_win)
         TextView matchesAgainstWin;
         @BindView(R.id.pros_avatar)
@@ -54,8 +52,9 @@ public class PlayerProsAdapter extends RecyclerView.Adapter<PlayerProsAdapter.My
         this.context = context;
     }
 
+    @NonNull
     @Override
-    public PlayerProsAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PlayerProsAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(LAYOUT, parent, false);
 
@@ -63,7 +62,7 @@ public class PlayerProsAdapter extends RecyclerView.Adapter<PlayerProsAdapter.My
     }
 
     @Override
-    public void onBindViewHolder(PlayerProsAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PlayerProsAdapter.MyViewHolder holder, int position) {
         if (pros != null) {
             Pros proPlayer = pros.get(position);
 
@@ -71,32 +70,31 @@ public class PlayerProsAdapter extends RecyclerView.Adapter<PlayerProsAdapter.My
 
             holder.proTeam.setText(proPlayer.getTeamName());
 
-            holder.proAllMatches.setText(proPlayer.getGames() + "");
-
-            //holder.matchesWith.setText(proPlayer.getWithGames() + "");
+            holder.proAllMatches.setText(context.getResources().getString(R.string.pro_all_matches, proPlayer.getGames()));
 
             double withWin = (double) proPlayer.getWithWin() / (double) proPlayer.getWithGames() * 100;
 
             double againstWin = (double) proPlayer.getAgainstWin() / (double) proPlayer.getAgainstGames() * 100;
 
-            if(proPlayer.getWithWin() != 0){
-                holder.matchesWithWin.setText(twoNumberAfterPoint(withWin));
+            if (proPlayer.getWithWin() != 0) {
+                holder.matchesWithWin.setText(context.getResources().getString(R.string.matches_with_win, twoNumberAfterPoint(withWin)));
             } else {
-                holder.matchesWithWin.setText(0 + "%");
+                holder.matchesWithWin.setText(context.getResources().getString(R.string.matches_with_win, "0"));
             }
 
-            //holder.matchesAgainst.setText(proPlayer.getAgainstGames() + "");
-
-            if(proPlayer.getAgainstWin() != 0){
-                holder.matchesAgainstWin.setText(twoNumberAfterPoint(againstWin));
+            if (proPlayer.getAgainstWin() != 0) {
+                holder.matchesAgainstWin.setText(context.getResources().getString(R.string.matches_with_win, twoNumberAfterPoint(againstWin)));
             } else {
-                holder.matchesAgainstWin.setText(0 + "%");
+                holder.matchesAgainstWin.setText(context.getResources().getString(R.string.matches_with_win, "0"));
             }
+
+            RequestOptions fitCenter = new RequestOptions()
+                    .fitCenter();
 
             Glide.with(context)
                     .load(proPlayer.getAvatarmedium())
-                    .error(R.drawable.avatar_unknown_medium)
-                    .fitCenter()
+                    .error(Glide.with(context).load(R.drawable.avatar_unknown_medium))
+                    .apply(fitCenter)
                     .into(holder.prosAvatar);
 
         } else {
@@ -104,9 +102,9 @@ public class PlayerProsAdapter extends RecyclerView.Adapter<PlayerProsAdapter.My
         }
     }
 
-    public String twoNumberAfterPoint(double number) {
+    private String twoNumberAfterPoint(double number) {
         DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(number) + "%";
+        return df.format(number);
     }
 
     public void setData(List<Pros> prosResponse) {

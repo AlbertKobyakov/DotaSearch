@@ -1,10 +1,17 @@
 package com.example.albert.dotasearch.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
+import android.support.annotation.NonNull;
+
+import com.example.albert.dotasearch.TypeConverter.LeaderboardConverter;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+@Entity
 public class TimeRefreshLeaderBoard {
     @SerializedName("time_posted")
     @Expose
@@ -17,7 +24,20 @@ public class TimeRefreshLeaderBoard {
     private long serverTime;
     @SerializedName("leaderboard")
     @Expose
+    @TypeConverters(LeaderboardConverter.class)
     private List<Leaderboard> leaderboard = null;
+    @PrimaryKey
+    @NonNull
+    private String division = "";
+
+    @NonNull
+    public String getDivision() {
+        return division;
+    }
+
+    public void setDivision(@NonNull String division) {
+        this.division = division;
+    }
 
     public long getTimePosted() {
         return timePosted;
@@ -25,11 +45,6 @@ public class TimeRefreshLeaderBoard {
 
     public void setTimePosted(long timePosted) {
         this.timePosted = timePosted;
-    }
-
-    public TimeRefreshLeaderBoard withTimePosted(long timePosted) {
-        this.timePosted = timePosted;
-        return this;
     }
 
     public long getNextScheduledPostTime() {
@@ -40,11 +55,6 @@ public class TimeRefreshLeaderBoard {
         this.nextScheduledPostTime = nextScheduledPostTime;
     }
 
-    public TimeRefreshLeaderBoard withNextScheduledPostTime(long nextScheduledPostTime) {
-        this.nextScheduledPostTime = nextScheduledPostTime;
-        return this;
-    }
-
     public long getServerTime() {
         return serverTime;
     }
@@ -53,21 +63,11 @@ public class TimeRefreshLeaderBoard {
         this.serverTime = serverTime;
     }
 
-    public TimeRefreshLeaderBoard withServerTime(long serverTime) {
-        this.serverTime = serverTime;
-        return this;
-    }
-
     public List<Leaderboard> getLeaderboard() {
         return leaderboard;
     }
 
     public void setLeaderboard(List<Leaderboard> leaderboard) {
         this.leaderboard = leaderboard;
-    }
-
-    public TimeRefreshLeaderBoard withLeaderboard(List<Leaderboard> leaderboard) {
-        this.leaderboard = leaderboard;
-        return this;
     }
 }

@@ -21,7 +21,7 @@ public class SearchViewModel extends ViewModel {
         return foundPlayers;
     }
 
-    public void searchRequest(String query){
+    public void searchRequest(String query) {
         repository.searchResult(query);
     }
 }

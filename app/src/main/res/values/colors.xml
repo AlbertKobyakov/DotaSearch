@@ -8,7 +8,7 @@
     <!--<color name="colorAccent">#FF4081</color>-->
     <color name="colorAccent">#222222</color>
     <color name="year">#999999</color>
-    <color name="title">#222222</color>
+    <color name="titleTab">#222222</color>
     <color name="win">#a8fa74</color>
     <color name="lose">#f1745e</color>
     <color name="gray">#484747</color>

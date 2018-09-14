@@ -12,11 +12,13 @@ import java.util.List;
 public class ProTeamsViewModel extends ViewModel {
     private LiveData<List<Team>> teams;
     private ProTeamRepository repository;
+    private static final String TAG = ProTeamsViewModel.class.getSimpleName();
 
     public ProTeamsViewModel() {
+        Log.d(TAG, "create");
         repository = new ProTeamRepository();
-        teams = repository.getProTeam();
-        Log.d("viewmodel", "create");
+        teams = repository.getTeams();
+        repository.checkValidateTeamsData();
     }
 
     public LiveData<List<Team>> getTeams() {

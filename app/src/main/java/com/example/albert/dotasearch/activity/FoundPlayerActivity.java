@@ -1,11 +1,6 @@
 package com.example.albert.dotasearch.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -36,6 +31,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -52,22 +48,29 @@ public class FoundPlayerActivity extends AppCompatActivity {
 
     public AppDatabase db;
 
-    public static List<FoundPlayer> foundPlayers;
     private FoundPlayerAdapter mAdapter;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private Unbinder unbinder;
 
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.text_toolbar_parallax_1) TextView textToolbarParallax1;
-    @BindView(R.id.text_toolbar_parallax_2) TextView textToolbarParallax2;
-    @BindView(R.id.text_toolbar_parallax_3) TextView textToolbarParallax3;
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.text_toolbar_parallax_1)
+    TextView textToolbarParallax1;
+    @BindView(R.id.text_toolbar_parallax_2)
+    TextView textToolbarParallax2;
+    @BindView(R.id.text_toolbar_parallax_3)
+    TextView textToolbarParallax3;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(LAYOUT);
 
-        ButterKnife.bind(this);
+        unbinder = ButterKnife.bind(this);
+
+        setAdapterAndRecyclerView();
 
         query = getIntent().getStringExtra("query");
 
@@ -81,23 +84,21 @@ public class FoundPlayerActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        FoundPlayerActivity::setFoundPlayers,
-                        error -> Log.e(TAG, error.getLocalizedMessage()),
-                        this::setAdapterAndRecyclerView
+                        this::setFoundPlayers,
+                        error -> Log.e(TAG, error.getLocalizedMessage())
                 );
 
         compositeDisposable.add(d1);
     }
 
-    public static void setFoundPlayers(List<FoundPlayer> foundPlayers1) {
-        foundPlayers = foundPlayers1;
-    }
-
-    public void setAdapterAndRecyclerView(){
+    public void setFoundPlayers(List<FoundPlayer> foundPlayers) {
+        mAdapter.setData(foundPlayers);
         textToolbarParallax2.setText(getResources().getString(R.string.found, query));
         textToolbarParallax3.setText(getResources().getString(R.string.result_search_query, foundPlayers.size()));
+    }
 
-        mAdapter = new FoundPlayerAdapter(foundPlayers, FoundPlayerActivity.this);
+    public void setAdapterAndRecyclerView() {
+        mAdapter = new FoundPlayerAdapter(getApplicationContext());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -106,7 +107,7 @@ public class FoundPlayerActivity extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                foundPlayer = foundPlayers.get(position);
+                foundPlayer = mAdapter.getFoundPlayerByPosition(position);
 
                 Disposable dis = hasInternetConnection().subscribe(
                         isInternet -> {
@@ -124,8 +125,7 @@ public class FoundPlayerActivity extends AppCompatActivity {
         }));
     }
 
-
-    public void goToPlayerInfoActivity(FoundPlayer foundPlayer){
+    public void goToPlayerInfoActivity(FoundPlayer foundPlayer) {
         Intent intent = new Intent(FoundPlayerActivity.this, PlayerInfoActivity.class);
         intent.putExtra("accountId", foundPlayer.getAccountId());
         intent.putExtra("personalName", foundPlayer.getPersonaname());
@@ -140,7 +140,7 @@ public class FoundPlayerActivity extends AppCompatActivity {
 
         MenuItem item = menu.findItem(R.id.menu_search);
 
-        SearchView searchView = (SearchView)item.getActionView();
+        SearchView searchView = (SearchView) item.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -159,28 +159,28 @@ public class FoundPlayerActivity extends AppCompatActivity {
     }
 
     private void initToolbar() {
-            toolbar.setTitle(R.string.search_players);
-            toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onBackPressed();
-                }
-            });
+        toolbar.setTitle(R.string.search_players);
+        toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.dispose();
+        unbinder.unbind();
     }
 
     Single<Boolean> hasInternetConnection() {
         return Single.fromCallable(() -> {
             try {
-                // Connect to Google DNS to check for connection
+                // Connect to Google DNS to checkValidateTeamsData for connection
                 int timeoutMs = 1500;
                 Socket socket = new Socket();
                 InetSocketAddress socketAddress = new InetSocketAddress("8.8.8.8", 53);

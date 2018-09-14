@@ -1,13 +1,11 @@
 package com.example.albert.dotasearch.tabs;
 
-import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -17,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.albert.dotasearch.AbstractTabFragment;
@@ -36,54 +36,56 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Optional;
+import butterknife.Unbinder;
 
 public class TabMatchDetail extends AbstractTabFragment {
 
     private static final String TAG = "TabMatchDetail";
     private static final int LAYOUT = R.layout.fragment_match_detail;
     private static final int SECONDS_IN_MINUTE = 60;
-    MatchDetailWithItems matchDetailWithItems;
+    private static final int TOTAL_PLAYERS_IN_MATCH = 10;
 
     private MatchDetailAdapter mAdapterRadiant;
     private MatchDetailAdapter mAdapterDire;
     private List<Player> playersDire;
     private List<Player> playersRadiant;
-    private List<Player> players;
-    MatchDetailViewModel viewModel;
+    private MatchDetailViewModel viewModel;
+    private Unbinder unbinder;
+    private View view;
 
-    @BindView(R.id.recycler_view_radiant) RecyclerView recyclerViewRadiant;
-    @BindView(R.id.recycler_view_dire) RecyclerView recyclerViewDire;
-    @BindView(R.id.who_win) TextView whoWin;
-    @BindView(R.id.game_mode_and_lobby_type) TextView gameModeAndLobbyType;
-    @BindView(R.id.text_dire) TextView textDire;
-    @BindView(R.id.text_radiant) TextView textRadiant;
+    @BindView(R.id.recycler_view_radiant)
+    RecyclerView recyclerViewRadiant;
+    @BindView(R.id.recycler_view_dire)
+    RecyclerView recyclerViewDire;
+    @BindView(R.id.who_win)
+    TextView whoWin;
+    @BindView(R.id.game_mode_and_lobby_type)
+    TextView gameModeAndLobbyType;
+    @BindView(R.id.text_dire)
+    TextView textDire;
+    @BindView(R.id.text_radiant)
+    TextView textRadiant;
 
-    @BindView(R.id.radiant_score) TextView radiantScore;
-    @BindView(R.id.dire_score) TextView direScore;
-    @BindView(R.id.match_duration) TextView matchDuration;
+    @BindView(R.id.radiant_score)
+    TextView radiantScore;
+    @BindView(R.id.dire_score)
+    TextView direScore;
+    @BindView(R.id.match_duration)
+    TextView matchDuration;
 
-    public static TabMatchDetail getInstance(Context context) {
-        Bundle args = new Bundle();
-        TabMatchDetail fragment = new TabMatchDetail();
-        fragment.setArguments(args);
-        fragment.setContext(context);
-        fragment.setTitle(context.getString(R.string.overview));
-        return fragment;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
+    @BindView(R.id.root_layout)
+    ScrollView rootLayout;
+    @BindView(R.id.empty_layout)
+    RelativeLayout emptyLayout;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
 
         Log.e(TAG, "onCreateView");
 
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         setAdapterAndRecyclerView();
 
@@ -106,9 +108,9 @@ public class TabMatchDetail extends AbstractTabFragment {
         recyclerViewDire.setNestedScrollingEnabled(false);
     }
 
-    public void setItemTouchListenerDire(RecyclerView recyclerView){
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(context, recyclerView, (view, position) -> {
-            if(playersDire.get(position).getAccountId() != 0){
+    public void setItemTouchListenerDire(RecyclerView recyclerView) {
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, (view, position) -> {
+            if (playersDire.get(position).getAccountId() != 0) {
                 Log.e("44444444", "444444444444441");
                 Intent intent = new Intent(getActivity(), PlayerInfoActivity.class);
                 intent.putExtra("accountId", playersDire.get(position).getAccountId());
@@ -121,9 +123,9 @@ public class TabMatchDetail extends AbstractTabFragment {
         }));
     }
 
-    public void setItemTouchListenerRadiant(RecyclerView recyclerView){
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(context, recyclerView, (view, position) -> {
-            if(playersRadiant.get(position).getAccountId() != 0){
+    public void setItemTouchListenerRadiant(RecyclerView recyclerView) {
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, (view, position) -> {
+            if (playersRadiant.get(position).getAccountId() != 0) {
                 Log.e("44444444", "444444444444441");
                 Intent intent = new Intent(getActivity(), PlayerInfoActivity.class);
                 intent.putExtra("accountId", playersRadiant.get(position).getAccountId());
@@ -146,35 +148,52 @@ public class TabMatchDetail extends AbstractTabFragment {
         matchDetail.observe(this, new Observer<MatchDetailWithItems>() {
             @Override
             public void onChanged(@Nullable MatchDetailWithItems matchDetailWithItems) {
-                if(matchDetailWithItems != null){
-                    MatchFullInfo matchFullInfo = matchDetailWithItems.getMatchFullInfo();
-                    playersDire = matchDetailWithItems.getMatchFullInfo().getPlayers().subList(5, 10);
-                    playersRadiant = matchDetailWithItems.getMatchFullInfo().getPlayers().subList(0, 5);
-                    mAdapterRadiant.setData(playersRadiant, matchDetailWithItems.getItems());
-                    mAdapterDire.setData(playersDire, matchDetailWithItems.getItems());
-
-                    String gameMode = UtilDota.getGameModeById(matchFullInfo.getGameMode());
-                    String lobbyType = UtilDota.getLobbyTypeById(matchFullInfo.getLobbyType());
-                    gameModeAndLobbyType.setText(gameMode + "/" + lobbyType);
-
-                    if(matchDetailWithItems.getMatchFullInfo().isRadiantWin()){
-                        whoWin.setText(getResources().getString(R.string.radiant_victory));
-                        textRadiant.setTextColor(getActivity().getResources().getColor(R.color.win));
-                        textDire.setTextColor(getActivity().getResources().getColor(R.color.lose));
-                    } else {
-                        whoWin.setText(getResources().getString(R.string.dire_victory));
-                        textRadiant.setTextColor(getActivity().getResources().getColor(R.color.lose));
-                        textDire.setTextColor(getActivity().getResources().getColor(R.color.win));
-                    }
-
-                    long minutes = matchFullInfo.getDuration()/ SECONDS_IN_MINUTE;
-                    long seconds = matchFullInfo.getDuration()-(minutes * SECONDS_IN_MINUTE);
-                    radiantScore.setText(getResources().getString(R.string.radiant_score, matchFullInfo.getRadiantScore()));
-                    direScore.setText(getResources().getString(R.string.dire_score, matchFullInfo.getDireScore()));
-                    matchDuration.setText(getResources().getString(R.string.match_duration, minutes, seconds));
+                if (matchDetailWithItems != null) {
+                    showData(matchDetailWithItems);
                 }
-
             }
         });
+    }
+
+    private void showData(MatchDetailWithItems matchDetailWithItems) {
+        MatchFullInfo matchFullInfo = matchDetailWithItems.getMatchFullInfo();
+        List<Player> players = matchFullInfo.getPlayers();
+        if (players.size() == TOTAL_PLAYERS_IN_MATCH) {
+            rootLayout.setVisibility(View.VISIBLE);
+            emptyLayout.setVisibility(View.GONE);
+            playersDire = matchFullInfo.getPlayers().subList(5, 10);
+            playersRadiant = matchFullInfo.getPlayers().subList(0, 5);
+            mAdapterRadiant.setData(playersRadiant, matchDetailWithItems.getItems());
+            mAdapterDire.setData(playersDire, matchDetailWithItems.getItems());
+
+            String gameMode = UtilDota.getGameModeById(matchFullInfo.getGameMode());
+            String lobbyType = UtilDota.getLobbyTypeById(matchFullInfo.getLobbyType());
+            gameModeAndLobbyType.setText(getResources().getString(R.string.game_mod_and_lobby_type, gameMode, lobbyType));
+
+            if (matchFullInfo.isRadiantWin()) {
+                whoWin.setText(getResources().getString(R.string.radiant_victory));
+                textRadiant.setTextColor(getResources().getColor(R.color.win));
+                textDire.setTextColor(getResources().getColor(R.color.lose));
+            } else {
+                whoWin.setText(getResources().getString(R.string.dire_victory));
+                textRadiant.setTextColor(getResources().getColor(R.color.lose));
+                textDire.setTextColor(getResources().getColor(R.color.win));
+            }
+
+            long minutes = matchFullInfo.getDuration() / SECONDS_IN_MINUTE;
+            long seconds = matchFullInfo.getDuration() - (minutes * SECONDS_IN_MINUTE);
+            radiantScore.setText(getResources().getString(R.string.radiant_score, matchFullInfo.getRadiantScore()));
+            direScore.setText(getResources().getString(R.string.dire_score, matchFullInfo.getDireScore()));
+            matchDuration.setText(getResources().getString(R.string.match_duration, minutes, seconds));
+        } else {
+            rootLayout.setVisibility(View.GONE);
+            emptyLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

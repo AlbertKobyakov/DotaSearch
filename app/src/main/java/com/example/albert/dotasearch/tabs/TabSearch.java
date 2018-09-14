@@ -2,14 +2,18 @@ package com.example.albert.dotasearch.tabs;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RVEmptyObserver;
 import com.example.albert.dotasearch.RecyclerTouchListener;
@@ -33,60 +36,61 @@ import com.example.albert.dotasearch.model.FoundPlayer;
 import com.example.albert.dotasearch.viewModel.FavoritePlayersViewModel;
 import com.example.albert.dotasearch.viewModel.SearchViewModel;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
-public class TabSearch extends AbstractTabFragment {
+public class TabSearch extends Fragment {
     private final static int LAYOUT = R.layout.fragment_search;
     private final static String TAG = "TabSearch";
 
     public FavoritePlayersViewModel mWordViewModel;
 
     private Unbinder unbinder;
-    private Context context;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private String query;
     private FavoritePlayersAdapter mAdapter;
     private List<FavoritePlayer> favoritePlayerList;
     private SearchViewModel viewModel;
+    private FragmentActivity activity;
 
-    @BindView(R.id.btn_search) Button btnSearch;
-    @BindView(R.id.search_edit) EditText searchEditText;
-    @BindView(R.id.progress_bar) ProgressBar progressBar;
-    @BindView(R.id.recycler_view_favorite) RecyclerView recyclerViewFavorite;
-    @BindView(R.id.search_image) ImageView imageView;
-    //@BindView(R.id.card2) CardView cardView;
-    @BindView(R.id.linear) LinearLayout linearLayout;
-    @BindView(R.id.list_favorite_players_wrapper) LinearLayout listFavoritePlayersWrapper;
+    @BindView(R.id.btn_search)
+    Button btnSearch;
+    @BindView(R.id.search_edit)
+    EditText searchEditText;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
+    @BindView(R.id.recycler_view_favorite)
+    RecyclerView recyclerViewFavorite;
+    @BindView(R.id.search_image)
+    ImageView imageView;
+    @BindView(R.id.linear)
+    LinearLayout linearLayout;
+    @BindView(R.id.list_favorite_players_wrapper)
+    LinearLayout listFavoritePlayersWrapper;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         Log.e(TAG, "onCreateView");
 
-        final View view = inflater.inflate(LAYOUT, container, false);
+        View view = inflater.inflate(LAYOUT, container, false);
 
-        context = view.getContext();
+        activity = getActivity();
 
         unbinder = ButterKnife.bind(this, view);
+
+        setToolbarTitle();
 
         setAdapterAndRecyclerView();
 
         mWordViewModel = ViewModelProviders.of(this).get(FavoritePlayersViewModel.class);
 
-        mWordViewModel.getmAllWords().observe(this, new Observer<List<FavoritePlayer>>() {
+        mWordViewModel.getAllFavoritePlayers().observe(this, new Observer<List<FavoritePlayer>>() {
             @Override
             public void onChanged(@Nullable List<FavoritePlayer> favoritePlayers) {
                 if (favoritePlayers != null) {
@@ -100,10 +104,13 @@ public class TabSearch extends AbstractTabFragment {
         viewModel.getFoundPlayers().observe(this, new Observer<List<FoundPlayer>>() {
             @Override
             public void onChanged(@Nullable List<FoundPlayer> foundPlayers) {
-                if(foundPlayers != null && foundPlayers.size() > 0){
+                if (foundPlayers != null && foundPlayers.size() > 0) {
                     Log.d(TAG, foundPlayers.get(0).getPersonaname());
-                    if(query != null){
+                    if (query != null) {
                         goToFoundPlayerActivity(query);
+                        query = null;
+                    } else {
+                        Log.d(TAG, "onChanged not query");
                     }
 
                 }
@@ -134,48 +141,53 @@ public class TabSearch extends AbstractTabFragment {
         return view;
     }
 
+    private void setToolbarTitle() {
+        if (activity.findViewById(R.id.toolbar) != null) {
+            Toolbar toolbar = activity.findViewById(R.id.toolbar);
+            toolbar.setTitle(R.string.search);
+        }
+    }
 
     public void setAdapterAndRecyclerView() {
-        mAdapter = new FavoritePlayersAdapter(getActivity());
+        mAdapter = new FavoritePlayersAdapter(activity);
 
-        recyclerViewFavorite.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerViewFavorite.setLayoutManager(new LinearLayoutManager(activity));
         recyclerViewFavorite.setItemAnimator(new DefaultItemAnimator());
         recyclerViewFavorite.setHasFixedSize(true);
         recyclerViewFavorite.setAdapter(mAdapter);
-        /*recyclerViewFavorite.addItemDecoration(new DividerItemDecoration(getContext(),
-                DividerItemDecoration.VERTICAL));*/
         mAdapter.registerAdapterDataObserver(new RVEmptyObserver(recyclerViewFavorite, linearLayout, listFavoritePlayersWrapper));
 
-        recyclerViewFavorite.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerViewFavorite, new RecyclerTouchListener.ClickListener() {
+        recyclerViewFavorite.addOnItemTouchListener(new RecyclerTouchListener(activity, recyclerViewFavorite, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Disposable dis = hasInternetConnection().subscribe(
-                        isInternet -> {
-                            if (isInternet) {
-                                goToPlayerInfoActivity(favoritePlayerList.get(position));
-                            } else {
-                                Snackbar.make(view, getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
-                            }
-                        },
-                        err -> System.out.println(err.getLocalizedMessage())
-                );
+                Log.d(TAG, "onClick recyclerViewFavorite" + position);
 
-                compositeDisposable.add(dis);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        goToPlayerInfoActivity(favoritePlayerList.get(position));
+                    }
+                }, 150);
+
             }
         }));
 
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                View viewActivity;
                 long currentAccountId = favoritePlayerList.get(viewHolder.getLayoutPosition()).getAccountId();
                 String currentPlayerName = favoritePlayerList.get(viewHolder.getLayoutPosition()).getPersonaname();
-                //Toast.makeText(context, "swipe " + currentAccountId, Toast.LENGTH_SHORT).show();
                 mWordViewModel.deletePlayerWithFavoriteList(currentAccountId);
-                Snackbar.make(getActivity().getWindow().getDecorView().getRootView(), "Игрок " + currentPlayerName + " удален из избранного", Snackbar.LENGTH_SHORT).show();
+
+                if (activity != null) {
+                    viewActivity = activity.getWindow().getDecorView().getRootView();
+                    Snackbar.make(viewActivity, "Игрок " + currentPlayerName + " удален из избранного", Snackbar.LENGTH_SHORT).show();
+                }
             }
 
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
         };
@@ -185,8 +197,8 @@ public class TabSearch extends AbstractTabFragment {
         itemTouchHelper.attachToRecyclerView(recyclerViewFavorite);
     }
 
-    public void goToPlayerInfoActivity(FavoritePlayer favoritePlayer){
-        Intent intent = new Intent(getContext(), PlayerInfoActivity.class);
+    public void goToPlayerInfoActivity(FavoritePlayer favoritePlayer) {
+        Intent intent = new Intent(activity, PlayerInfoActivity.class);
         intent.putExtra("accountId", favoritePlayer.getAccountId());
         intent.putExtra("personalName", favoritePlayer.getPersonaname());
         intent.putExtra("urlPlayer", favoritePlayer.getAvatarfull());
@@ -196,57 +208,38 @@ public class TabSearch extends AbstractTabFragment {
     @Override
     public void onStart() {
         super.onStart();
-        if(btnSearch != null && btnSearch.getVisibility() == View.GONE){
+        if (btnSearch != null && btnSearch.getVisibility() == View.GONE) {
             btnSearch.setVisibility(View.VISIBLE);
         }
-        if(progressBar != null && progressBar.getVisibility() == View.VISIBLE){
+        if (progressBar != null && progressBar.getVisibility() == View.VISIBLE) {
             progressBar.setVisibility(View.GONE);
         }
     }
 
-    public static TabSearch getInstance(Context context) {
-        Bundle args = new Bundle();
-        TabSearch fragment = new TabSearch();
-        fragment.setArguments(args);
-        fragment.setContext(context);
-        fragment.setTitle(context.getString(R.string.search));
-        return fragment;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
     @OnClick(R.id.btn_search)
     public void onClick(final View v) {
+
         query = searchEditText.getText().toString();
-        if(query.trim().length() == 0 || query.trim().length() < 3){
-            Snackbar.make(getActivity().getWindow().getDecorView().getRootView(), "Запрос должен состоять минимум из 3 символов", Snackbar.LENGTH_SHORT).show();
+
+        Log.d(TAG, "onClick btn_search");
+        if (query.trim().length() == 0 || query.trim().length() < 3) {
+            Snackbar.make(activity.getWindow().getDecorView().getRootView(), "Запрос должен состоять минимум из 3 символов", Snackbar.LENGTH_SHORT).show();
         } else {
-            btnSearch.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
+            viewModel.searchRequest(query);
 
-            Disposable dis = hasInternetConnection().subscribe(
-                    isInternet -> {
-                        if (isInternet) {
-                            viewModel.searchRequest(query);
-                        } else {
-                            Snackbar.make(v, getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
-                            btnSearch.setVisibility(View.VISIBLE);
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    },
-                    err -> System.out.println(err.getLocalizedMessage())
-            );
-
-            compositeDisposable.add(dis);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    btnSearch.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.VISIBLE);
+                }
+            }, 300);
         }
-
     }
 
-    public void goToFoundPlayerActivity(String query){
+    public void goToFoundPlayerActivity(String query) {
         Log.d(TAG, "goToFoundPlayerActivity");
-        Intent intent = new Intent(context, FoundPlayerActivity.class);
+        Intent intent = new Intent(activity, FoundPlayerActivity.class);
         intent.putExtra("query", query);
         startActivity(intent);
     }
@@ -257,10 +250,10 @@ public class TabSearch extends AbstractTabFragment {
         compositeDisposable.dispose();
     }
 
-    Single<Boolean> hasInternetConnection() {
+    /*Single<Boolean> hasInternetConnection() {
         return Single.fromCallable(() -> {
             try {
-                // Connect to Google DNS to check for connection
+                // Connect to Google DNS to checkValidateTeamsData for connection
                 int timeoutMs = 1500;
                 Socket socket = new Socket();
                 InetSocketAddress socketAddress = new InetSocketAddress("8.8.8.8", 53);
@@ -275,5 +268,5 @@ public class TabSearch extends AbstractTabFragment {
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-    }
+    }*/
 }

@@ -13,7 +13,7 @@ public class RVEmptyObserver extends RecyclerView.AdapterDataObserver {
      */
     public RVEmptyObserver(RecyclerView recyclerView, View emptyView, View recyclerViewWrapper) {
         this.recyclerView = recyclerView;
-        this.emptyView    = emptyView;
+        this.emptyView = emptyView;
         this.recyclerViewWrapper = recyclerViewWrapper;
         checkIfEmpty();
     }
@@ -22,7 +22,8 @@ public class RVEmptyObserver extends RecyclerView.AdapterDataObserver {
      * Check if Layout is empty and show the appropriate view
      */
     private void checkIfEmpty() {
-        if (emptyView != null && recyclerView.getAdapter() != null) {
+        //count для того чтобы убрать крастковременный показ макета пустого ресуклера
+        if (emptyView != null && recyclerView.getAdapter() != null/* && count > 0*/) {
             boolean emptyViewVisible = recyclerView.getAdapter().getItemCount() == 0;
             emptyView.setVisibility(emptyViewVisible ? View.VISIBLE : View.GONE);
             recyclerViewWrapper.setVisibility(emptyViewVisible ? View.GONE : View.VISIBLE);
@@ -30,7 +31,7 @@ public class RVEmptyObserver extends RecyclerView.AdapterDataObserver {
     }
 
     /**
-     Abstract method implementations
+     * Abstract method implementations
      */
     @Override
     public void onChanged() {

@@ -1,46 +1,42 @@
 package com.example.albert.dotasearch;
 
-import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.SparseArray;
 
 import com.example.albert.dotasearch.tabs.TabMatchDetail;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class TabsFragmentMatchDetailAdapter extends FragmentPagerAdapter {
-    private Map<Integer, AbstractTabFragment> tabs;
-    private Context context;
 
-    public TabsFragmentMatchDetailAdapter(FragmentManager fm, Context context) {
+    private SparseArray<AbstractTabFragment> fragmentSparseArray = new SparseArray<>();
+
+    public TabsFragmentMatchDetailAdapter(FragmentManager fm) {
         super(fm);
 
-        this.context = context;
-
-        initTabsMap(context);
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return tabs.get(position).getTitle();
+        initTabsMap();
     }
 
     @Override
     public Fragment getItem(int position) {
-        return tabs.get(position);
+        return fragmentSparseArray.get(position);
     }
 
     @Override
     public int getCount() {
-        return tabs.size();
+        return fragmentSparseArray.size();
     }
 
-    private void initTabsMap(Context context) {
-        tabs = new HashMap<>();
-        tabs.put(0, TabMatchDetail.getInstance(context));
-        /*tabs.put(1, TabMatchDetailDamage.getInstance(context));
-        tabs.put(2, TabMatchDetailFarm.getInstance(context));*/
+    private void initTabsMap() {
+        TabMatchDetail tabMatchDetail = new TabMatchDetail();
+        tabMatchDetail.setTitle("Обзор");
+        fragmentSparseArray.put(0, tabMatchDetail);
+    }
+
+    @Nullable
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return fragmentSparseArray.get(position).getTitle();
     }
 }

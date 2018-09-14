@@ -1,8 +1,8 @@
 package com.example.albert.dotasearch.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +11,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
-import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,7 +25,6 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
 
 
     private List<MatchShortInfo> matchesCopy;
-    private Map<Integer, Hero> heroes;
     public Context context;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
@@ -54,8 +51,9 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
     }
 
 
+    @NonNull
     @Override
-    public PlayerInfoMatchesAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PlayerInfoMatchesAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(LAYOUT, parent, false);
 
@@ -63,23 +61,18 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
     }
 
     @Override
-    public void onBindViewHolder(PlayerInfoMatchesAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PlayerInfoMatchesAdapter.MyViewHolder holder, int position) {
 
         if (matchesCopy != null) {
             MatchShortInfo matchShortInfo = matchesCopy.get(position);
 
-            int heroId = (int) matchShortInfo.getHeroId();
-
             long minutes = matchShortInfo.getDuration() / 60;
             long seconds = matchShortInfo.getDuration() - (minutes * 60);
 
-            String heroName;
-            String heroImg = "";
+            String heroImg = matchShortInfo.getHeroImageUrl();
+            String heroName = matchShortInfo.getHeroName();
 
-            if(heroes.get(heroId) != null){
-                heroImg = heroes.get(heroId).getImg();
-                heroName = heroes.get(heroId).getLocalizedName();
-            } else {
+            if (heroName.trim().length() == 0) {
                 heroName = context.getResources().getString(R.string.unknown);
             }
 
@@ -99,21 +92,18 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
 
             Glide.with(context)
                     .load(heroImg)
-                    .error(R.drawable.avatar_unknown_medium)
-                    .fitCenter()
+                    .error(Glide.with(context).load(R.drawable.avatar_unknown_medium))
                     .into(holder.imageView);
         }
     }
 
-    public void setData(List<MatchShortInfo> match, Map<Integer, Hero> heroes) {
+    public void setData(List<MatchShortInfo> match) {
         this.matchesCopy = match;
-        this.heroes = heroes;
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        Log.e(TAG, "kkk1111k");
         if (matchesCopy != null) {
             return matchesCopy.size();
         } else {

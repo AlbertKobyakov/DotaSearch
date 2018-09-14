@@ -10,7 +10,6 @@ import com.example.albert.dotasearch.dao.HeroDao;
 import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.model.Hero;
-import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.model.PlayerHero;
 import com.example.albert.dotasearch.model.PlayerInfo;
 import com.example.albert.dotasearch.model.PlayerOverviewCombine;
@@ -26,7 +25,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-
 public class PlayerInfoRepository {
 
     public static final String TAG = "PlayerInfoRepository";
@@ -35,9 +33,7 @@ public class PlayerInfoRepository {
     private HeroDao heroDao;
     private AppDatabase db;
     private MutableLiveData<PlayerOverviewCombine> playerFullInfo;
-    private MutableLiveData<List<FavoritePlayer>> favoritePlayers;
     private MutableLiveData<Boolean> isFavoritePlayer;
-    private MutableLiveData<List<MatchShortInfo>> matches;
     private MutableLiveData<List<Pros>> pros;
     private MutableLiveData<List<PlayerHero>> playerHeroes;
 
@@ -47,8 +43,8 @@ public class PlayerInfoRepository {
         heroDao = db.heroDao();
     }
 
-    public LiveData<PlayerOverviewCombine> getLiveDataPlayerFullInfo(){
-        if(playerFullInfo == null){
+    public LiveData<PlayerOverviewCombine> getLiveDataPlayerFullInfo() {
+        if (playerFullInfo == null) {
             playerFullInfo = new MutableLiveData<>();
 
             System.out.println("NETWORK");
@@ -60,26 +56,20 @@ public class PlayerInfoRepository {
                     .getPlayerWinLoseById(accountId)
                     .subscribeOn(Schedulers.io());
 
-            /*Single<List<MatchShortInfo>> allMatches = UtilDota.initRetrofitRx()
-                    .getMatchesPlayerRx(accountId)
-                    .subscribeOn(Schedulers.io());*/
             Disposable disposable = Single.zip(
                     playerInfo,
                     winLose,
-                    //allMatches,
-                    (playerInfo1, winLose1/*, allMatches1*/) -> new PlayerOverviewCombine(playerInfo1, winLose1, /*allMatches1,*/ accountId))
+                    (playerInfo1, winLose1) -> new PlayerOverviewCombine(playerInfo1, winLose1, accountId))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             playerOverviewCombine -> playerFullInfo.setValue(playerOverviewCombine),
                             error -> System.out.println(error.getLocalizedMessage())
                     );
         }
-
         return playerFullInfo;
-
     }
 
-    public List<Hero> getAllHeroes(){
+    public List<Hero> getAllHeroes() {
         Log.e("TabPlayerOverview12", "DB GET HEROES");
         try {
             return new getHeroesAsyncTask(heroDao).execute().get();
@@ -91,42 +81,36 @@ public class PlayerInfoRepository {
         return null;
     }
 
-    public LiveData<PlayerOverviewCombine> getPlayerFullInfo() {
-        return playerFullInfo;
-    }
-
     public void insertPlayerToFavoriteList(FavoritePlayer favoritePlayer) {
-
         Disposable disposable = Single.fromCallable(() -> {
             db.favoritePlayerDao().insertPlayer(favoritePlayer);
             return Single.just(favoritePlayer.getAccountId());
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        accountId -> Log.d(TAG, "Player " + accountId + " inserted to favorite table"),
+                        accountId -> isFavoritePlayer.setValue(true),
                         Throwable::printStackTrace
                 );
 
         isPlayerFavoriteById(favoritePlayer.getAccountId());
-
     }
 
-    public void deletePlayerWithFavoriteList(long accountId){
+    public void deletePlayerWithFavoriteList(long accountId) {
         Disposable disposable = Single.fromCallable(() -> {
             db.favoritePlayerDao().deleteById(accountId);
             return Single.just(accountId);
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        id -> Log.d(TAG, "Player " + id + " deleted"),
+                        id -> isFavoritePlayer.setValue(false),
                         Throwable::printStackTrace
                 );
 
         isPlayerFavoriteById(accountId);
     }
 
-    public LiveData<Boolean> isPlayerFavoriteById(long accountId){
-        if(isFavoritePlayer == null){
+    public LiveData<Boolean> isPlayerFavoriteById(long accountId) {
+        if (isFavoritePlayer == null) {
             isFavoritePlayer = new MutableLiveData<>();
         }
 
@@ -142,8 +126,8 @@ public class PlayerInfoRepository {
 
     }
 
-    public LiveData<List<PlayerHero>> getPlayerHeroes(){
-        if(playerHeroes == null){
+    public LiveData<List<PlayerHero>> getPlayerHeroes() {
+        if (playerHeroes == null) {
             playerHeroes = new MutableLiveData<>();
         }
 
@@ -159,9 +143,9 @@ public class PlayerInfoRepository {
         return playerHeroes;
     }
 
-    public LiveData<List<Pros>> getPros(){
+    public LiveData<List<Pros>> getPros() {
         Log.d(TAG, "NETWORK REQUEST");
-        if(pros == null){
+        if (pros == null) {
             pros = new MutableLiveData<>();
         }
 
@@ -177,24 +161,7 @@ public class PlayerInfoRepository {
         return pros;
     }
 
-    public LiveData<List<MatchShortInfo>> getMatches(){
-        if(matches == null){
-            matches = new MutableLiveData<>();
-        }
-
-        Disposable disposable = UtilDota.initRetrofitRx()
-                .getMatchesPlayerRx(accountId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        matchShortInfos -> matches.setValue(matchShortInfos),
-                        err -> Log.e(TAG, err.getLocalizedMessage())
-                );
-
-        return matches;
-    }
-
-    private static class getHeroesAsyncTask extends AsyncTask<Void, Void, List<Hero>>{
+    private static class getHeroesAsyncTask extends AsyncTask<Void, Void, List<Hero>> {
         HeroDao daoAsync;
 
         getHeroesAsyncTask(HeroDao dao) {

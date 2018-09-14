@@ -1,90 +1,34 @@
 package com.example.albert.dotasearch.util;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.albert.dotasearch.App;
-import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
 import com.example.albert.dotasearch.model.ItemsInfoWithSteam;
-import com.example.albert.dotasearch.model.Leaderboard;
 import com.example.albert.dotasearch.model.LobbyType;
-import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.retrofit.DotaClient;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
-import okhttp3.Cache;
-import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static android.content.Context.MODE_PRIVATE;
-
 public class UtilDota {
-
-    private final static int CACHE_SIZE_BYTES = 1024 * 1024 * 2;
     private final static String TAG = "UtilDota";
 
     private static AppDatabase db = App.get().getDB();
 
-    private static Context context;
-
-    public UtilDota(Context context) {
-        this.context = context;
-    }
-
-    public UtilDota() {
-    }
-
-    final String GENERAL_VALUE = "general_value";
-
-    public DotaClient initRetrofit(String generalUrl){
-        Retrofit.Builder builder = new Retrofit.Builder()
-                .baseUrl(generalUrl)
-                .addConverterFactory(GsonConverterFactory.create());
-
-        Retrofit retrofit = builder.build();
-
-        DotaClient client = retrofit.create(DotaClient.class);
-        return client;
-    }
-
-    public DotaClient initRetrofit(String generalUrl, Context context){
-        Cache cache = new Cache(context.getCacheDir(), CACHE_SIZE_BYTES);
-
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .cache(cache)
-                .build();
-
-        Retrofit.Builder builder = new Retrofit.Builder()
-                .baseUrl(generalUrl)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create());
-
-        Retrofit retrofit = builder.build();
-
-        DotaClient client = retrofit.create(DotaClient.class);
-        return client;
-    }
-
-    public static DotaClient initRetrofitRx(){
+    public static DotaClient initRetrofitRx() {
         return new Retrofit.Builder()
                 .baseUrl("https://api.opendota.com")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -92,7 +36,7 @@ public class UtilDota {
                 .build().create(DotaClient.class);
     }
 
-    public static DotaClient initRetrofitRxSteame(){
+    public static DotaClient initRetrofitRxSteame() {
         return new Retrofit.Builder()
                 .baseUrl("https://api.steampowered.com")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -100,7 +44,7 @@ public class UtilDota {
                 .build().create(DotaClient.class);
     }
 
-    public static DotaClient initRetrofitRxDota2Ru(){
+    public static DotaClient initRetrofitRxDota2Ru() {
         return new Retrofit.Builder()
                 .baseUrl("http://www.dota2.com")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -108,57 +52,31 @@ public class UtilDota {
                 .build().create(DotaClient.class);
     }
 
-    public void saveValue(String name, int value, Activity activity) {
-        SharedPreferences sharedPreferences = activity.getSharedPreferences(GENERAL_VALUE, MODE_PRIVATE);
-        SharedPreferences.Editor ed = sharedPreferences.edit();
-        ed.putInt(name, value);
-        ed.apply();
-        Toast.makeText(activity, "Text saved", Toast.LENGTH_SHORT).show();
-    }
-
-    public int loadValue(String name, Activity activity) {
-        SharedPreferences sharedPreferences = activity.getSharedPreferences(GENERAL_VALUE, MODE_PRIVATE);
-        int value = sharedPreferences.getInt(name, 0);
-
-        Toast.makeText(activity, "Load Value", Toast.LENGTH_SHORT).show();
-        return value;
-    }
-
-    public static void storeProPlayersInDB(List<ProPlayer> proPlayers){
-        if(db.proPlayerDao().getAll().size() == 0){
-            db.proPlayerDao().insertAll(proPlayers);
-            Log.e(TAG, "Success. proPlayers insert to Db " + Thread.currentThread().getName() + " " + proPlayers.size());
-        } else {
-            db.proPlayerDao().updateAll(proPlayers);
-            Log.e(TAG, "Success. proPlayers update to Db " + Thread.currentThread().getName() + " " + proPlayers.size());
-        }
-    }
-
-    public static String createUrlItem(String nameItem){
+    private static String createUrlItem(String nameItem) {
         nameItem = nameItem.replace("item_", "");
         nameItem = "https://api.opendota.com/apps/dota2/images/items/" + nameItem + "_lg.png";
         Log.d(TAG, "String after replace = " + nameItem);
         return nameItem;
     }
 
-    public static void setUrlItem(List<Item> items){
-        for (int i = 0; i < items.size(); i++){
+    private static void setUrlItem(List<Item> items) {
+        for (int i = 0; i < items.size(); i++) {
             Item item = items.get(i);
             String itemName = item.getName();
             items.get(i).setItemUrl(createUrlItem(itemName));
         }
     }
 
-    public static void setMissingItems(List<Item> items){
+    private static void setMissingItems(List<Item> items) {
         items.add(new Item(0, "item_empty"));
         items.add(new Item(195, "item_recipe_diffusal_blade_2"));
         items.add(new Item(196, "item_diffusal_blade_2"));
         items.add(new Item(84, "item_flying_courier"));
     }
 
-    public static void storeItemsSteamInDB(ItemsInfoWithSteam itemsInfoWithSteam){
+    public static void storeItemsSteamInDB(ItemsInfoWithSteam itemsInfoWithSteam) {
         long status = itemsInfoWithSteam.getResult().getStatus();
-        if(status == 200){
+        if (status == 200) {
             Log.e(TAG, "successes, status = " + status);
 
             List<Item> items = itemsInfoWithSteam.getResult().getItems();
@@ -166,7 +84,7 @@ public class UtilDota {
             setMissingItems(items);
             setUrlItem(items);
 
-            if(db.itemDao().getAll().size() == 0){
+            if (db.itemDao().getAll().size() == 0) {
                 db.itemDao().insertAll(items);
                 Log.e(TAG, "Success. items insert to Db");
             } else {
@@ -179,17 +97,17 @@ public class UtilDota {
         }
     }
 
-    public static void setHeroFullIconAndImageUrl(List<Hero> heroes){
-        for(Hero hero : heroes){
+    private static void setHeroFullIconAndImageUrl(List<Hero> heroes) {
+        for (Hero hero : heroes) {
             hero.setImg("https://api.opendota.com" + hero.getImg());
             hero.setIcon("https://api.opendota.com" + hero.getIcon());
         }
     }
 
-    public static void storeHeroesInDB(List<Hero> heroes){
+    public static void storeHeroesInDB(List<Hero> heroes) {
         setHeroFullIconAndImageUrl(heroes);
 
-        if(db.heroDao().getAll().size() == 0){
+        if (db.heroDao().getAll().size() == 0) {
             db.heroDao().insertAll(heroes);
             Log.e(TAG, "Success. heroes insert to Db " + Thread.currentThread().getName() + " " + heroes.size());
         } else {
@@ -198,17 +116,7 @@ public class UtilDota {
         }
     }
 
-    public static void storeLeaderboardInDB(List<Leaderboard> leaderboards){
-        if(db.leaderboardDao().getAll().size() == 0){
-            db.leaderboardDao().insertAll(leaderboards);
-            Log.e("insertLeaderboard", "Success. Leaderboard save to Db " + Thread.currentThread().getName() + " " + leaderboards.size());
-        } else {
-            db.leaderboardDao().updateAll(leaderboards);
-            Log.e("updateLeaderboard", "Success. Leaderboard save to Db " + Thread.currentThread().getName() + " " + leaderboards.size());
-        }
-    }
-
-    public static String getGameModeById(long id){
+    public static String getGameModeById(long id) {
         SparseArray<String> gameModes = new SparseArray<>();
 
         gameModes.append(0, "None");
@@ -233,10 +141,10 @@ public class UtilDota {
         gameModes.append(21, "1v1 Mid Only");
         gameModes.append(22, "All Pick");
 
-        return gameModes.get((int)id);
+        return gameModes.get((int) id);
     }
 
-    public static String getLobbyTypeById(long id){
+    public static String getLobbyTypeById(long id) {
         SparseArray<String> lobbyTypes = new SparseArray<>();
 
         lobbyTypes.append(-1, "Invalid");
@@ -250,10 +158,10 @@ public class UtilDota {
         lobbyTypes.append(7, "Ranked");
         lobbyTypes.append(8, "1v1 Mid");
 
-        return lobbyTypes.get((int)id);
+        return lobbyTypes.get((int) id);
     }
 
-    public static List<LobbyType> getAllLobbyTypes(){
+    public static List<LobbyType> getAllLobbyTypes() {
         List<LobbyType> lobbyTypes = new ArrayList<>();
 
         lobbyTypes.add(new LobbyType(-1, "Invalid"));
@@ -273,7 +181,7 @@ public class UtilDota {
         return lobbyTypes;
     }
 
-    public static String getRankTier(Integer id){
+    public static String getRankTier(Integer id) {
 
         SparseArray<String> rankTiers = new SparseArray<>();
 
@@ -325,14 +233,15 @@ public class UtilDota {
         rankTiers.append(74, "Divine[4]");
         rankTiers.append(75, "Divine[5]");
         rankTiers.append(76, "Divine[6]");
+        rankTiers.append(80, "Immortal[0]");
 
         return rankTiers.get(id);
     }
 
-    public static String formatLongNumberToFloatWitK(Long number){
+    public static String formatLongNumberToFloatWitK(Long number) {
         String result;
-        if(number != 0){
-            float numberToFloat = (float)number / 1000;
+        if (number != 0) {
+            float numberToFloat = (float) number / 1000;
             result = new DecimalFormat("###.#").format(numberToFloat) + "k";
         } else {
             result = "-";
@@ -340,14 +249,14 @@ public class UtilDota {
         return result;
     }
 
-    public static void setImageView(String url, int defaultImage, ImageView imageView, Context context){
-        //Picasso.with(context).load(url).error(defaultImage).fit().into(imageView);
+    public static void setImageView(String url, int defaultImage, ImageView imageView, Context context) {
+        RequestOptions centerCrop = new RequestOptions()
+                .centerCrop();
+
         Glide.with(context)
                 .load(url)
-                .error(defaultImage)
-                .centerCrop()
+                .error(Glide.with(context).load(defaultImage))
+                .apply(centerCrop)
                 .into(imageView);
     }
-
-
 }

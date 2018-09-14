@@ -2,28 +2,23 @@ package com.example.albert.dotasearch.viewModel;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
+import android.util.SparseArray;
 
 import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.model.Hero;
-import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.model.PlayerHero;
 import com.example.albert.dotasearch.model.PlayerOverviewCombine;
 import com.example.albert.dotasearch.model.Pros;
 import com.example.albert.dotasearch.repository.PlayerInfoRepository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import io.reactivex.Single;
 
 public class PlayerInfoViewModel extends ViewModel {
     private PlayerInfoRepository repository;
-    private Map<Integer, Hero> heroes;
+    private SparseArray<Hero> heroes;
     private LiveData<PlayerOverviewCombine> playerFullInfo;
     private LiveData<Boolean> isFavoritePlayer;
     private long accountId;
-    private LiveData<List<MatchShortInfo>> matches;
     private LiveData<List<Pros>> pros;
     private LiveData<List<PlayerHero>> playerHeroes;
 
@@ -41,7 +36,6 @@ public class PlayerInfoViewModel extends ViewModel {
         playerFullInfo = repository.getLiveDataPlayerFullInfo();
         this.accountId = accountId;
         isFavoritePlayer = repository.isPlayerFavoriteById(accountId);
-        matches = repository.getMatches();
         pros = repository.getPros();
         playerHeroes = repository.getPlayerHeroes();
     }
@@ -50,11 +44,7 @@ public class PlayerInfoViewModel extends ViewModel {
         return isFavoritePlayer;
     }
 
-    public LiveData<List<MatchShortInfo>> getMatches() {
-        return matches;
-    }
-
-    public Map<Integer, Hero> getHeroes() {
+    public SparseArray<Hero> getHeroes() {
         return heroes;
     }
 
@@ -62,9 +52,9 @@ public class PlayerInfoViewModel extends ViewModel {
         return playerHeroes;
     }
 
-    public Map<Integer, Hero> sortHeroes(List<Hero> heroes){
-        Map<Integer, Hero> sortedHeroes = new HashMap<>();
-        for(int i = 0; i < heroes.size(); i++){
+    private SparseArray<Hero> sortHeroes(List<Hero> heroes) {
+        SparseArray<Hero> sortedHeroes = new SparseArray<>();
+        for (int i = 0; i < heroes.size(); i++) {
             System.out.println("id = " + heroes.get(i).getId() + " HERO = " + heroes.get(i));
             sortedHeroes.put(heroes.get(i).getId(), heroes.get(i));
         }
@@ -75,15 +65,11 @@ public class PlayerInfoViewModel extends ViewModel {
         return accountId;
     }
 
-    public void insertPlayerToFavoriteList(FavoritePlayer favoritePlayer){
+    public void insertPlayerToFavoriteList(FavoritePlayer favoritePlayer) {
         repository.insertPlayerToFavoriteList(favoritePlayer);
     }
 
-    public void deletePlayerWithFavoriteList(long accountId){
+    public void deletePlayerWithFavoriteList(long accountId) {
         repository.deletePlayerWithFavoriteList(accountId);
-    }
-
-    public void getPlayerFavoriteById(long accountId){
-        repository.isPlayerFavoriteById(accountId);
     }
 }

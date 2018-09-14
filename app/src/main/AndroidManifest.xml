@@ -23,7 +23,6 @@
         </activity>
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.FoundPlayerActivity" />
-        <activity android:name=".activity.RankingActivity" />
         <activity android:name=".activity.PlayerInfoActivity" />
         <activity android:name=".activity.MatchDetailActivity" />
     </application>

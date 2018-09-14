@@ -4,6 +4,8 @@
     <string name="search_players">Поиск игроков</string>
     <string name="tab_pro_players">Про Игроки</string>
     <string name="tab_ranking">Рейтинг Игроков</string>
+    <string name="tab_pro_teams">Про Команды</string>
+    <string name="fragment_records">Рекорды</string>
     <string name="search_title">Поиск</string>
     <string name="toolbar_for_ranking">Рейтинг %1$s</string>
 
@@ -71,4 +73,40 @@
     <string name="by_query">По запросу:</string>
     <string name="found">\"%1$s\"</string>
     <string name="favorite_players">Избранные игроки:</string>
+    <string name="china">Китай</string>
+    <string name="americas">Америка</string>
+    <string name="se_asia">ЮВ Азия</string>
+    <string name="europe">Европа</string>
+    <string name="top_100_players">Топ 100 игроков</string>
+    <string name="ranking_player_position">%1$d</string>
+    <string name="rank_image">Место в рейтинге</string>
+    <string name="player">Игрок</string>
+    <string name="team">Команда</string>
+    <string name="country_flag">Флаг</string>
+    <string name="country_title">Страна</string>
+    <string name="logo_player_desc">Лого игрока</string>
+    <string name="empty_data_by_match">Данные о текущем матче отсутствуют</string>
+    <string name="game_mod_and_lobby_type">%1s / %2s</string>
+    <string name="double_click_to_exit">Нажмите еще раз для выхода</string>
+
+    <string name="duration_title">Длительность</string>
+    <string name="last_hits_title">Ластхит</string>
+    <string name="gold_per_min_title">GPM</string>
+    <string name="xp_per_min_title">XPM</string>
+    <string name="date_title">Дата</string>
+    <string name="kills_title">Убийств</string>
+    <string name="deaths_title">Смертей</string>
+    <string name="assists_title">Помощь</string>
+    <string name="denies_title">Не отдано крипов</string>
+    <string name="hero_damage_title">Урон по героям</string>
+    <string name="tower_damage_title">Урон по строениям</string>
+    <string name="hero_healing_title">Восстановлено здоровья</string>
+    <string name="sort_by_date">Сортировка по дате</string>
+    <string name="sort_by_score">Сортировка по значению</string>
+    <string name="games_hero">%1d</string>
+    <string name="win_rate_hero">%1d</string>
+    <string name="pro_all_matches">%1d</string>
+    <string name="matches_with_win">%1s%%</string>
+    <string name="matches_against_win">%1s%%</string>
+    <string name="team_mame">%1s</string>
 </resources>

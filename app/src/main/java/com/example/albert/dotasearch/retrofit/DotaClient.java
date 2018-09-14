@@ -7,7 +7,7 @@ import com.example.albert.dotasearch.model.MatchFullInfo;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.model.PlayerHero;
 import com.example.albert.dotasearch.model.PlayerInfo;
-import com.example.albert.dotasearch.model.ProMatch;
+import com.example.albert.dotasearch.model.Record;
 import com.example.albert.dotasearch.model.ProPlayer;
 import com.example.albert.dotasearch.model.Pros;
 import com.example.albert.dotasearch.model.Team;
@@ -18,23 +18,17 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface DotaClient {
-    @GET("/api/proPlayers/")
-    Call<List<ProPlayer>> getProPlayer();
 
     @GET("/api/proPlayers/")
-    Observable<List<ProPlayer>> getAllProPlayerRx();
+    Single<List<ProPlayer>> getAllProPlayerRx();
 
     @GET("/api/teams/")
     Single<List<Team>> getAllProTeam();
-
-    @GET("/api/promatches/")
-    Single<List<ProMatch>> getAllProMatch();
 
     @GET("/api/search")
     Single<List<FoundPlayer>> getFoundPlayersRx(
@@ -42,7 +36,7 @@ public interface DotaClient {
     );
 
     @GET("/webapi/ILeaderboard/GetDivisionLeaderboard/v0001")
-    Observable<TimeRefreshLeaderBoard> getLeaderBorderRx(
+    Single<TimeRefreshLeaderBoard> getLeaderBorderRx(
             @Query("division") String division
     );
 
@@ -56,6 +50,11 @@ public interface DotaClient {
             @Path("Id") long playerId
     );
 
+    @GET("/api/records/{title}")
+    Single<List<Record>> getRecordsByTitle(
+            @Path("title") String titleRecord
+    );
+
     @GET("/api/players/{Id}/heroes")
     Single<List<PlayerHero>> getPlayerHeroes(
             @Path("Id") long playerId
@@ -64,12 +63,6 @@ public interface DotaClient {
     @GET("/api/players/{Id}/wl")
     Single<WinLose> getPlayerWinLoseById(
             @Path("Id") long playerId
-    );
-
-    @GET("/api/players/{Id}/matches")
-    Call<List<MatchShortInfo>> getMatchesPlayer(
-        @Path("Id") long playerId,
-        @Query("limit") int limit
     );
 
     @GET("/api/players/{Id}/matches")
@@ -90,7 +83,4 @@ public interface DotaClient {
     Observable<ItemsInfoWithSteam> getItemInfoSteamRx(
             @Query("key") String key
     );
-
-    @GET("/api/teams")
-    Single<Team> getAllTeams();
 }

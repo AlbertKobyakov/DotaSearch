@@ -11,6 +11,8 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -19,7 +21,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.model.PlayerInfo;
@@ -30,7 +34,6 @@ import com.example.albert.dotasearch.tabs.FragmentPlayerInfoPros;
 import com.example.albert.dotasearch.tabs.FragmentPlayerInfoHeroes;
 import com.example.albert.dotasearch.tabs.TabPlayerMatches;
 import com.example.albert.dotasearch.viewModel.PlayerInfoViewModel;
-import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.Objects;
@@ -45,16 +48,20 @@ public class PlayerInfoActivity extends AppCompatActivity {
 
     public static long accountId;
     public static String personalName;
-    public static String urlPlayer;
     public static PlayerInfoViewModel viewModel;
 
     private TabPlayerMatches tabPlayerMatches;
-    private FragmentPlayerInfoPros fragmentPlayerInfoPros;
-    private FragmentPlayerInfoHeroes fragmentPlayerInfoHeroes;
+    private FragmentPlayerInfoPros fragmentPlayerInfoPros = new FragmentPlayerInfoPros();
+    private FragmentPlayerInfoHeroes fragmentPlayerInfoHeroes = new FragmentPlayerInfoHeroes();
+
+    private PlayerInfo playerInfo;
+    private WinLose winLose;
+    private String urlPlayerImg;
 
     LiveData<Boolean> isFavorite;
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
     @BindView(R.id.collapsingToolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
     @BindView(R.id.player_img)
@@ -79,61 +86,58 @@ public class PlayerInfoActivity extends AppCompatActivity {
     BottomNavigationView navigation;
 
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.player_overview:
-                    tabPlayerMatches = new TabPlayerMatches();
-                    changeFragment(tabPlayerMatches);
-                    return true;
-                case R.id.pros:
-                    fragmentPlayerInfoPros = new FragmentPlayerInfoPros();
-                    changeFragment(fragmentPlayerInfoPros);
-                    return true;
-                case R.id.navigation_notifications:
-                    fragmentPlayerInfoHeroes = new FragmentPlayerInfoHeroes();
-                    changeFragment(fragmentPlayerInfoHeroes);
-                    return true;
-            }
-            return false;
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(LAYOUT);
 
+        Log.d(TAG, "onCreate");
+
         ButterKnife.bind(this);
 
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        if(savedInstanceState==null){
-            navigation.setSelectedItemId(R.id.player_overview);
-        }
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.player_overview:
+                        changeFragment(tabPlayerMatches, "tabPlayerMatches");
+                        return true;
+                    case R.id.pros:
+                        changeFragment(fragmentPlayerInfoPros, "fragmentPlayerInfoPros");
+                        return true;
+                    case R.id.navigation_notifications:
+                        changeFragment(fragmentPlayerInfoHeroes, "fragmentPlayerInfoHeroes");
+                        return true;
+                }
+                return false;
+            }
+        });
 
         accountId = getIntent().getLongExtra("accountId", 0);
         personalName = getIntent().getStringExtra("personalName");
-        urlPlayer = getIntent().getStringExtra("urlPlayer");
+        //urlPlayer = getIntent().getStringExtra("urlPlayer");
+
+        if (savedInstanceState == null) {
+            tabPlayerMatches = TabPlayerMatches.newInstance(accountId);
+            navigation.setSelectedItemId(R.id.player_overview);
+        }
 
         viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoViewModel(accountId)).get(PlayerInfoViewModel.class);
         LiveData<PlayerOverviewCombine> playerFullInfo = viewModel.getPlayerFullInfo();
         playerFullInfo.observe(this, new Observer<PlayerOverviewCombine>() {
             @Override
             public void onChanged(@Nullable PlayerOverviewCombine playerOverviewCombine) {
-                Log.e("FRAGMENT","777777777777777777777");
-                if (navigation.getVisibility() == View.INVISIBLE){
+                Log.e("FRAGMENT", "777777777777777777777");
+                if (navigation.getVisibility() == View.INVISIBLE) {
                     navigation.setVisibility(View.VISIBLE);
                 }
 
-                Log.e(TAG,"7777777777777774777777" + (playerOverviewCombine!=null));
+                Log.e(TAG, "7777777777777774777777" + (playerOverviewCombine != null));
                 initToolbar();
 
-                if(playerOverviewCombine != null){
-                    PlayerInfo playerInfo = playerOverviewCombine.getPlayerInfo();
-                    WinLose winLose = playerOverviewCombine.getWinLose();
+                if (playerOverviewCombine != null) {
+                    playerInfo = playerOverviewCombine.getPlayerInfo();
+                    winLose = playerOverviewCombine.getWinLose();
 
                     setPlayerSoloMMRNameImgAndRankTier(playerInfo);
                     setPlayerRecordAndWinRate(winLose);
@@ -161,8 +165,14 @@ public class PlayerInfoActivity extends AppCompatActivity {
 
     public void setPlayerSoloMMRNameImgAndRankTier(PlayerInfo playerInfo) {
         long soloMmr = playerInfo.getSoloCompetitiveRank();
-        String urlPlayerImg = playerInfo.getProfile().getAvatarfull();
-        String playerPersonalName = playerInfo.getProfile().getPersonaname();
+
+        if (playerInfo.getProfile() != null) {
+            urlPlayerImg = playerInfo.getProfile().getAvatarfull();
+        } else {
+            Toast.makeText(this, "Данные об игроке отсутствуют", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
         long rankTier = playerInfo.getRankTier();
         long leaderBoard = playerInfo.getLeaderboardRank();
 
@@ -170,8 +180,8 @@ public class PlayerInfoActivity extends AppCompatActivity {
             playerSoloMMR.setText(this.getResources().getString(R.string.solo_mmr, soloMmr));
         }
 
-        Picasso.with(this).load(urlPlayerImg).into(playerImg);
-        playerName.setText(playerPersonalName);
+        Glide.with(this).load(urlPlayerImg).error(Glide.with(this).load(R.drawable.avatar_unknown_medium)).into(playerImg);
+        playerName.setText(getRealPlayerName(playerInfo));
         setRankTier(rankTier, leaderBoard);
     }
 
@@ -213,18 +223,47 @@ public class PlayerInfoActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        toolbar.setNavigationOnClickListener(v -> {
+            onBackPressed();
+            Log.d(TAG, "onBackPressed");
+        });
     }
 
-    public void changeFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, fragment).commit();
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    public void changeFragment(Fragment fragment, String fragmentTagName) {
+        FragmentManager mFragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+
+        Fragment curFrag = mFragmentManager.getPrimaryNavigationFragment();
+        if (curFrag != null) {
+            Log.d(TAG, curFrag.getTag() + " detach");
+            fragmentTransaction.detach(curFrag);
+        }
+
+        Fragment fragmentTemp = mFragmentManager.findFragmentByTag(fragmentTagName);
+        if (fragmentTemp == null) {
+            fragmentTemp = fragment;
+            Log.d(TAG, "add");
+            fragmentTransaction.add(R.id.content, fragmentTemp, fragmentTagName);
+        } else {
+            Log.d(TAG, fragmentTemp.getTag() + " attach");
+            fragmentTransaction.attach(fragmentTemp);
+        }
+
+        fragmentTransaction.setPrimaryNavigationFragment(fragmentTemp);
+        fragmentTransaction.setReorderingAllowed(true);
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_for_player_info, menu);
         MenuItem itemStar = menu.getItem(0);
-        if(isFavorite.getValue()){
+        if (isFavorite.getValue() != null && isFavorite.getValue()) {
             itemStar.setIcon(getResources().getDrawable(R.mipmap.ic_star_white_48dp));
         } else {
             itemStar.setIcon(getResources().getDrawable(R.mipmap.ic_star_outline_white_48dp));
@@ -237,16 +276,35 @@ public class PlayerInfoActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.star && isFavorite.getValue()){
+        if (id == R.id.star && isFavorite.getValue() != null && isFavorite.getValue()) {
             item.setIcon(getResources().getDrawable(R.mipmap.ic_star_outline_white_48dp));
             viewModel.deletePlayerWithFavoriteList(accountId);
             Snackbar.make(getWindow().getDecorView().getRootView(), "Пользователь удален из избранного", Snackbar.LENGTH_SHORT).show();
-        } else if(id == R.id.star && !isFavorite.getValue()){
-            Log.d(TAG, "click");
-            viewModel.insertPlayerToFavoriteList(new FavoritePlayer(accountId, urlPlayer, personalName));
+        } else if (id == R.id.star && !isFavorite.getValue()) {
+            Log.d(TAG, "click " + urlPlayerImg);
+            viewModel.insertPlayerToFavoriteList(new FavoritePlayer(accountId, urlPlayerImg, getRealPlayerName(playerInfo)));
             item.setIcon(getResources().getDrawable(R.mipmap.ic_star_white_48dp));
             Snackbar.make(getWindow().getDecorView().getRootView(), "Пользователь добавлен в избранное", Snackbar.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public String getRealPlayerName(PlayerInfo playerInfo) {
+        String name = "";
+        if (playerInfo.getProfile() != null) {
+            if (playerInfo.getProfile().getName() != null) {
+                name = playerInfo.getProfile().getName();
+            } else {
+                name = personalName;
+            }
+        }
+
+        return name;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy");
     }
 }

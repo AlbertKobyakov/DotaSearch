@@ -55,7 +55,26 @@ public class MatchShortInfo {
     @Expose
     private long partySize;
 
+    private String heroImageUrl;
+    private String heroName;
+
     private long playerId;
+
+    public String getHeroName() {
+        return heroName;
+    }
+
+    public void setHeroName(String heroName) {
+        this.heroName = heroName;
+    }
+
+    public String getHeroImageUrl() {
+        return heroImageUrl;
+    }
+
+    public void setHeroImageUrl(String heroImageUrl) {
+        this.heroImageUrl = heroImageUrl;
+    }
 
     public long getPlayerId() {
         return playerId;

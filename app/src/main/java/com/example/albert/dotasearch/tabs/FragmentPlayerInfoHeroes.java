@@ -2,15 +2,18 @@ package com.example.albert.dotasearch.tabs;
 
 import android.arch.lifecycle.Observer;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
@@ -19,7 +22,6 @@ import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.PlayerHero;
 
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,8 +33,7 @@ public class FragmentPlayerInfoHeroes extends Fragment {
     private static final int LAYOUT = R.layout.fragment_player_overview;
     private View view;
 
-    private List<PlayerHero> playerHeroes;
-    private Map<Integer, Hero> heroList;
+    private SparseArray<Hero> heroList;
     private PlayerInfoHeroesAdapter mAdapter;
 
     @BindView(R.id.recycler_view)
@@ -40,7 +41,7 @@ public class FragmentPlayerInfoHeroes extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.e(TAG, "onCreateView");
 
         view = inflater.inflate(LAYOUT, container, false);
@@ -77,10 +78,10 @@ public class FragmentPlayerInfoHeroes extends Fragment {
         recyclerView.setAdapter(mAdapter);
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
-        @Override
-        public void onClick(View view, int position) {
-            //toMatchDetailActivity(position);
-        }
-    }));
-}
+            @Override
+            public void onClick(View view, int position) {
+                Toast.makeText(getContext(), mAdapter.getPlayerHeroByPosition(position).getHeroId() + "", Toast.LENGTH_SHORT).show();
+            }
+        }));
+    }
 }
