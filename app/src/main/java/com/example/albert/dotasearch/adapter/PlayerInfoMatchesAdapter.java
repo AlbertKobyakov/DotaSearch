@@ -1,15 +1,18 @@
 package com.example.albert.dotasearch.adapter;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 
@@ -19,25 +22,29 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMatchesAdapter.MyViewHolder> {
-
     private static final String TAG = "PlayerMatchesAdapter";
     private static final int LAYOUT = R.layout.match_player_list_row;
 
-
     private List<MatchShortInfo> matchesCopy;
     public Context context;
+    private RequestManager glide;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.match_hero)
         TextView hero;
         @BindView(R.id.match_result)
         TextView result;
-        @BindView(R.id.match_duration)
-        TextView duration;
         @BindView(R.id.match_kda)
         TextView kda;
         @BindView(R.id.imageView)
         ImageView imageView;
+
+        @Nullable
+        @BindView(R.id.match_duration)
+        TextView duration;
+        @Nullable
+        @BindView(R.id.match_date)
+        TextView date;
 
         MyViewHolder(View view) {
             super(view);
@@ -46,8 +53,9 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
         }
     }
 
-    public PlayerInfoMatchesAdapter(Context context) {
+    public PlayerInfoMatchesAdapter(Context context, RequestManager glide) {
         this.context = context;
+        this.glide = glide;
     }
 
 
@@ -62,12 +70,21 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
 
     @Override
     public void onBindViewHolder(@NonNull PlayerInfoMatchesAdapter.MyViewHolder holder, int position) {
-
         if (matchesCopy != null) {
             MatchShortInfo matchShortInfo = matchesCopy.get(position);
 
-            long minutes = matchShortInfo.getDuration() / 60;
-            long seconds = matchShortInfo.getDuration() - (minutes * 60);
+            if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
+                long seconds = matchShortInfo.getDuration();
+                String duration = DateUtils.formatElapsedTime(seconds);
+
+                String matchStartDate = DateUtils.getRelativeTimeSpanString(
+                        matchShortInfo.getStartTime() * 1000
+                ).toString();
+
+                holder.duration.setText(context.getResources().getString(R.string.match_duration, duration));
+                holder.date.setText(matchStartDate);
+
+            }
 
             String heroImg = matchShortInfo.getHeroImageUrl();
             String heroName = matchShortInfo.getHeroName();
@@ -77,8 +94,6 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
             }
 
             holder.kda.setText(context.getResources().getString(R.string.kda, matchShortInfo.getKills(), matchShortInfo.getDeaths(), matchShortInfo.getAssists()));
-
-            holder.duration.setText(context.getResources().getString(R.string.match_duration, minutes, seconds));
 
             holder.hero.setText(heroName);
 
@@ -90,9 +105,8 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
                 holder.result.setText(context.getResources().getString(R.string.lose));
             }
 
-            Glide.with(context)
-                    .load(heroImg)
-                    .error(Glide.with(context).load(R.drawable.avatar_unknown_medium))
+            glide.load(heroImg)
+                    .error(glide.load(R.drawable.avatar_unknown_medium))
                     .into(holder.imageView);
         }
     }

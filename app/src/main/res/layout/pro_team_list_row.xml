@@ -19,9 +19,9 @@
             <ImageView
                 android:id="@+id/team_logo"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="90dp"
                 android:scaleType="centerCrop"
-                android:padding="5dp"/>
+                android:padding="10dp"/>
 
             <!--<TextView
                 android:id="@+id/team_win"
@@ -38,6 +38,7 @@
                 android:gravity="center" />-->
 
             <TextView
+                android:padding="5dp"
                 android:id="@+id/team_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

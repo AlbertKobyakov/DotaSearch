@@ -1,12 +1,13 @@
 package com.example.albert.dotasearch.activity;
 
-
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
@@ -18,12 +19,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.model.PlayerInfo;
@@ -46,19 +48,20 @@ public class PlayerInfoActivity extends AppCompatActivity {
     public static final String TAG = "PlayerInfoActivity";
     public static final int LAYOUT = R.layout.activity_player_info;
 
-    public static long accountId;
-    public static String personalName;
-    public static PlayerInfoViewModel viewModel;
+    public long accountId;
+    public String personalName;
+    public PlayerInfoViewModel viewModel;
 
     private TabPlayerMatches tabPlayerMatches;
-    private FragmentPlayerInfoPros fragmentPlayerInfoPros = new FragmentPlayerInfoPros();
-    private FragmentPlayerInfoHeroes fragmentPlayerInfoHeroes = new FragmentPlayerInfoHeroes();
+    private FragmentPlayerInfoHeroes fragmentPlayerInfoHeroes;
+    private FragmentPlayerInfoPros fragmentPlayerInfoPros;
 
     private PlayerInfo playerInfo;
     private WinLose winLose;
     private String urlPlayerImg;
 
-    LiveData<Boolean> isFavorite;
+    private LiveData<Boolean> isFavorite;
+    private RequestManager glide;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -80,11 +83,10 @@ public class PlayerInfoActivity extends AppCompatActivity {
     TextView countLose;
     @BindView(R.id.solo_mmr_value)
     TextView playerSoloMMR;
-    @BindView(R.id.last_match_value)
-    TextView playerLastMatch;
     @BindView(R.id.navigation)
     BottomNavigationView navigation;
-
+    @BindView(R.id.appBar)
+    AppBarLayout appBarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +96,15 @@ public class PlayerInfoActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate");
 
         ButterKnife.bind(this);
+
+        accountId = getIntent().getLongExtra("accountId", 0);
+        personalName = getIntent().getStringExtra("personalName");
+
+        glide = Glide.with(this);
+
+        tabPlayerMatches = TabPlayerMatches.newInstance(accountId);
+        fragmentPlayerInfoHeroes = FragmentPlayerInfoHeroes.newInstance(accountId);
+        fragmentPlayerInfoPros = FragmentPlayerInfoPros.newInstance(accountId);
 
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -113,12 +124,8 @@ public class PlayerInfoActivity extends AppCompatActivity {
             }
         });
 
-        accountId = getIntent().getLongExtra("accountId", 0);
-        personalName = getIntent().getStringExtra("personalName");
-        //urlPlayer = getIntent().getStringExtra("urlPlayer");
-
         if (savedInstanceState == null) {
-            tabPlayerMatches = TabPlayerMatches.newInstance(accountId);
+            Log.d(TAG, "savedInstanceState == null " + tabPlayerMatches + " " + fragmentPlayerInfoPros + " " + fragmentPlayerInfoHeroes);
             navigation.setSelectedItemId(R.id.player_overview);
         }
 
@@ -128,17 +135,17 @@ public class PlayerInfoActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable PlayerOverviewCombine playerOverviewCombine) {
                 Log.e("FRAGMENT", "777777777777777777777");
-                if (navigation.getVisibility() == View.INVISIBLE) {
+                /*if (navigation.getVisibility() == View.INVISIBLE) {
                     navigation.setVisibility(View.VISIBLE);
-                }
+                }*/
 
                 Log.e(TAG, "7777777777777774777777" + (playerOverviewCombine != null));
-                initToolbar();
 
                 if (playerOverviewCombine != null) {
                     playerInfo = playerOverviewCombine.getPlayerInfo();
                     winLose = playerOverviewCombine.getWinLose();
 
+                    setToolbarTitle(getRealPlayerName(playerInfo));
                     setPlayerSoloMMRNameImgAndRankTier(playerInfo);
                     setPlayerRecordAndWinRate(winLose);
                 }
@@ -146,6 +153,12 @@ public class PlayerInfoActivity extends AppCompatActivity {
         });
 
         isFavorite = viewModel.getIsFavoritePlayer();
+
+        initToolbar();
+    }
+
+    public void setToolbarTitle(String name) {
+        collapsingToolbarLayout.setTitle(getResources().getString(R.string.statistics_player, name, accountId));
     }
 
     public void setPlayerRecordAndWinRate(WinLose winLose) {
@@ -165,6 +178,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
 
     public void setPlayerSoloMMRNameImgAndRankTier(PlayerInfo playerInfo) {
         long soloMmr = playerInfo.getSoloCompetitiveRank();
+        String name = getRealPlayerName(playerInfo);
 
         if (playerInfo.getProfile() != null) {
             urlPlayerImg = playerInfo.getProfile().getAvatarfull();
@@ -180,8 +194,11 @@ public class PlayerInfoActivity extends AppCompatActivity {
             playerSoloMMR.setText(this.getResources().getString(R.string.solo_mmr, soloMmr));
         }
 
-        Glide.with(this).load(urlPlayerImg).error(Glide.with(this).load(R.drawable.avatar_unknown_medium)).into(playerImg);
-        playerName.setText(getRealPlayerName(playerInfo));
+        glide.load(urlPlayerImg)
+                .error(glide.load(R.drawable.avatar_unknown_medium).apply(RequestOptions.circleCropTransform()))
+                .apply(RequestOptions.circleCropTransform())
+                .into(playerImg);
+        playerName.setText(name);
         setRankTier(rankTier, leaderBoard);
     }
 
@@ -190,7 +207,9 @@ public class PlayerInfoActivity extends AppCompatActivity {
             long first = rank / 10;
             long second = rank - (first * 10);
 
-            if (first == 7 && second == 6) {
+            if (leaderBoard == 1) {
+                playerRankTierImage.setImageResource(R.drawable.top_1_rank);
+            } else if (first == 7 && second == 6) {
 
                 String nameGeneralImg;
                 if (leaderBoard <= 10) {
@@ -215,11 +234,17 @@ public class PlayerInfoActivity extends AppCompatActivity {
                 playerRankTierImage.setImageResource(id);
                 playerRankTierStarImage.setImageResource(idStar);
             }
+
         }
     }
 
     private void initToolbar() {
-        collapsingToolbarLayout.setTitle(getResources().getString(R.string.statistics_player, personalName, accountId));
+        if (Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation) {
+            appBarLayout.setExpanded(false, true);
+        } else {
+            appBarLayout.setExpanded(true, true);
+        }
+
         toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -248,6 +273,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
         if (fragmentTemp == null) {
             fragmentTemp = fragment;
             Log.d(TAG, "add");
+            Log.d(TAG, fragmentTemp + " " + fragmentTagName);
             fragmentTransaction.add(R.id.content, fragmentTemp, fragmentTagName);
         } else {
             Log.d(TAG, fragmentTemp.getTag() + " attach");
@@ -272,19 +298,21 @@ public class PlayerInfoActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.star && isFavorite.getValue() != null && isFavorite.getValue()) {
             item.setIcon(getResources().getDrawable(R.mipmap.ic_star_outline_white_48dp));
             viewModel.deletePlayerWithFavoriteList(accountId);
-            Snackbar.make(getWindow().getDecorView().getRootView(), "Пользователь удален из избранного", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.navigation), "Пользователь удален из избранного", Snackbar.LENGTH_SHORT).show();
         } else if (id == R.id.star && !isFavorite.getValue()) {
-            Log.d(TAG, "click " + urlPlayerImg);
-            viewModel.insertPlayerToFavoriteList(new FavoritePlayer(accountId, urlPlayerImg, getRealPlayerName(playerInfo)));
-            item.setIcon(getResources().getDrawable(R.mipmap.ic_star_white_48dp));
-            Snackbar.make(getWindow().getDecorView().getRootView(), "Пользователь добавлен в избранное", Snackbar.LENGTH_SHORT).show();
+            if (playerInfo != null) {
+                viewModel.insertPlayerToFavoriteList(new FavoritePlayer(accountId, urlPlayerImg, getRealPlayerName(playerInfo)));
+                item.setIcon(getResources().getDrawable(R.mipmap.ic_star_white_48dp));
+                Snackbar.make(findViewById(R.id.navigation), "Пользователь добавлен в избранное", Snackbar.LENGTH_SHORT).show();
+            } else {
+                Snackbar.make(findViewById(R.id.navigation), "Пожалуйста дождитесь полной загрузки профиля игрока", Snackbar.LENGTH_SHORT).show();
+            }
         }
         return super.onOptionsItemSelected(item);
     }

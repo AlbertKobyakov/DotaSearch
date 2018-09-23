@@ -1,5 +1,7 @@
 package com.example.albert.dotasearch.activity;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,19 +12,18 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.albert.dotasearch.App;
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.adapter.FoundPlayerAdapter;
-import com.example.albert.dotasearch.database.AppDatabase;
 import com.example.albert.dotasearch.model.FoundPlayer;
+import com.example.albert.dotasearch.viewModel.FoundPlayerViewModel;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -46,11 +47,10 @@ public class FoundPlayerActivity extends AppCompatActivity {
     private FoundPlayer foundPlayer;
     private String query;
 
-    public AppDatabase db;
-
     private FoundPlayerAdapter mAdapter;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private Unbinder unbinder;
+    private FoundPlayerViewModel viewModel;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -74,31 +74,23 @@ public class FoundPlayerActivity extends AppCompatActivity {
 
         query = getIntent().getStringExtra("query");
 
-        db = App.get().getDB();
-
         initToolbar();
 
-        Disposable d1 = db.foundPlayerDao()
-                .getAllRx()
-                .toObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        this::setFoundPlayers,
-                        error -> Log.e(TAG, error.getLocalizedMessage())
-                );
-
-        compositeDisposable.add(d1);
-    }
-
-    public void setFoundPlayers(List<FoundPlayer> foundPlayers) {
-        mAdapter.setData(foundPlayers);
-        textToolbarParallax2.setText(getResources().getString(R.string.found, query));
-        textToolbarParallax3.setText(getResources().getString(R.string.result_search_query, foundPlayers.size()));
+        viewModel = ViewModelProviders.of(this).get(FoundPlayerViewModel.class);
+        viewModel.getFoundPlayers().observe(this, new Observer<List<FoundPlayer>>() {
+            @Override
+            public void onChanged(@Nullable List<FoundPlayer> foundPlayers) {
+                if (foundPlayers != null && foundPlayers.size() > 0) {
+                    mAdapter.setData(foundPlayers);
+                    textToolbarParallax2.setText(getResources().getString(R.string.found, query));
+                    textToolbarParallax3.setText(getResources().getString(R.string.result_search_query, foundPlayers.size()));
+                }
+            }
+        });
     }
 
     public void setAdapterAndRecyclerView() {
-        mAdapter = new FoundPlayerAdapter(getApplicationContext());
+        mAdapter = new FoundPlayerAdapter(getApplicationContext(), Glide.with(this));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.FavoritePlayer;
@@ -19,15 +20,22 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class FavoritePlayersAdapter extends RecyclerView.Adapter<FavoritePlayersAdapter.MyViewHolder> implements View.OnLongClickListener {
+public class FavoritePlayersAdapter extends RecyclerView.Adapter<FavoritePlayersAdapter.MyViewHolder>
+        implements View.OnLongClickListener {
+
     public static final String TAG = "FoundPlayerAdapter";
     public static final int LAYOUT = R.layout.favorite_player_list_row;
-
     private List<FavoritePlayer> favoritePlayers;
     private Context context;
+    private RequestManager glide;
 
-    public FavoritePlayersAdapter(Context context) {
+    public FavoritePlayersAdapter(Context context, RequestManager glide) {
+        this.glide = glide;
         this.context = context;
+    }
+
+    public List<FavoritePlayer> getFavoritePlayers() {
+        return favoritePlayers;
     }
 
     @NonNull
@@ -41,7 +49,6 @@ public class FavoritePlayersAdapter extends RecyclerView.Adapter<FavoritePlayers
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-
         if (favoritePlayers != null) {
             FavoritePlayer favoritePlayer = favoritePlayers.get(position);
             holder.namePlayer.setText(favoritePlayer.getPersonaname());
@@ -49,9 +56,8 @@ public class FavoritePlayersAdapter extends RecyclerView.Adapter<FavoritePlayers
             RequestOptions fitCenter = new RequestOptions()
                     .fitCenter();
 
-            Glide.with(context)
-                    .load(favoritePlayer.getAvatarfull())
-                    .error(Glide.with(context).load(R.drawable.avatar_unknown_medium).apply(RequestOptions.circleCropTransform()))
+            glide.load(favoritePlayer.getAvatarfull())
+                    .error(glide.load(R.drawable.avatar_unknown_medium).apply(RequestOptions.circleCropTransform()))
                     .apply(fitCenter)
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.imagePlayer);

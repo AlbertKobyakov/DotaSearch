@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.adapter.ProTeamAdapter;
@@ -79,14 +80,14 @@ public class TabProTeam extends Fragment {
     }
 
     private void setToolbarTitle() {
-        if(getActivity() != null && getActivity().findViewById(R.id.toolbar) != null){
+        if (getActivity() != null && getActivity().findViewById(R.id.toolbar) != null) {
             Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-            toolbar.setTitle(R.string.tab_pro_teams);
+            toolbar.setTitle(R.string.fragment_pro_teams);
         }
     }
 
     public void setAdapterAndRecyclerView() {
-        mAdapter = new ProTeamAdapter(getActivity());
+        mAdapter = new ProTeamAdapter(getActivity(), Glide.with(this));
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), calculateNoOfColumns(getContext())));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);

@@ -9,8 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.albert.dotasearch.AnimationForRecyclerViewItems;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Leaderboard;
 import com.example.albert.dotasearch.model.TimeRefreshLeaderBoard;
@@ -21,7 +22,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHolder> {
+public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHolder> implements AnimationForRecyclerViewItems {
     private static final String TAG = "RankingAdapter";
     private static final int LAYOUT = R.layout.leader_board_list_row;
 
@@ -29,6 +30,7 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHo
     private List<Leaderboard> leaderboardList;
     private List<Leaderboard> leaderboardListForAdapter;
     public Context context;
+    private RequestManager glide;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.position_text)
@@ -49,8 +51,9 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHo
         }
     }
 
-    public RankingAdapter(Context context) {
+    public RankingAdapter(Context context, RequestManager glide) {
         this.context = context;
+        this.glide = glide;
     }
 
     @NonNull
@@ -101,14 +104,15 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHo
                 RequestOptions fitCenter = new RequestOptions()
                         .fitCenter();
 
-                Glide.with(context)
-                        .load("https://www.countryflags.io/" + leaderboard.getCountry() + "/flat/64.png")
-                        .error(Glide.with(context).load(R.drawable.avatar_unknown_medium))
+                glide.load("https://www.countryflags.io/" + leaderboard.getCountry() + "/flat/64.png")
+                        .error(glide.load(R.drawable.avatar_unknown_medium))
                         .apply(fitCenter)
                         .into(holder.countryFlag);
             } else {
-                Glide.with(context).clear(holder.countryFlag);
+                glide.clear(holder.countryFlag);
             }
+
+            setFadeAnimationVerTwo(holder.itemView);
         }
     }
 

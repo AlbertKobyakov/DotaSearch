@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         this.doubleBackToExitPressedOnce = true;
-        Snackbar.make(getWindow().getDecorView().getRootView(), getResources().getString(R.string.double_click_to_exit), Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(R.id.bottom_navigation_view), getResources().getString(R.string.double_click_to_exit), Snackbar.LENGTH_SHORT).show();
 
         new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }

@@ -13,16 +13,16 @@
         android:layout_height="300dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:fitsSystemWindows="true"
-        android:background="@drawable/item_background">
+        android:background="@color/colorAccent">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:minHeight="?attr/actionBarSize"
+            android:minHeight="?android:attr/actionBarSize"
             android:fitsSystemWindows="true"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:contentScrim="?attr/colorPrimary"
+            app:contentScrim="@color/colorAccent"
             app:expandedTitleMarginStart="48dp"
             app:expandedTitleMarginEnd="64dp"
             app:title="@string/search_result"
@@ -50,7 +50,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/found"
                     android:textStyle="bold"
                     android:textSize="30sp"
                     android:paddingBottom="10dp"/>
@@ -59,15 +58,14 @@
                     android:id="@+id/text_toolbar_parallax_3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/result_search_query" />
+                    android:gravity="center" />
             </LinearLayout>
 
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="?android:attr/actionBarSize"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:layout_collapseMode="pin"/>
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -79,7 +77,7 @@
         android:orientation="vertical"
         android:id="@+id/linear_block"
         android:background="@android:color/white"
-        android:paddingBottom="?attr/actionBarSize"
+        android:paddingBottom="?android:attr/actionBarSize"
         app:behavior_overlapTop="80dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 

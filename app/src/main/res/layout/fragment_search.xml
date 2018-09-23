@@ -9,18 +9,18 @@
         layout="@layout/fragment_search_players"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_margin="2dp" />
+        android:layout_margin="16dp" />
 
     <include
         layout="@layout/favorite_players_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="2dp"/>
+        android:layout_margin="16dp" />
 
     <include
         layout="@layout/empty_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="2dp" />
+        android:layout_margin="16dp" />
 
 </LinearLayout>

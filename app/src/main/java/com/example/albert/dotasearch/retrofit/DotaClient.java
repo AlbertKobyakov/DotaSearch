@@ -72,7 +72,7 @@ public interface DotaClient {
     );
 
     @GET("/api/heroStats")
-    Observable<List<Hero>> getAllHeroesRx();
+    Single<List<Hero>> getAllHeroesRx();
 
     @GET("/api/matches/{match_id}")
     Observable<MatchFullInfo> getMatchFullInfoRx(
@@ -80,7 +80,7 @@ public interface DotaClient {
     );
 
     @GET("/IEconDOTA2_570/GetGameItems/v0001/")
-    Observable<ItemsInfoWithSteam> getItemInfoSteamRx(
+    Single<ItemsInfoWithSteam> getItemInfoSteamRx(
             @Query("key") String key
     );
 }

@@ -28,6 +28,24 @@ public class PlayerHero {
     @SerializedName("against_win")
     @Expose
     private long againstWin;
+    private String heroName;
+    private String heroImg;
+
+    public String getHeroImg() {
+        return heroImg;
+    }
+
+    public void setHeroImg(String heroImg) {
+        this.heroImg = heroImg;
+    }
+
+    public String getHeroName() {
+        return heroName;
+    }
+
+    public void setHeroName(String heroName) {
+        this.heroName = heroName;
+    }
 
     public String getHeroId() {
         return heroId;

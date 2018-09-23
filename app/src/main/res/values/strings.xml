@@ -2,9 +2,9 @@
     <string name="app_name">DotaSearch</string>
     <string name="search">Поиск</string>
     <string name="search_players">Поиск игроков</string>
-    <string name="tab_pro_players">Про Игроки</string>
-    <string name="tab_ranking">Рейтинг Игроков</string>
-    <string name="tab_pro_teams">Про Команды</string>
+    <string name="fragment_pro_players">Про Игроки</string>
+    <string name="fragment_ranking">Таблица лидеров</string>
+    <string name="fragment_pro_teams">Про Команды</string>
     <string name="fragment_records">Рекорды</string>
     <string name="search_title">Поиск</string>
     <string name="toolbar_for_ranking">Рейтинг %1$s</string>
@@ -20,7 +20,7 @@
     <string name="win">win</string>
     <string name="lose">lose</string>
     <string name="kda">%1$d/%2$d/%3$d</string>
-    <string name="match_duration">%1$d:%2$d</string>
+    <string name="match_duration">%1$s</string>
     <string name="radiant_score">%1$d</string>
     <string name="dire_score">%1$d</string>
     <string name="exit">Выход</string>
@@ -106,7 +106,23 @@
     <string name="games_hero">%1d</string>
     <string name="win_rate_hero">%1d</string>
     <string name="pro_all_matches">%1d</string>
-    <string name="matches_with_win">%1s%%</string>
+    <string name="matches_with_win">%1$s</string>
     <string name="matches_against_win">%1s%%</string>
     <string name="team_mame">%1s</string>
+    <string name="fragment_home">Главная</string>
+    <string name="payer_image">Фото игрока</string>
+    <string name="vector_icon">Векторная иконка Избранные игроки</string>
+    <string name="last_match_time_title">Последний матч</string>
+    <string name="logo_hero_title">Логотип героя</string>
+    <string name="hero_name_title">Герой</string>
+    <string name="result_title">Результат</string>
+    <string name="kda_title">K/D/A</string>
+    <string name="refresh">Обновить</string>
+    <string name="star">звезда</string>
+    <string name="list_favorite_player_is_empty">Список избранных игроков пуст</string>
+    <string name="name_title">Имя</string>
+    <string name="games_title">Игр</string>
+    <string name="percent_win">% Побед</string>
+    <string name="win_with_title">Побед С</string>
+    <string name="win_against_title">Побед Против</string>
 </resources>

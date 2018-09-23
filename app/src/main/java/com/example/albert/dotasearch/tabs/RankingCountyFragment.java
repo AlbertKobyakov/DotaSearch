@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.adapter.RankingAdapter;
 import com.example.albert.dotasearch.model.TimeRefreshLeaderBoard;
@@ -90,7 +91,7 @@ public class RankingCountyFragment extends Fragment {
     }
 
     public void setRecyclerViewAdapter() {
-        mAdapter = new RankingAdapter(getActivity());
+        mAdapter = new RankingAdapter(getActivity(), Glide.with(this));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -132,7 +133,13 @@ public class RankingCountyFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop");
+        Log.d(TAG, "onStop " + getTitle());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume " + getTitle());
     }
 
     @Override

@@ -10,8 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.albert.dotasearch.AnimationForRecyclerViewItems;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Team;
 
@@ -21,13 +22,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ProTeamAdapter extends RecyclerView.Adapter<ProTeamAdapter.MyViewHolder> {
+public class ProTeamAdapter extends RecyclerView.Adapter<ProTeamAdapter.MyViewHolder> implements AnimationForRecyclerViewItems {
     private static final String TAG = "ProTeamAdapter";
     private static final int LAYOUT = R.layout.pro_team_list_row;
 
     private List<Team> teamsForAdapter;
     private List<Team> teamsAll;
     public Context context;
+    private RequestManager glide;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.team_logo)
@@ -42,8 +44,9 @@ public class ProTeamAdapter extends RecyclerView.Adapter<ProTeamAdapter.MyViewHo
         }
     }
 
-    public ProTeamAdapter(Context context) {
+    public ProTeamAdapter(Context context, RequestManager glide) {
         this.context = context;
+        this.glide = glide;
     }
 
 
@@ -72,10 +75,8 @@ public class ProTeamAdapter extends RecyclerView.Adapter<ProTeamAdapter.MyViewHo
                     .override(100, 100)
                     /*.diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)*/;
 
-            Glide.with(context)
-                    .load(team.getLogoUrl())
-                    .error(Glide.with(context).load(R.drawable.help))
-
+            glide.load(team.getLogoUrl())
+                    .error(glide.load(R.drawable.help))
                     .apply(fitCenter)
                     .into(holder.teamLogo);
 
@@ -84,6 +85,8 @@ public class ProTeamAdapter extends RecyclerView.Adapter<ProTeamAdapter.MyViewHo
             } else {
                 holder.teamName.setText(context.getResources().getString(R.string.team_mame, team.getName()));
             }
+
+            setFadeAnimation(holder.itemView);
         }
     }
 

@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.MatchDetailActivity;
@@ -48,7 +49,8 @@ public class TabRecord extends Fragment {
     private Unbinder unbinder;
     private RecordAdapter mAdapter;
 
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
 
     public static TabRecord newInstance(String titleRecord, String titleTab) {
         TabRecord tabRecord = new TabRecord();
@@ -151,7 +153,7 @@ public class TabRecord extends Fragment {
     }
 
     public void setRecyclerViewAdapter() {
-        mAdapter = new RecordAdapter(getActivity(), titleTab, titleRecord);
+        mAdapter = new RecordAdapter(getActivity(), titleTab, titleRecord, Glide.with(this));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

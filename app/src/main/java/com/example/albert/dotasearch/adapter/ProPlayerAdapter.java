@@ -12,8 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.albert.dotasearch.AnimationForRecyclerViewItems;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.ProPlayer;
 
@@ -23,7 +24,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyViewHolder> {
+public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyViewHolder> implements AnimationForRecyclerViewItems {
 
     public static final String TAG = "ProPlayerAdapter";
     public static final int LAYOUT = R.layout.pro_player_list_row;
@@ -31,6 +32,7 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
     private List<ProPlayer> proPlayers;
     private List<ProPlayer> proPlayersTempAll;
     public Context context;
+    private RequestManager glide;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.name_pro_player)
@@ -50,8 +52,9 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
         }
     }
 
-    public ProPlayerAdapter(Context context) {
+    public ProPlayerAdapter(Context context, RequestManager glide) {
         this.context = context;
+        this.glide = glide;
     }
 
     public void setData(List<ProPlayer> proPlayersList) {
@@ -96,9 +99,8 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
                 avatarMedium = proPlayer.getAvatarmedium();
             }
 
-            Glide.with(context)
-                    .load(avatarMedium)
-                    .error(Glide.with(context).load(R.drawable.avatar_unknown_medium).apply(RequestOptions.circleCropTransform()))
+            glide.load(avatarMedium)
+                    .error(glide.load(R.drawable.avatar_unknown_medium).apply(RequestOptions.circleCropTransform()))
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.imageView);
 
@@ -111,6 +113,8 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
                     }
                 }
             }
+
+            setFadeAnimation(holder.itemView);
         }
     }
 

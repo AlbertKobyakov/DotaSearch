@@ -9,9 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.FoundPlayer;
@@ -34,6 +36,7 @@ public class FoundPlayerAdapter extends RecyclerView.Adapter<FoundPlayerAdapter.
     private List<FoundPlayer> foundUsersCopy;
     private List<FoundPlayer> foundPlayersForAdapter;
     public Context context;
+    private RequestManager glide;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.name_found_player)
@@ -42,6 +45,8 @@ public class FoundPlayerAdapter extends RecyclerView.Adapter<FoundPlayerAdapter.
         TextView lastMatchFoundPlayer;
         @BindView(R.id.imageView)
         ImageView imageView;
+        @BindView(R.id.block_last_match_time)
+        LinearLayout blockLastMatchTime;
 
 
         public MyViewHolder(View view) {
@@ -51,12 +56,9 @@ public class FoundPlayerAdapter extends RecyclerView.Adapter<FoundPlayerAdapter.
         }
     }
 
-    public FoundPlayerAdapter(Context context) {
+    public FoundPlayerAdapter(Context context, RequestManager glide) {
         this.context = context;
-    }
-
-    public List<FoundPlayer> getFoundPlayersForAdapter() {
-        return foundPlayersForAdapter;
+        this.glide = glide;
     }
 
     public FoundPlayer getFoundPlayerByPosition(int position) {
@@ -82,15 +84,21 @@ public class FoundPlayerAdapter extends RecyclerView.Adapter<FoundPlayerAdapter.
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         if (foundPlayersForAdapter != null) {
             FoundPlayer foundPlayer = foundPlayersForAdapter.get(position);
+            String lastMatchTime = generateLastMatchTime(foundPlayer.getLastMatchTime());
+
             holder.nameFoundPlayer.setText(foundPlayer.getPersonaname());
-            holder.lastMatchFoundPlayer.setText(generateLastMatchTime(foundPlayer.getLastMatchTime()));
+            if (lastMatchTime.trim().length() > 0) {
+                holder.blockLastMatchTime.setVisibility(View.VISIBLE);
+                holder.lastMatchFoundPlayer.setText(lastMatchTime);
+            }
+
             Log.d(TAG, "onBindViewHolder " + position + " " + foundPlayer.getLastMatchTime());
 
             RequestOptions fitCenter = new RequestOptions()
                     .fitCenter();
 
-            Glide.with(context)
-                    .load(foundPlayer.getAvatarfull())
+            glide.load(foundPlayer.getAvatarfull())
+                    .error(glide.load(R.drawable.avatar_unknown_medium).apply(fitCenter))
                     .apply(fitCenter)
                     .into(holder.imageView);
         }

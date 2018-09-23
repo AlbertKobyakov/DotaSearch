@@ -1,17 +1,11 @@
 package com.example.albert.dotasearch.util;
 
-import android.content.Context;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.albert.dotasearch.App;
-import com.example.albert.dotasearch.database.AppDatabase;
-import com.example.albert.dotasearch.model.Hero;
-import com.example.albert.dotasearch.model.Item;
-import com.example.albert.dotasearch.model.ItemsInfoWithSteam;
 import com.example.albert.dotasearch.model.LobbyType;
 import com.example.albert.dotasearch.retrofit.DotaClient;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -25,8 +19,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class UtilDota {
     private final static String TAG = "UtilDota";
-
-    private static AppDatabase db = App.get().getDB();
 
     public static DotaClient initRetrofitRx() {
         return new Retrofit.Builder()
@@ -50,70 +42,6 @@ public class UtilDota {
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build().create(DotaClient.class);
-    }
-
-    private static String createUrlItem(String nameItem) {
-        nameItem = nameItem.replace("item_", "");
-        nameItem = "https://api.opendota.com/apps/dota2/images/items/" + nameItem + "_lg.png";
-        Log.d(TAG, "String after replace = " + nameItem);
-        return nameItem;
-    }
-
-    private static void setUrlItem(List<Item> items) {
-        for (int i = 0; i < items.size(); i++) {
-            Item item = items.get(i);
-            String itemName = item.getName();
-            items.get(i).setItemUrl(createUrlItem(itemName));
-        }
-    }
-
-    private static void setMissingItems(List<Item> items) {
-        items.add(new Item(0, "item_empty"));
-        items.add(new Item(195, "item_recipe_diffusal_blade_2"));
-        items.add(new Item(196, "item_diffusal_blade_2"));
-        items.add(new Item(84, "item_flying_courier"));
-    }
-
-    public static void storeItemsSteamInDB(ItemsInfoWithSteam itemsInfoWithSteam) {
-        long status = itemsInfoWithSteam.getResult().getStatus();
-        if (status == 200) {
-            Log.e(TAG, "successes, status = " + status);
-
-            List<Item> items = itemsInfoWithSteam.getResult().getItems();
-
-            setMissingItems(items);
-            setUrlItem(items);
-
-            if (db.itemDao().getAll().size() == 0) {
-                db.itemDao().insertAll(items);
-                Log.e(TAG, "Success. items insert to Db");
-            } else {
-                db.itemDao().updateAll(items);
-                Log.e(TAG, "Success. items update to Db");
-            }
-
-        } else {
-            Log.e(TAG, "error storeItemsSteamInDB, status = " + status);
-        }
-    }
-
-    private static void setHeroFullIconAndImageUrl(List<Hero> heroes) {
-        for (Hero hero : heroes) {
-            hero.setImg("https://api.opendota.com" + hero.getImg());
-            hero.setIcon("https://api.opendota.com" + hero.getIcon());
-        }
-    }
-
-    public static void storeHeroesInDB(List<Hero> heroes) {
-        setHeroFullIconAndImageUrl(heroes);
-
-        if (db.heroDao().getAll().size() == 0) {
-            db.heroDao().insertAll(heroes);
-            Log.e(TAG, "Success. heroes insert to Db " + Thread.currentThread().getName() + " " + heroes.size());
-        } else {
-            db.heroDao().updateAll(heroes);
-            Log.e(TAG, "Success. heroes update to Db " + Thread.currentThread().getName() + " " + heroes.size());
-        }
     }
 
     public static String getGameModeById(long id) {
@@ -249,13 +177,12 @@ public class UtilDota {
         return result;
     }
 
-    public static void setImageView(String url, int defaultImage, ImageView imageView, Context context) {
+    public static void setImageView(String url, int defaultImage, ImageView imageView, RequestManager glide) {
         RequestOptions centerCrop = new RequestOptions()
                 .centerCrop();
 
-        Glide.with(context)
-                .load(url)
-                .error(Glide.with(context).load(defaultImage))
+        glide.load(url)
+                .error(glide.load(defaultImage))
                 .apply(centerCrop)
                 .into(imageView);
     }

@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
@@ -93,7 +94,7 @@ public class TabProPlayers extends AbstractTabFragment {
     private void setToolbarTitle() {
         if (getActivity() != null && getActivity().findViewById(R.id.toolbar) != null) {
             Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-            toolbar.setTitle(R.string.tab_pro_players);
+            toolbar.setTitle(R.string.fragment_pro_players);
         }
     }
 
@@ -133,7 +134,7 @@ public class TabProPlayers extends AbstractTabFragment {
 
     public void setAdapterAndRecyclerView() {
         Log.e(TAG, "setAdapterAndRecyclerView");
-        mAdapter = new ProPlayerAdapter(getActivity());
+        mAdapter = new ProPlayerAdapter(getActivity(), Glide.with(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);

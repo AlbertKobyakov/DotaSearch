@@ -22,7 +22,6 @@ public class RVEmptyObserver extends RecyclerView.AdapterDataObserver {
      * Check if Layout is empty and show the appropriate view
      */
     private void checkIfEmpty() {
-        //count для того чтобы убрать крастковременный показ макета пустого ресуклера
         if (emptyView != null && recyclerView.getAdapter() != null/* && count > 0*/) {
             boolean emptyViewVisible = recyclerView.getAdapter().getItemCount() == 0;
             emptyView.setVisibility(emptyViewVisible ? View.VISIBLE : View.GONE);

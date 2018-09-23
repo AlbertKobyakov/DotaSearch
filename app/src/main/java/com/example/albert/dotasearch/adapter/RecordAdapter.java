@@ -7,12 +7,11 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
+import com.example.albert.dotasearch.AnimationForRecyclerViewItems;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Record;
 
@@ -25,15 +24,15 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.MyViewHolder> {
+public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.MyViewHolder> implements AnimationForRecyclerViewItems {
     private static final String TAG = "RecordAdapter";
     private static final int LAYOUT = R.layout.record_list_row;
-    private static final int DURATION_MILLIS = 1000;
 
     private List<Record> recordListForAdapter;
     private Context context;
     private String titleScore;
     private String typeRecord;
+    private RequestManager glide;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.name_player)
@@ -52,10 +51,11 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.MyViewHold
         }
     }
 
-    public RecordAdapter(Context context, String titleTab, String typeRecord) {
+    public RecordAdapter(Context context, String titleTab, String typeRecord, RequestManager glide) {
         this.context = context;
         this.titleScore = titleTab;
         this.typeRecord = typeRecord;
+        this.glide = glide;
     }
 
     @NonNull
@@ -95,9 +95,8 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.MyViewHold
         }
 
         if (currentRecord.getHeroImgUrl() != null) {
-            Glide.with(context)
-                    .load(currentRecord.getHeroImgUrl())
-                    .error(Glide.with(context).load(R.drawable.avatar_unknown_medium))
+            glide.load(currentRecord.getHeroImgUrl())
+                    .error(glide.load(R.drawable.avatar_unknown_medium))
                     .into(holder.heroImg);
         } else {
             holder.heroImg.setVisibility(View.GONE);
@@ -126,12 +125,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.MyViewHold
         } else {
             return 0;
         }
-    }
-
-    private void setFadeAnimation(View view) {
-        ScaleAnimation anim = new ScaleAnimation(0.0f, 1.0f, 0.0f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        anim.setDuration(DURATION_MILLIS);
-        view.startAnimation(anim);
     }
 
     private String formatNumber(double d) {

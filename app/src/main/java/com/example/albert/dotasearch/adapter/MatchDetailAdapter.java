@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
@@ -42,6 +43,7 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
     public List<Item> items;
     public Context context;
     private Map<Long, Item> itemsMap;
+    private RequestManager glide;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -102,8 +104,9 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         }
     }
 
-    public MatchDetailAdapter(Context context) {
+    public MatchDetailAdapter(Context context, RequestManager glide) {
         this.context = context;
+        this.glide = glide;
     }
 
     @NonNull
@@ -206,7 +209,7 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        hero -> UtilDota.setImageView(hero.getImg(), R.drawable.avatar_unknown_medium, holder.imageView, context),
+                        hero -> UtilDota.setImageView(hero.getImg(), R.drawable.avatar_unknown_medium, holder.imageView, glide),
                         error -> Log.e(TAG, error.getLocalizedMessage()),
                         () -> Log.d(TAG, "onComplete")
                 );

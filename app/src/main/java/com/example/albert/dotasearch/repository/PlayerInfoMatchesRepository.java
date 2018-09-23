@@ -36,9 +36,10 @@ public class PlayerInfoMatchesRepository {
         Log.d(TAG, "Network Request");
 
         Single<List<MatchShortInfo>> listMatchShortInfo = UtilDota.initRetrofitRx()
-                .getMatchesPlayerRx(accountId);
+                .getMatchesPlayerRx(accountId)
+                .doOnError(Throwable::printStackTrace);
 
-        Single<List<Hero>> listHeroes = db.heroDao().getAllRx();
+        Single<List<Hero>> listHeroes = db.heroDao().getAllRx().doOnError(Throwable::printStackTrace);
 
         Disposable disposable = Single.zip(listMatchShortInfo, listHeroes, new BiFunction<List<MatchShortInfo>, List<Hero>, List<MatchShortInfo>>() {
             @Override
@@ -66,7 +67,10 @@ public class PlayerInfoMatchesRepository {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         fullPlayerMatchesWithHeroUrl -> matches.setValue(fullPlayerMatchesWithHeroUrl),
-                        err -> Log.e(TAG, err.getLocalizedMessage())
+                        err -> {
+                            err.printStackTrace();
+                            Log.e(TAG, err.getLocalizedMessage());
+                        }
                 );
 
         return matches;

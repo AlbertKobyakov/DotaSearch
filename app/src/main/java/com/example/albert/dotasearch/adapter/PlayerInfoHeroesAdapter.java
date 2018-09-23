@@ -1,21 +1,21 @@
 package com.example.albert.dotasearch.adapter;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.albert.dotasearch.R;
-import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.PlayerHero;
 
 import java.text.DecimalFormat;
@@ -30,20 +30,27 @@ public class PlayerInfoHeroesAdapter extends RecyclerView.Adapter<PlayerInfoHero
     private static final int LAYOUT = R.layout.heroes_player_list_row;
 
     private List<PlayerHero> playerHeroesForAdapter;
-    private SparseArray<Hero> heroes;
     public Context context;
+    private RequestManager glide;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.last_played_hero)
         TextView lastPlayedHero;
         @BindView(R.id.games_hero)
         TextView gamesHero;
-        @BindView(R.id.winrate_hero)
-        TextView winRateHero;
         @BindView(R.id.hero_image)
         ImageView heroImage;
         @BindView(R.id.winrate_hero_percent)
         TextView winRateHeroPercent;
+        @BindView(R.id.hero_name)
+        TextView heroName;
+
+        @Nullable
+        @BindView(R.id.winrate_hero_percent_with)
+        TextView with;
+        @Nullable
+        @BindView(R.id.winrate_hero_percent_against)
+        TextView against;
 
         MyViewHolder(View view) {
             super(view);
@@ -52,11 +59,12 @@ public class PlayerInfoHeroesAdapter extends RecyclerView.Adapter<PlayerInfoHero
         }
     }
 
-    public PlayerInfoHeroesAdapter(Context context) {
+    public PlayerInfoHeroesAdapter(Context context, RequestManager glide) {
         this.context = context;
+        this.glide = glide;
     }
 
-    public PlayerHero getPlayerHeroByPosition(int position){
+    public PlayerHero getPlayerHeroByPosition(int position) {
         return playerHeroesForAdapter.get(position);
     }
 
@@ -77,18 +85,17 @@ public class PlayerInfoHeroesAdapter extends RecyclerView.Adapter<PlayerInfoHero
             int heroId = Integer.parseInt(playerHero.getHeroId());
 
             if (heroId != 0) {  // 0 hero id not exist
-                String heroImage = heroes.get(heroId).getImg();
+                String heroImage = playerHero.getHeroImg();
 
                 holder.gamesHero.setText(context.getResources().getString(R.string.games_hero, playerHero.getGames()));
 
-                holder.winRateHero.setText(context.getResources().getString(R.string.win_rate_hero, playerHero.getWin()));
+                holder.heroName.setText(playerHero.getHeroName());
 
                 RequestOptions fitCenter = new RequestOptions()
                         .fitCenter();
 
-                Glide.with(context)
-                        .load(heroImage)
-                        .error(Glide.with(context).load(R.drawable.avatar_unknown_medium))
+                glide.load(heroImage)
+                        .error(glide.load(R.drawable.avatar_unknown_medium))
                         .apply(fitCenter)
                         .into(holder.heroImage);
 
@@ -106,6 +113,23 @@ public class PlayerInfoHeroesAdapter extends RecyclerView.Adapter<PlayerInfoHero
                 double winRate = ((double) playerHero.getWin() / (double) playerHero.getGames()) * 100;
 
                 holder.winRateHeroPercent.setText(twoNumberAfterPoint(winRate));
+
+                if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
+                    double withWin = (double) playerHero.getWithWin() / (double) playerHero.getWithGames() * 100;
+                    double againstWin = (double) playerHero.getAgainstWin() / (double) playerHero.getAgainstGames() * 100;
+
+                    if (playerHero.getWithWin() != 0) {
+                        holder.with.setText(context.getResources().getString(R.string.matches_with_win, twoNumberAfterPoint(withWin, playerHero.getWithGames())));
+                    } else {
+                        holder.with.setText(context.getResources().getString(R.string.matches_with_win, "0"));
+                    }
+
+                    if (playerHero.getAgainstWin() != 0) {
+                        holder.against.setText(context.getResources().getString(R.string.matches_with_win, twoNumberAfterPoint(againstWin, playerHero.getAgainstGames())));
+                    } else {
+                        holder.against.setText(context.getResources().getString(R.string.matches_with_win, "0"));
+                    }
+                }
             }
         }
     }
@@ -120,9 +144,13 @@ public class PlayerInfoHeroesAdapter extends RecyclerView.Adapter<PlayerInfoHero
         }
     }
 
-    public void setData(List<PlayerHero> playerHeroes, SparseArray<Hero> heroes) {
+    private String twoNumberAfterPoint(double number, long allGames) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return allGames + " (" + df.format(number) + "%)";
+    }
+
+    public void setData(List<PlayerHero> playerHeroes) {
         this.playerHeroesForAdapter = playerHeroes;
-        this.heroes = heroes;
         notifyDataSetChanged();
     }
 

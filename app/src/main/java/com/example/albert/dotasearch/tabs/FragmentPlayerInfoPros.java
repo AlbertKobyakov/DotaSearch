@@ -1,9 +1,12 @@
 package com.example.albert.dotasearch.tabs;
 
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,64 +15,124 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.PlayerInfoActivity;
 import com.example.albert.dotasearch.adapter.PlayerProsAdapter;
 import com.example.albert.dotasearch.model.Pros;
+import com.example.albert.dotasearch.modelfactory.FactoryForPlayerInfoProsViewModel;
+import com.example.albert.dotasearch.viewModel.PlayerInfoProsViewModel;
 
 import java.util.List;
 
-import static com.example.albert.dotasearch.activity.PlayerInfoActivity.viewModel;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class FragmentPlayerInfoPros extends Fragment {
     private static final String TAG = "FragmentPlayerInfoPros";
-    private static final int LAYOUT = R.layout.fragment_player_info_pros;
-    private View view;
-    public PlayerProsAdapter adapter;
-    public List<Pros> allPros;
+    private static final int LAYOUT = R.layout.fragment_player_overview;
+    private static final String ACCOUNT_ID = "account_id";
 
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    public PlayerProsAdapter mAdapter;
+    public List<Pros> allPros;
+    private long accountId;
+    private PlayerInfoProsViewModel viewModel;
+
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
+    @BindView(R.id.empty_progress_bar)
+    ProgressBar progressBar;
+    @BindView(R.id.for_empty_recycler_size)
+    TextView forEmptyRecyclerSize;
+    @BindView(R.id.btn_refresh)
+    Button btnRefresh;
+    @BindView(R.id.block_error)
+    LinearLayout blockError;
+
+    public static FragmentPlayerInfoPros newInstance(long accountId) {
+        FragmentPlayerInfoPros fragmentPlayerInfoPros = new FragmentPlayerInfoPros();
+        Bundle bundle = new Bundle();
+        bundle.putLong(ACCOUNT_ID, accountId);
+        fragmentPlayerInfoPros.setArguments(bundle);
+
+        return fragmentPlayerInfoPros;
+    }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.e(TAG, "onCreateView");
 
-        view = inflater.inflate(LAYOUT, container, false);
+        View view = inflater.inflate(LAYOUT, container, false);
 
         ButterKnife.bind(this, view);
 
+        AppBarLayout appBar = getActivity().findViewById(R.id.appBar);
+
+        if (getArguments() != null) {
+            accountId = getArguments().getLong(ACCOUNT_ID);
+        }
+
+        setAdapterAndRecyclerView();
+
+        viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoProsViewModel(accountId)).get(PlayerInfoProsViewModel.class);
+
+        viewModel.getPros().observe(this, new Observer<List<Pros>>() {
+            @Override
+            public void onChanged(@Nullable List<Pros> pros) {
+                if (pros != null) {
+                    if (pros.size() > 0) {
+                        Log.d(TAG, pros.size() + "");
+                        allPros = pros;
+                        mAdapter.setData(pros);
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        //appBar.setExpanded(true, true);
+                    } else {
+                        //appBar.setExpanded(false, true);
+                        progressBar.setVisibility(View.GONE);
+                        forEmptyRecyclerSize.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
+
+        viewModel.getErrorMessage().observe(this, errorMessage -> {
+            if (errorMessage != null && errorMessage.equals("timeout")) {
+                Log.d(TAG, "timeout response");
+                progressBar.setVisibility(View.GONE);
+                blockError.setVisibility(View.VISIBLE);
+            }
+        });
+
         return view;
+    }
+
+    @OnClick(R.id.btn_refresh)
+    public void refresh() {
+        viewModel.repeatedRequest();
+        progressBar.setVisibility(View.VISIBLE);
+        blockError.setVisibility(View.GONE);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        viewModel.getPros().observe(this, new Observer<List<Pros>>() {
-            @Override
-            public void onChanged(@Nullable List<Pros> pros) {
-                if(pros != null){
-                    setAdapterAndRecyclerView();
-
-                    allPros = pros;
-                    adapter.setData(pros);
-                    Log.d(TAG, pros.size() + "");
-                }
-            }
-        });
     }
 
     public void setAdapterAndRecyclerView() {
-        adapter = new PlayerProsAdapter(getActivity());
+        mAdapter = new PlayerProsAdapter(getActivity(), Glide.with(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(mAdapter);
+        //mAdapter.registerAdapterDataObserver(new RVEmptyObserver(recyclerView, progressBar, recyclerView));
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -80,7 +143,6 @@ public class FragmentPlayerInfoPros extends Fragment {
     }
 
     public void toPlayerInfoActivity(int position) {
-        Log.e(TAG, "2222");
         Intent intent = new Intent(getActivity(), PlayerInfoActivity.class);
         intent.putExtra("accountId", allPros.get(position).getAccountId());
         intent.putExtra("personalName", allPros.get(position).getName());

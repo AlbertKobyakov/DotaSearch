@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.AbstractTabFragment;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
@@ -93,14 +94,14 @@ public class TabMatchDetail extends AbstractTabFragment {
     }
 
     public void setAdapterAndRecyclerView() {
-        mAdapterRadiant = new MatchDetailAdapter(getContext());
+        mAdapterRadiant = new MatchDetailAdapter(getContext(), Glide.with(this));
         recyclerViewRadiant.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewRadiant.setItemAnimator(new DefaultItemAnimator());
         recyclerViewRadiant.setAdapter(mAdapterRadiant);
         setItemTouchListenerRadiant(recyclerViewRadiant);
         recyclerViewRadiant.setNestedScrollingEnabled(false);
 
-        mAdapterDire = new MatchDetailAdapter(getContext());
+        mAdapterDire = new MatchDetailAdapter(getContext(), Glide.with(this));
         recyclerViewDire.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewDire.setItemAnimator(new DefaultItemAnimator());
         recyclerViewDire.setAdapter(mAdapterDire);
@@ -184,7 +185,7 @@ public class TabMatchDetail extends AbstractTabFragment {
             long seconds = matchFullInfo.getDuration() - (minutes * SECONDS_IN_MINUTE);
             radiantScore.setText(getResources().getString(R.string.radiant_score, matchFullInfo.getRadiantScore()));
             direScore.setText(getResources().getString(R.string.dire_score, matchFullInfo.getDireScore()));
-            matchDuration.setText(getResources().getString(R.string.match_duration, minutes, seconds));
+            matchDuration.setText(getResources().getString(R.string.match_duration, minutes + " " + seconds));
         } else {
             rootLayout.setVisibility(View.GONE);
             emptyLayout.setVisibility(View.VISIBLE);

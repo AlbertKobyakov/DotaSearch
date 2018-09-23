@@ -14,8 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
+import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
+import com.example.albert.dotasearch.RVEmptyObserver;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.MatchDetailActivity;
 import com.example.albert.dotasearch.adapter.PlayerInfoMatchesAdapter;
@@ -43,6 +46,8 @@ public class TabPlayerMatches extends Fragment {
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
+    @BindView(R.id.empty_progress_bar)
+    ProgressBar progressBar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,7 +56,7 @@ public class TabPlayerMatches extends Fragment {
         Log.e(TAG, "onCreate");
     }
 
-    public static TabPlayerMatches newInstance(long accountId){
+    public static TabPlayerMatches newInstance(long accountId) {
         TabPlayerMatches tabPlayerMatches = new TabPlayerMatches();
         Bundle bundle = new Bundle();
         bundle.putLong(ACCOUNT_ID, accountId);
@@ -68,14 +73,17 @@ public class TabPlayerMatches extends Fragment {
         Log.e(TAG, "onCreateView");
         ButterKnife.bind(this, view);
 
-        if(getArguments() != null){
+        if (getArguments() != null) {
             accountId = getArguments().getLong(ACCOUNT_ID);
         }
+
+        Log.d(TAG, accountId + " idididididView");
 
         viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoMatchesViewModel(accountId)).get(PlayerInfoMatchesViewModel.class);
         viewModel.getMatches().observe(this, new Observer<List<MatchShortInfo>>() {
             @Override
             public void onChanged(@Nullable List<MatchShortInfo> matchShortInfos) {
+                Log.d(TAG, "onChanged");
                 if (matchShortInfos != null) {
                     setAdapterAndRecyclerView();
 
@@ -89,10 +97,11 @@ public class TabPlayerMatches extends Fragment {
     }
 
     public void setAdapterAndRecyclerView() {
-        mAdapter = new PlayerInfoMatchesAdapter(getActivity());
+        mAdapter = new PlayerInfoMatchesAdapter(getActivity(), Glide.with(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+        mAdapter.registerAdapterDataObserver(new RVEmptyObserver(recyclerView, progressBar, recyclerView));
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -113,5 +122,11 @@ public class TabPlayerMatches extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         compositeDisposable.dispose();
+        //Toast.makeText(getContext(), "onDestroyView", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }
