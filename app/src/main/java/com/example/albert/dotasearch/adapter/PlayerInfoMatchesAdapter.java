@@ -76,10 +76,8 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
             if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
                 long seconds = matchShortInfo.getDuration();
                 String duration = DateUtils.formatElapsedTime(seconds);
-
-                String matchStartDate = DateUtils.getRelativeTimeSpanString(
-                        matchShortInfo.getStartTime() * 1000
-                ).toString();
+                long secondsMatchEndTime = (seconds + matchShortInfo.getStartTime()) * 1000;
+                String matchStartDate = DateUtils.getRelativeTimeSpanString(secondsMatchEndTime).toString();
 
                 holder.duration.setText(context.getResources().getString(R.string.match_duration, duration));
                 holder.date.setText(matchStartDate);

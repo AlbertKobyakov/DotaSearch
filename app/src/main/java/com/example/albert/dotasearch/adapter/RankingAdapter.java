@@ -1,6 +1,7 @@
 package com.example.albert.dotasearch.adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -101,10 +102,13 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHo
 
             if (leaderboard.getCountry() != null) {
 
+                final int resourceId = getResourceDrawableByName(leaderboard.getCountry(), context);
+
                 RequestOptions fitCenter = new RequestOptions()
                         .fitCenter();
 
-                glide.load("https://www.countryflags.io/" + leaderboard.getCountry() + "/flat/64.png")
+                //glide.load("https://www.countryflags.io/" + leaderboard.getCountry() + "/flat/64.png")
+                glide.load(resourceId)
                         .error(glide.load(R.drawable.avatar_unknown_medium))
                         .apply(fitCenter)
                         .into(holder.countryFlag);
@@ -151,5 +155,10 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHo
         leaderboardListForAdapter = leaderboardListFiltered;
 
         notifyDataSetChanged();
+    }
+
+    private int getResourceDrawableByName(String nameDrawable, Context context){
+        Resources resources = context.getResources();
+        return resources.getIdentifier(nameDrawable, "drawable", context.getPackageName());
     }
 }
