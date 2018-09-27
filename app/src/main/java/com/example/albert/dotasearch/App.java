@@ -2,8 +2,11 @@ package com.example.albert.dotasearch;
 
 import android.app.Application;
 import android.arch.persistence.room.Room;
+import android.content.Context;
 
 import com.example.albert.dotasearch.database.AppDatabase;
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 
 public class App extends Application {
 
@@ -24,6 +27,8 @@ public class App extends Application {
         database = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, DATABASE_NAME).build();
 
         INSTANCE = this;
+
+        LeakCanary.install(this);
     }
 
     public AppDatabase getDB() {

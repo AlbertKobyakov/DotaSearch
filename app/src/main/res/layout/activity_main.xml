@@ -18,8 +18,9 @@
             android:layout_height="?android:attr/actionBarSize"
             android:background="@color/colorAccent"
             android:theme="@style/ThemeOverlay.AppCompat.Dark"
-            app:layout_scrollFlags="enterAlways|scroll"
+
             app:titleTextColor="@android:color/white" />
+        <!--app:layout_scrollFlags="enterAlways|scroll"-->
 
     </android.support.design.widget.AppBarLayout>
 
@@ -30,14 +31,11 @@
         android:orientation="vertical"
         android:paddingBottom="?android:attr/actionBarSize"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <!--android:paddingBottom="?android:attr/actionBarSize"
-        app:behavior_overlapTop="80dp"-->
 
         <FrameLayout
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
         </FrameLayout>
     </LinearLayout>
 

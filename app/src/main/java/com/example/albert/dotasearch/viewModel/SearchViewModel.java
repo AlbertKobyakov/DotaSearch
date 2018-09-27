@@ -8,16 +8,18 @@ import com.example.albert.dotasearch.repository.SearchPlayersRepository;
 
 import java.util.List;
 
+import io.reactivex.Single;
+
 public class SearchViewModel extends ViewModel {
     private SearchPlayersRepository repository;
 
     private LiveData<List<FavoritePlayer>> favoritePlayersLive;
-    private LiveData<Boolean> isRequestSearchSuccessful;
+    private LiveData<Integer> responseStatusCode;
 
     public SearchViewModel() {
         repository = new SearchPlayersRepository();
         favoritePlayersLive = repository.getAllFavoritePlayer();
-        isRequestSearchSuccessful = repository.getIsRequestSearchSuccessful();
+        responseStatusCode = repository.getResponseStatusCode();
     }
 
     public LiveData<List<FavoritePlayer>> getAllFavoritePlayers() {
@@ -32,7 +34,11 @@ public class SearchViewModel extends ViewModel {
         repository.searchResult(query);
     }
 
-    public LiveData<Boolean> getIsRequestSearchSuccessful() {
-        return isRequestSearchSuccessful;
+    public LiveData<Integer> getResponseStatusCode() {
+        return responseStatusCode;
+    }
+
+    public Single<Boolean> hasInternet() {
+        return repository.hasInternetConnection();
     }
 }

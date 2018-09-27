@@ -18,47 +18,58 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
 
 public class PlayerInfoMatchesRepository {
-    private static final String TAG = PlayerInfoMatchesRepository.class.getSimpleName();
+    private static final String TAG = "PlayerInfoMatchesRep";
     private AppDatabase db;
     private MutableLiveData<List<MatchShortInfo>> matches;
+    private MutableLiveData<Integer> statusCode;
+    private long accountId;
 
-    public PlayerInfoMatchesRepository() {
+    public PlayerInfoMatchesRepository(long accountId) {
+        this.accountId = accountId;
         db = App.get().getDB();
+        statusCode = new MutableLiveData<>();
+        matches = new MutableLiveData<>();
+        sendRequest();
     }
 
-    public LiveData<List<MatchShortInfo>> getMatches(long accountId) {
+    public LiveData<List<MatchShortInfo>> getMatches() {
         if (matches == null) {
             matches = new MutableLiveData<>();
         }
+        return matches;
+    }
 
-        Log.d(TAG, "Network Request");
+    public void sendRequest() {
+        Log.d(TAG, "NETWORK REQUEST");
 
-        Single<List<MatchShortInfo>> listMatchShortInfo = UtilDota.initRetrofitRx()
-                .getMatchesPlayerRx(accountId)
-                .doOnError(Throwable::printStackTrace);
+        Single<Response<List<MatchShortInfo>>> listMatchShortInfo = UtilDota.initRetrofitRx()
+                .getMatchesPlayerResponse(accountId);
 
-        Single<List<Hero>> listHeroes = db.heroDao().getAllRx().doOnError(Throwable::printStackTrace);
+        Single<List<Hero>> listHeroes = db.heroDao().getAllRx();
 
-        Disposable disposable = Single.zip(listMatchShortInfo, listHeroes, new BiFunction<List<MatchShortInfo>, List<Hero>, List<MatchShortInfo>>() {
+        Disposable disposable = Single.zip(listMatchShortInfo, listHeroes, new BiFunction<Response<List<MatchShortInfo>>, List<Hero>, Response<List<MatchShortInfo>>>() {
             @Override
-            public List<MatchShortInfo> apply(List<MatchShortInfo> matchShortInfos, List<Hero> heroes) {
+            public Response<List<MatchShortInfo>> apply(Response<List<MatchShortInfo>> matchShortInfos, List<Hero> heroes) {
                 SparseArray<Hero> heroMap = sortHeroes(heroes);
 
-                for (MatchShortInfo matchShortInfo : matchShortInfos) {
-                    int heroId = (int) matchShortInfo.getHeroId();
+                if (matchShortInfos.body() != null) {
+                    for (MatchShortInfo matchShortInfo : matchShortInfos.body()) {
+                        int heroId = (int) matchShortInfo.getHeroId();
 
-                    String heroImageUrl = "";
-                    String heroName = "";
+                        String heroImageUrl = "";
+                        String heroName = "";
 
-                    if (heroMap.get(heroId) != null) {
-                        heroImageUrl = heroMap.get(heroId).getImg();
-                        heroName = heroMap.get(heroId).getLocalizedName();
+                        if (heroMap.get(heroId) != null) {
+                            heroImageUrl = heroMap.get(heroId).getImg();
+                            heroName = heroMap.get(heroId).getLocalizedName();
+                        }
+
+                        matchShortInfo.setHeroImageUrl(heroImageUrl);
+                        matchShortInfo.setHeroName(heroName);
                     }
-
-                    matchShortInfo.setHeroImageUrl(heroImageUrl);
-                    matchShortInfo.setHeroName(heroName);
                 }
                 return matchShortInfos;
             }
@@ -66,14 +77,17 @@ public class PlayerInfoMatchesRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        fullPlayerMatchesWithHeroUrl -> matches.setValue(fullPlayerMatchesWithHeroUrl),
+                        response -> {
+                            matches.setValue(response.body());
+                            if (response.code() != 200) {
+                                statusCode.setValue(response.code());
+                            }
+                        },
                         err -> {
-                            err.printStackTrace();
                             Log.e(TAG, err.getLocalizedMessage());
+                            statusCode.setValue(-200);
                         }
                 );
-
-        return matches;
     }
 
     private SparseArray<Hero> sortHeroes(List<Hero> heroes) {
@@ -82,5 +96,9 @@ public class PlayerInfoMatchesRepository {
             sortedHeroes.put(heroes.get(i).getId(), heroes.get(i));
         }
         return sortedHeroes;
+    }
+
+    public MutableLiveData<Integer> getStatusCode() {
+        return statusCode;
     }
 }

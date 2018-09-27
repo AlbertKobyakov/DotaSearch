@@ -3,7 +3,6 @@ package com.example.albert.dotasearch.activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,7 +33,7 @@ import com.example.albert.dotasearch.model.WinLose;
 import com.example.albert.dotasearch.modelfactory.FactoryForPlayerInfoViewModel;
 import com.example.albert.dotasearch.tabs.FragmentPlayerInfoPros;
 import com.example.albert.dotasearch.tabs.FragmentPlayerInfoHeroes;
-import com.example.albert.dotasearch.tabs.TabPlayerMatches;
+import com.example.albert.dotasearch.tabs.FragmentPlayerInfoMatches;
 import com.example.albert.dotasearch.viewModel.PlayerInfoViewModel;
 
 import java.text.DecimalFormat;
@@ -52,7 +51,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
     public String personalName;
     public PlayerInfoViewModel viewModel;
 
-    private TabPlayerMatches tabPlayerMatches;
+    private FragmentPlayerInfoMatches fragmentPlayerInfoMatches;
     private FragmentPlayerInfoHeroes fragmentPlayerInfoHeroes;
     private FragmentPlayerInfoPros fragmentPlayerInfoPros;
 
@@ -102,7 +101,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
 
         glide = Glide.with(this);
 
-        tabPlayerMatches = TabPlayerMatches.newInstance(accountId);
+        fragmentPlayerInfoMatches = FragmentPlayerInfoMatches.newInstance(accountId);
         fragmentPlayerInfoHeroes = FragmentPlayerInfoHeroes.newInstance(accountId);
         fragmentPlayerInfoPros = FragmentPlayerInfoPros.newInstance(accountId);
 
@@ -111,7 +110,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.player_overview:
-                        changeFragment(tabPlayerMatches, "tabPlayerMatches");
+                        changeFragment(fragmentPlayerInfoMatches, "fragmentPlayerInfoMatches");
                         return true;
                     case R.id.pros:
                         changeFragment(fragmentPlayerInfoPros, "fragmentPlayerInfoPros");
@@ -125,7 +124,6 @@ public class PlayerInfoActivity extends AppCompatActivity {
         });
 
         if (savedInstanceState == null) {
-            Log.d(TAG, "savedInstanceState == null " + tabPlayerMatches + " " + fragmentPlayerInfoPros + " " + fragmentPlayerInfoHeroes);
             navigation.setSelectedItemId(R.id.player_overview);
         }
 
@@ -135,19 +133,17 @@ public class PlayerInfoActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable PlayerOverviewCombine playerOverviewCombine) {
                 Log.e("FRAGMENT", "777777777777777777777");
-                /*if (navigation.getVisibility() == View.INVISIBLE) {
-                    navigation.setVisibility(View.VISIBLE);
-                }*/
-
-                Log.e(TAG, "7777777777777774777777" + (playerOverviewCombine != null));
 
                 if (playerOverviewCombine != null) {
+
                     playerInfo = playerOverviewCombine.getPlayerInfo();
                     winLose = playerOverviewCombine.getWinLose();
 
-                    setToolbarTitle(getRealPlayerName(playerInfo));
-                    setPlayerSoloMMRNameImgAndRankTier(playerInfo);
-                    setPlayerRecordAndWinRate(winLose);
+                    if (playerInfo.getErrorMessage() == null && winLose.getErrorMessage() == null) {
+                        setToolbarTitle(getRealPlayerName(playerInfo));
+                        setPlayerSoloMMRNameImgAndRankTier(playerInfo);
+                        setPlayerRecordAndWinRate(winLose);
+                    }
                 }
             }
         });
@@ -239,11 +235,11 @@ public class PlayerInfoActivity extends AppCompatActivity {
     }
 
     private void initToolbar() {
-        if (Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation) {
+        /*if (Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation) {
             appBarLayout.setExpanded(false, true);
         } else {
             appBarLayout.setExpanded(true, true);
-        }
+        }*/
 
         toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
         setSupportActionBar(toolbar);

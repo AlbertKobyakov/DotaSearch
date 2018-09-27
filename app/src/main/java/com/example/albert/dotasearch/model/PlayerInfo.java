@@ -26,6 +26,15 @@ public class PlayerInfo {
     @SerializedName("mmr_estimate")
     @Expose
     private MmrEstimate mmrEstimate;
+    private String errorMessage;
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
 
     public String getTrackedUntil() {
         return trackedUntil;

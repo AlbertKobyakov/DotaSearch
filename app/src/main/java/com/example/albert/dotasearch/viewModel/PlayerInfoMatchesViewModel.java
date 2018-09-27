@@ -13,14 +13,24 @@ public class PlayerInfoMatchesViewModel extends ViewModel {
 
     private PlayerInfoMatchesRepository repository;
     private LiveData<List<MatchShortInfo>> matches;
+    private LiveData<Integer> statusCode;
 
     public PlayerInfoMatchesViewModel(long accountId) {
-        repository = new PlayerInfoMatchesRepository();
-        matches = repository.getMatches(accountId);
+        repository = new PlayerInfoMatchesRepository(accountId);
+        matches = repository.getMatches();
+        statusCode = repository.getStatusCode();
         Log.d("PlayerMatchesViewModel", "constructor");
     }
 
     public LiveData<List<MatchShortInfo>> getMatches() {
         return matches;
+    }
+
+    public LiveData<Integer> getStatusCode() {
+        return statusCode;
+    }
+
+    public void repeatedRequest() {
+        repository.sendRequest();
     }
 }

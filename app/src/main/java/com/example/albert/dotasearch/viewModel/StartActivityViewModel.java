@@ -20,4 +20,8 @@ public class StartActivityViewModel extends ViewModel {
     public LiveData<Boolean> getIsLoadMainActivity() {
         return isLoadMainActivity;
     }
+
+    public void refresh() {
+        repository.dataInitialization();
+    }
 }

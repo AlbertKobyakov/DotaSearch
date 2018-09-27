@@ -68,7 +68,9 @@
     <string name="damage">DMG</string>
     <string name="dire">Тьма</string>
     <string name="nickname">Прозвище</string>
-    <string name="no_internet">Подключение к интернету отсутствует…</string>
+    <string name="no_internet">Интернет соединение отсутствует…</string>
+    <string name="errors_500">Ошибка сервера…</string>
+    <string name="errors_400">Ошибка клиента…</string>
     <string name="result_search_query">найденно %1$d совпадений</string>
     <string name="by_query">По запросу:</string>
     <string name="found">\"%1$s\"</string>
@@ -125,4 +127,8 @@
     <string name="percent_win">% Побед</string>
     <string name="win_with_title">Побед С</string>
     <string name="win_against_title">Побед Против</string>
+    <string name="matches">Матчи</string>
+    <string name="pro_players">Профессионалы</string>
+    <string name="heroes">Герои</string>
+    <string name="loading">Загрузка…</string>
 </resources>

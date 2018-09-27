@@ -8,6 +8,8 @@ import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.model.PlayerOverviewCombine;
 import com.example.albert.dotasearch.repository.PlayerInfoRepository;
 
+import io.reactivex.Single;
+
 public class PlayerInfoViewModel extends ViewModel {
     private static final String TAG = "PlayerInfoViewModel";
 
@@ -43,5 +45,9 @@ public class PlayerInfoViewModel extends ViewModel {
 
     public void deletePlayerWithFavoriteList(long accountId) {
         repository.deletePlayerWithFavoriteList(accountId);
+    }
+
+    public Single<Boolean> hasInternet() {
+        return repository.hasInternetConnection();
     }
 }

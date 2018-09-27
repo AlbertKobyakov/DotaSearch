@@ -19,51 +19,42 @@ public class PlayerInfoProsRepository {
 
     private long accountId;
     private MutableLiveData<List<Pros>> pros;
-    private MutableLiveData<String> errorMessage;
+    private MutableLiveData<Integer> statusCode;
 
     public PlayerInfoProsRepository(long accountId) {
         this.accountId = accountId;
-        errorMessage = new MutableLiveData<>();
+        statusCode = new MutableLiveData<>();
+        pros = new MutableLiveData<>();
+        sendRequest();
         Log.d(TAG, "new constructor");
     }
 
     public LiveData<List<Pros>> getPros() {
-        Log.d(TAG, "NETWORK REQUEST");
-        if (pros == null) {
-            pros = new MutableLiveData<>();
-        }
-
-        Disposable disposable = UtilDota.initRetrofitRx()
-                .getPlayerPros(accountId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        prosResponse -> pros.setValue(prosResponse),
-                        //prosResponse -> errorMessage.setValue("timeout"),
-                        err -> {
-                            Log.e(TAG, err.getLocalizedMessage());
-                            errorMessage.setValue(err.getLocalizedMessage());
-                        }
-                );
-
         return pros;
     }
 
-    public void repeatedRequest() {
+    public void sendRequest() {
+        Log.d(TAG, "NETWORK REQUEST");
         Disposable disposable = UtilDota.initRetrofitRx()
-                .getPlayerPros(accountId)
+                .getPlayerProsResponse(accountId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        prosResponse -> pros.setValue(prosResponse),
+                        response -> {
+                            List<Pros> prosList = response.body();
+                            pros.setValue(prosList);
+                            if (response.code() != 200) {
+                                statusCode.setValue(response.code());
+                            }
+                        },
                         err -> {
                             Log.e(TAG, err.getLocalizedMessage());
-                            errorMessage.setValue(err.getLocalizedMessage());
+                            statusCode.setValue(-200);
                         }
                 );
     }
 
-    public MutableLiveData<String> getErrorMessage() {
-        return errorMessage;
+    public MutableLiveData<Integer> getStatusCode() {
+        return statusCode;
     }
 }

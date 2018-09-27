@@ -13,7 +13,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -29,6 +31,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class FragmentPlayerInfoHeroes extends Fragment {
     private static final String TAG = "FragmentPlayerHeroes";
@@ -38,11 +41,21 @@ public class FragmentPlayerInfoHeroes extends Fragment {
     private View view;
     private PlayerInfoHeroesAdapter mAdapter;
     private long accountId;
+    private List<PlayerHero> playerHeroes;
+    private PlayerInfoHeroesViewModel viewModel;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
     @BindView(R.id.empty_progress_bar)
     ProgressBar progressBar;
+    @BindView(R.id.block_error)
+    LinearLayout blockError;
+    @BindView(R.id.no_internet)
+    TextView text_no_internet;
+    @BindView(R.id.network_error)
+    TextView text_network_error;
+    @BindView(R.id.for_empty_recycler_size)
+    TextView forEmptyRecyclerSize;
 
     public static FragmentPlayerInfoHeroes newInstance(long accountId) {
         FragmentPlayerInfoHeroes fragmentPlayerInfoHeroes = new FragmentPlayerInfoHeroes();
@@ -66,15 +79,38 @@ public class FragmentPlayerInfoHeroes extends Fragment {
             accountId = getArguments().getLong(ACCOUNT_ID);
         }
 
-        PlayerInfoHeroesViewModel viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoHeroViewModel(accountId)).get(PlayerInfoHeroesViewModel.class);
+        viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoHeroViewModel(accountId)).get(PlayerInfoHeroesViewModel.class);
 
         viewModel.getPlayerHeroes().observe(this, new Observer<List<PlayerHero>>() {
             @Override
-            public void onChanged(@Nullable List<PlayerHero> playerHeroes) {
-                if (playerHeroes != null) {
-                    Log.d(TAG, playerHeroes.toString());
+            public void onChanged(@Nullable List<PlayerHero> playerHeroesResponse) {
+                if (playerHeroesResponse != null) {
+                    if (playerHeroesResponse.size() > 0) {
+                        playerHeroes = playerHeroesResponse;
+                        mAdapter.setData(playerHeroesResponse/*, heroList*/);
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    } else {
+                        progressBar.setVisibility(View.GONE);
+                        forEmptyRecyclerSize.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
 
-                    mAdapter.setData(playerHeroes/*, heroList*/);
+        viewModel.getStatusCode().observe(this, statusCode -> {
+            if (statusCode != null && playerHeroes == null) {
+                Log.d(TAG, statusCode + "");
+                int fistNumberStatusCode = statusCode / 100;
+                progressBar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.GONE);
+
+                if (fistNumberStatusCode > 2) {
+                    blockError.setVisibility(View.VISIBLE);
+                    text_network_error.setVisibility(View.VISIBLE);
+                } else if (fistNumberStatusCode == -2) {
+                    blockError.setVisibility(View.VISIBLE);
+                    text_no_internet.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -102,5 +138,12 @@ public class FragmentPlayerInfoHeroes extends Fragment {
                 Toast.makeText(getContext(), mAdapter.getPlayerHeroByPosition(position).getHeroId() + "", Toast.LENGTH_SHORT).show();
             }
         }));
+    }
+
+    @OnClick(R.id.btn_refresh)
+    public void refresh() {
+        viewModel.repeatedRequest();
+        progressBar.setVisibility(View.VISIBLE);
+        blockError.setVisibility(View.GONE);
     }
 }

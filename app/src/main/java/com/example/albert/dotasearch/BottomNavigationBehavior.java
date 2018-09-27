@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
 
 class BottomNavigationBehavior extends CoordinatorLayout.Behavior<View> {
@@ -36,10 +35,13 @@ class BottomNavigationBehavior extends CoordinatorLayout.Behavior<View> {
     private void updateSnackBar(View child, View snackbarLayout) {
         if (snackbarLayout.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
             CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+            //int bottomNavigationViewHeight = child.findViewById(child.getId()).getHeight();
+            int bottomNavigationViewHeight = child.getHeight();
 
-            params.setAnchorId(child.getId());
-            params.anchorGravity = Gravity.TOP;
-            params.gravity = Gravity.TOP;
+            //params.setAnchorId(child.getId());
+            /*params.anchorGravity = Gravity.TOP;
+            params.gravity = Gravity.TOP;*/
+            params.setMargins(0, 0, 0, bottomNavigationViewHeight);
             snackbarLayout.setLayoutParams(params);
         }
     }

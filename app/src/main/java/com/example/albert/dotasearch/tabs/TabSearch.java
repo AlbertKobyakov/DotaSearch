@@ -45,13 +45,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.widget.LinearLayout.VERTICAL;
 
 public class TabSearch extends Fragment {
     private final static int LAYOUT = R.layout.fragment_search;
     private final static String TAG = "TabSearch";
+    private final static int DELAY = 150;
 
     public SearchViewModel viewModel;
 
@@ -112,13 +116,26 @@ public class TabSearch extends Fragment {
             }
         });
 
-        viewModel.getIsRequestSearchSuccessful().observe(this, new Observer<Boolean>() {
+        viewModel.getResponseStatusCode().observe(this, new Observer<Integer>() {
             @Override
-            public void onChanged(@Nullable Boolean isSuccessSearchRequest) {
-                if (isSuccessSearchRequest != null && isSuccessSearchRequest && query != null) {
-                    goToFoundPlayerActivity(query);
-                    query = null;
+            public void onChanged(Integer responseStatusCode) {
+                if (responseStatusCode != null) {
+                    int code = responseStatusCode / 100;
+
+                    if (code == 2 && query != null) {
+                        goToFoundPlayerActivity(query);
+                    } else if (code == -1 && query != null) {
+                        Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), R.string.no_internet, Snackbar.LENGTH_SHORT).show();
+                    } else if (code == 5 && query != null) {
+                        Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), R.string.errors_500, Snackbar.LENGTH_SHORT).show();
+                    } else if (code == 4 && query != null) {
+                        Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), R.string.errors_400, Snackbar.LENGTH_SHORT).show();
+                    }
                 }
+
+                query = null;
+                btnSearch.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
             }
         });
 
@@ -173,12 +190,19 @@ public class TabSearch extends Fragment {
             public void onClick(View view, int position) {
                 Log.d(TAG, "onClick recyclerViewFavorite" + position);
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        goToPlayerInfoActivity(favoritePlayerList.get(position));
-                    }
-                }, 150);
+                Disposable disposable = viewModel.hasInternet()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                isInternet -> {
+                                    if (isInternet) {
+                                        new Handler().postDelayed(() -> goToPlayerInfoActivity(favoritePlayerList.get(position)), DELAY);
+                                    } else {
+                                        Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), R.string.no_internet, Snackbar.LENGTH_SHORT).show();
+                                    }
+                                },
+                                Throwable::printStackTrace
+                        );
             }
         }));
 
@@ -218,35 +242,18 @@ public class TabSearch extends Fragment {
         startActivity(intent);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (btnSearch != null && btnSearch.getVisibility() == View.GONE) {
-            btnSearch.setVisibility(View.VISIBLE);
-        }
-        if (progressBar != null && progressBar.getVisibility() == View.VISIBLE) {
-            progressBar.setVisibility(View.GONE);
-        }
-    }
-
     @OnClick(R.id.btn_search)
-    public void onClick(final View v) {
-
+    public void onClick() {
         query = searchEditText.getText().toString();
 
         Log.d(TAG, "onClick btn_search");
         if (query.trim().length() == 0 || query.trim().length() < 3) {
-            Snackbar.make(activity.getWindow().getDecorView().getRootView(), "Запрос должен состоять минимум из 3 символов", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), "Запрос должен состоять минимум из 3 символов", Snackbar.LENGTH_SHORT).show();
         } else {
             viewModel.searchRequest(query);
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    btnSearch.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.VISIBLE);
-                }
-            }, 300);
+            btnSearch.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
         }
     }
 

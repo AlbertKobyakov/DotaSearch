@@ -18,6 +18,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -32,6 +33,11 @@ public interface DotaClient {
 
     @GET("/api/search")
     Single<List<FoundPlayer>> getFoundPlayersRx(
+            @Query("q") String query
+    );
+
+    @GET("/api/search")
+    Single<Response<List<FoundPlayer>>> getFoundPlayersRxResponse(
             @Query("q") String query
     );
 
@@ -50,6 +56,11 @@ public interface DotaClient {
             @Path("Id") long playerId
     );
 
+    @GET("/api/players/{Id}/pros")
+    Single<Response<List<Pros>>> getPlayerProsResponse(
+            @Path("Id") long playerId
+    );
+
     @GET("/api/records/{title}")
     Single<List<Record>> getRecordsByTitle(
             @Path("title") String titleRecord
@@ -57,6 +68,11 @@ public interface DotaClient {
 
     @GET("/api/players/{Id}/heroes")
     Single<List<PlayerHero>> getPlayerHeroes(
+            @Path("Id") long playerId
+    );
+
+    @GET("/api/players/{Id}/heroes")
+    Single<Response<List<PlayerHero>>> getPlayerHeroesResponse(
             @Path("Id") long playerId
     );
 
@@ -69,6 +85,11 @@ public interface DotaClient {
     Single<List<MatchShortInfo>> getMatchesPlayerRx(
             @Path("Id") long playerId/*,
             @Query("limit") int limit*/
+    );
+
+    @GET("/api/players/{Id}/matches")
+    Single<Response<List<MatchShortInfo>>> getMatchesPlayerResponse(
+            @Path("Id") long playerId
     );
 
     @GET("/api/heroStats")

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -55,6 +54,10 @@ public class FragmentPlayerInfoPros extends Fragment {
     Button btnRefresh;
     @BindView(R.id.block_error)
     LinearLayout blockError;
+    @BindView(R.id.no_internet)
+    TextView text_no_internet;
+    @BindView(R.id.network_error)
+    TextView text_network_error;
 
     public static FragmentPlayerInfoPros newInstance(long accountId) {
         FragmentPlayerInfoPros fragmentPlayerInfoPros = new FragmentPlayerInfoPros();
@@ -74,8 +77,6 @@ public class FragmentPlayerInfoPros extends Fragment {
 
         ButterKnife.bind(this, view);
 
-        AppBarLayout appBar = getActivity().findViewById(R.id.appBar);
-
         if (getArguments() != null) {
             accountId = getArguments().getLong(ACCOUNT_ID);
         }
@@ -88,15 +89,13 @@ public class FragmentPlayerInfoPros extends Fragment {
             @Override
             public void onChanged(@Nullable List<Pros> pros) {
                 if (pros != null) {
-                    if (pros.size() > 0) {
+                    if (pros.size() > 0/* && allPros == null*/) {
                         Log.d(TAG, pros.size() + "");
                         allPros = pros;
                         mAdapter.setData(pros);
                         progressBar.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
-                        //appBar.setExpanded(true, true);
                     } else {
-                        //appBar.setExpanded(false, true);
                         progressBar.setVisibility(View.GONE);
                         forEmptyRecyclerSize.setVisibility(View.VISIBLE);
                     }
@@ -104,11 +103,20 @@ public class FragmentPlayerInfoPros extends Fragment {
             }
         });
 
-        viewModel.getErrorMessage().observe(this, errorMessage -> {
-            if (errorMessage != null && errorMessage.equals("timeout")) {
-                Log.d(TAG, "timeout response");
+        viewModel.getStatusCode().observe(this, statusCode -> {
+            if (statusCode != null && allPros == null) {
+                Log.d(TAG, statusCode + "");
+                int fistNumberStatusCode = statusCode / 100;
                 progressBar.setVisibility(View.GONE);
-                blockError.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+
+                if (fistNumberStatusCode > 2) {
+                    blockError.setVisibility(View.VISIBLE);
+                    text_network_error.setVisibility(View.VISIBLE);
+                } else if (fistNumberStatusCode == -2) {
+                    blockError.setVisibility(View.VISIBLE);
+                    text_no_internet.setVisibility(View.VISIBLE);
+                }
             }
         });
 

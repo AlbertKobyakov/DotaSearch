@@ -24,7 +24,6 @@ public class StartActivity extends AppCompatActivity {
 
     private static final int LAYOUT = R.layout.activity_start;
     private static final String TAG = "StartActivity";
-    private static final String KEY = "C35559BD1BEA3B0DC2F958ADF8B7E484";
 
     public static AppDatabase db;
     private StartActivityViewModel viewModel;
@@ -33,6 +32,8 @@ public class StartActivity extends AppCompatActivity {
     TextView textViewLoading;
     @BindView(R.id.btn_exit)
     Button btnExit;
+    @BindView(R.id.btn_refresh)
+    Button btnRefresh;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,11 +51,12 @@ public class StartActivity extends AppCompatActivity {
         viewModel.getIsLoadMainActivity().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
-                Log.d(TAG, aBoolean + " 44444444444444444444444");
                 if (aBoolean) {
                     loadMainActivity(aBoolean);
                 } else {
-                    textViewLoading.setText("Интернет соединение отсутствует...");
+                    textViewLoading.setText(R.string.no_internet);
+                    //btnExit.setVisibility(View.VISIBLE);
+                    btnRefresh.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -77,5 +79,13 @@ public class StartActivity extends AppCompatActivity {
     @OnClick(R.id.btn_exit)
     public void onClick(View view) {
         finish();
+    }
+
+    @OnClick(R.id.btn_refresh)
+    public void refresh() {
+        viewModel.refresh();
+        btnExit.setVisibility(View.GONE);
+        btnRefresh.setVisibility(View.GONE);
+        textViewLoading.setText(R.string.loading);
     }
 }

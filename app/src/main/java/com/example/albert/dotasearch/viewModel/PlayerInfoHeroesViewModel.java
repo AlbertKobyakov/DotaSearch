@@ -15,11 +15,13 @@ public class PlayerInfoHeroesViewModel extends ViewModel {
     private PlayerInfoHeroRepository repository;
     private long accountId;
     private LiveData<List<PlayerHero>> playerHeroes;
+    private LiveData<Integer> statusCode;
 
     public PlayerInfoHeroesViewModel(long accountId) {
         this.accountId = accountId;
         repository = new PlayerInfoHeroRepository(accountId);
         playerHeroes = repository.getPlayerHeroes();
+        statusCode = repository.getStatusCode();
 
         Log.d(TAG, "constructor");
     }
@@ -30,5 +32,13 @@ public class PlayerInfoHeroesViewModel extends ViewModel {
 
     public long getAccountId() {
         return accountId;
+    }
+
+    public LiveData<Integer> getStatusCode() {
+        return statusCode;
+    }
+
+    public void repeatedRequest() {
+        repository.sendRequest();
     }
 }

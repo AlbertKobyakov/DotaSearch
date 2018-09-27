@@ -15,25 +15,25 @@ public class PlayerInfoProsViewModel extends ViewModel {
     private PlayerInfoProsRepository repository;
     private long accountId;
     private LiveData<List<Pros>> pros;
-    private LiveData<String> errorMessage;
+    private LiveData<Integer> statusCode;
 
     public PlayerInfoProsViewModel(long accountId) {
+        this.accountId = accountId;
         Log.d(TAG, "constructor");
         repository = new PlayerInfoProsRepository(accountId);
-        this.accountId = accountId;
         pros = repository.getPros();
-        errorMessage = repository.getErrorMessage();
+        statusCode = repository.getStatusCode();
     }
 
     public LiveData<List<Pros>> getPros() {
         return pros;
     }
 
-    public LiveData<String> getErrorMessage() {
-        return errorMessage;
+    public LiveData<Integer> getStatusCode() {
+        return statusCode;
     }
 
     public void repeatedRequest() {
-        repository.repeatedRequest();
+        repository.sendRequest();
     }
 }

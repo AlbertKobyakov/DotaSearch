@@ -14,7 +14,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.R;
@@ -30,11 +32,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class TabPlayerMatches extends Fragment {
+public class FragmentPlayerInfoMatches extends Fragment {
 
-    private static final String TAG = "TabPlayerMatches";
+    private static final String TAG = "FrPlayerInfoMatches";
     private static final int LAYOUT = R.layout.fragment_player_overview;
     private static final String ACCOUNT_ID = "account_id";
 
@@ -48,6 +51,14 @@ public class TabPlayerMatches extends Fragment {
     RecyclerView recyclerView;
     @BindView(R.id.empty_progress_bar)
     ProgressBar progressBar;
+    @BindView(R.id.block_error)
+    LinearLayout blockError;
+    @BindView(R.id.no_internet)
+    TextView text_no_internet;
+    @BindView(R.id.network_error)
+    TextView text_network_error;
+    @BindView(R.id.for_empty_recycler_size)
+    TextView forEmptyRecyclerSize;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,13 +67,13 @@ public class TabPlayerMatches extends Fragment {
         Log.e(TAG, "onCreate");
     }
 
-    public static TabPlayerMatches newInstance(long accountId) {
-        TabPlayerMatches tabPlayerMatches = new TabPlayerMatches();
+    public static FragmentPlayerInfoMatches newInstance(long accountId) {
+        FragmentPlayerInfoMatches fragmentPlayerInfoMatches = new FragmentPlayerInfoMatches();
         Bundle bundle = new Bundle();
         bundle.putLong(ACCOUNT_ID, accountId);
-        tabPlayerMatches.setArguments(bundle);
+        fragmentPlayerInfoMatches.setArguments(bundle);
 
-        return tabPlayerMatches;
+        return fragmentPlayerInfoMatches;
     }
 
     @Nullable
@@ -85,13 +96,38 @@ public class TabPlayerMatches extends Fragment {
             public void onChanged(@Nullable List<MatchShortInfo> matchShortInfos) {
                 Log.d(TAG, "onChanged");
                 if (matchShortInfos != null) {
-                    setAdapterAndRecyclerView();
-
-                    matchList = matchShortInfos;
-                    mAdapter.setData(matchList/*, heroList*/);
+                    if (matchShortInfos.size() > 0) {
+                        matchList = matchShortInfos;
+                        mAdapter.setData(matchList/*, heroList*/);
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    } else {
+                        progressBar.setVisibility(View.GONE);
+                        forEmptyRecyclerSize.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });
+
+        viewModel.getStatusCode().observe(this, statusCode -> {
+            Log.d(TAG, statusCode + " ");
+            if (statusCode != null && matchList == null) {
+                Log.d(TAG, statusCode + "");
+                int fistNumberStatusCode = statusCode / 100;
+                progressBar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.GONE);
+
+                if (fistNumberStatusCode > 2) {
+                    blockError.setVisibility(View.VISIBLE);
+                    text_network_error.setVisibility(View.VISIBLE);
+                } else if (fistNumberStatusCode == -2) {
+                    blockError.setVisibility(View.VISIBLE);
+                    text_no_internet.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        setAdapterAndRecyclerView();
 
         return view;
     }
@@ -116,6 +152,13 @@ public class TabPlayerMatches extends Fragment {
         Intent intent = new Intent(getActivity(), MatchDetailActivity.class);
         intent.putExtra("matchId", matchList.get(position).getMatchId());
         startActivity(intent);
+    }
+
+    @OnClick(R.id.btn_refresh)
+    public void refresh() {
+        viewModel.repeatedRequest();
+        progressBar.setVisibility(View.VISIBLE);
+        blockError.setVisibility(View.GONE);
     }
 
     @Override
