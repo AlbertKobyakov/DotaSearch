@@ -100,6 +100,11 @@ public interface DotaClient {
             @Path("match_id") long matchId
     );
 
+    @GET("/api/matches/{match_id}")
+    Single<Response<MatchFullInfo>> getMatchFullInfoRxResponse(
+            @Path("match_id") long matchId
+    );
+
     @GET("/IEconDOTA2_570/GetGameItems/v0001/")
     Single<ItemsInfoWithSteam> getItemInfoSteamRx(
             @Query("key") String key

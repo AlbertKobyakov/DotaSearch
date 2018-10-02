@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RVEmptyObserver;
 import com.example.albert.dotasearch.RecyclerTouchListener;
@@ -26,8 +27,10 @@ import com.example.albert.dotasearch.adapter.PlayerInfoHeroesAdapter;
 import com.example.albert.dotasearch.model.PlayerHero;
 import com.example.albert.dotasearch.modelfactory.FactoryForPlayerInfoHeroViewModel;
 import com.example.albert.dotasearch.viewModel.PlayerInfoHeroesViewModel;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -145,5 +148,12 @@ public class FragmentPlayerInfoHeroes extends Fragment {
         viewModel.repeatedRequest();
         progressBar.setVisibility(View.VISIBLE);
         blockError.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        RefWatcher refWatcher = App.getRefWatcher(Objects.requireNonNull(getActivity()));
+        refWatcher.watch(this);
     }
 }

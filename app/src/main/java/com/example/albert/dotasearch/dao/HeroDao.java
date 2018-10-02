@@ -27,6 +27,9 @@ public interface HeroDao {
     @Query("SELECT * FROM hero WHERE id == :id LIMIT 1")
     Single<Hero> getHeroByIdRx(long id);
 
+    @Query("SELECT * FROM hero WHERE id == :id LIMIT 1")
+    Hero getHeroById(long id);
+
     @Insert
     void insertAll(List<Hero> heroes);
 
@@ -38,4 +41,10 @@ public interface HeroDao {
 
     @Update
     void updateAll(List<Hero> heroes);
+
+    @Query("SELECT * FROM hero WHERE heroId IN(:heroIds)")
+    List<Hero> heroFindByIds(List<Integer> heroIds);
+
+    @Query("SELECT * FROM hero WHERE heroId IN(:heroIds)")
+    List<Hero> heroFindByIdsArr(Long[] heroIds);
 }

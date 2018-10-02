@@ -3,19 +3,22 @@ package com.example.albert.dotasearch.viewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.example.albert.dotasearch.model.MatchDetailWithItems;
 import com.example.albert.dotasearch.repository.MatchDetailRepository;
 
 public class MatchDetailViewModel extends ViewModel {
     private MatchDetailRepository repository;
-    private LiveData<MatchDetailWithItems> matchDetail;
+    private LiveData<Integer> statusCode;
 
     public MatchDetailViewModel(long matchId) {
         repository = new MatchDetailRepository(matchId);
-        matchDetail = repository.getMatchDetailWithItemsMutableLiveData();
+        statusCode = repository.getStatusCode();
     }
 
-    public LiveData<MatchDetailWithItems> getMatchDetail() {
-        return matchDetail;
+    public LiveData<Integer> getStatusCode() {
+        return statusCode;
+    }
+
+    public void repeatRequest() {
+        repository.sendRequest();
     }
 }

@@ -1,13 +1,18 @@
 package com.example.albert.dotasearch.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity
 public class MatchFullInfo {
-
     @SerializedName("match_id")
     @Expose
+    @PrimaryKey
     private long matchId;
     @SerializedName("barracks_status_dire")
     @Expose
@@ -15,27 +20,12 @@ public class MatchFullInfo {
     @SerializedName("barracks_status_radiant")
     @Expose
     private long barracksStatusRadiant;
-    @SerializedName("chat")
-    @Expose
-    private Object chat;
-    @SerializedName("cluster")
-    @Expose
-    private long cluster;
-    @SerializedName("cosmetics")
-    @Expose
-    private Object cosmetics;
     @SerializedName("dire_score")
     @Expose
     private long direScore;
-    @SerializedName("draft_timings")
-    @Expose
-    private Object draftTimings;
     @SerializedName("duration")
     @Expose
     private long duration;
-    @SerializedName("engine")
-    @Expose
-    private long engine;
     @SerializedName("first_blood_time")
     @Expose
     private long firstBloodTime;
@@ -51,24 +41,15 @@ public class MatchFullInfo {
     @SerializedName("lobby_type")
     @Expose
     private long lobbyType;
-    @SerializedName("match_seq_num")
-    @Expose
-    private long matchSeqNum;
-    @SerializedName("negative_votes")
-    @Expose
-    private long negativeVotes;
-    @SerializedName("objectives")
-    @Expose
-    private Object objectives;
     @SerializedName("picks_bans")
     @Expose
-    private Object picksBans;
+    private List<PicksBan> picksBans;
     @SerializedName("positive_votes")
     @Expose
     private long positiveVotes;
     @SerializedName("radiant_gold_adv")
     @Expose
-    private Object radiantGoldAdv;
+    private List<Long> radiantGoldAdv;
     @SerializedName("radiant_score")
     @Expose
     private long radiantScore;
@@ -77,16 +58,13 @@ public class MatchFullInfo {
     private boolean radiantWin;
     @SerializedName("radiant_xp_adv")
     @Expose
-    private Object radiantXpAdv;
+    private List<Long> radiantXpAdv;
     @SerializedName("skill")
     @Expose
     private long skill;
     @SerializedName("start_time")
     @Expose
     private long startTime;
-    @SerializedName("teamfights")
-    @Expose
-    private Object teamfights;
     @SerializedName("tower_status_dire")
     @Expose
     private long towerStatusDire;
@@ -95,7 +73,7 @@ public class MatchFullInfo {
     private long towerStatusRadiant;
     @SerializedName("version")
     @Expose
-    private Object version;
+    private long version;
     @SerializedName("players")
     @Expose
     private List<Player> players = null;
@@ -105,6 +83,81 @@ public class MatchFullInfo {
     @SerializedName("region")
     @Expose
     private long region;
+    @SerializedName("radiant_team")
+    @Expose
+    private RadiantTeam radiantTeam;
+    @SerializedName("dire_team")
+    @Expose
+    private DireTeam direTeam;
+    @SerializedName("league")
+    @Expose
+    private League league;
+    @SerializedName("objectives")
+    @Expose
+    private List<Objective> objectives = null;
+    @SerializedName("series_id")
+    @Expose
+    private long seriesId;
+    @SerializedName("series_type")
+    @Expose
+    private long seriesType;
+
+    public long getSeriesId() {
+        return seriesId;
+    }
+
+    public void setSeriesId(long seriesId) {
+        this.seriesId = seriesId;
+    }
+
+    public long getSeriesType() {
+        return seriesType;
+    }
+
+    public void setSeriesType(long seriesType) {
+        this.seriesType = seriesType;
+    }
+
+    public List<Objective> getObjectives() {
+        return objectives;
+    }
+
+    public void setObjectives(List<Objective> objectives) {
+        this.objectives = objectives;
+    }
+
+    public List<PicksBan> getPicksBans() {
+        return picksBans;
+    }
+
+    public void setPicksBans(List<PicksBan> picksBans) {
+        this.picksBans = picksBans;
+    }
+
+    public League getLeague() {
+        return league;
+    }
+
+    public void setLeague(League league) {
+        this.league = league;
+    }
+
+    public RadiantTeam getRadiantTeam() {
+        return radiantTeam;
+    }
+
+    public void setRadiantTeam(RadiantTeam radiantTeam) {
+        this.radiantTeam = radiantTeam;
+    }
+
+    public DireTeam getDireTeam() {
+        return direTeam;
+    }
+
+    public void setDireTeam(DireTeam direTeam) {
+        this.direTeam = direTeam;
+    }
+
 
     public long getMatchId() {
         return matchId;
@@ -130,30 +183,6 @@ public class MatchFullInfo {
         this.barracksStatusRadiant = barracksStatusRadiant;
     }
 
-    public Object getChat() {
-        return chat;
-    }
-
-    public void setChat(Object chat) {
-        this.chat = chat;
-    }
-
-    public long getCluster() {
-        return cluster;
-    }
-
-    public void setCluster(long cluster) {
-        this.cluster = cluster;
-    }
-
-    public Object getCosmetics() {
-        return cosmetics;
-    }
-
-    public void setCosmetics(Object cosmetics) {
-        this.cosmetics = cosmetics;
-    }
-
     public long getDireScore() {
         return direScore;
     }
@@ -162,28 +191,12 @@ public class MatchFullInfo {
         this.direScore = direScore;
     }
 
-    public Object getDraftTimings() {
-        return draftTimings;
-    }
-
-    public void setDraftTimings(Object draftTimings) {
-        this.draftTimings = draftTimings;
-    }
-
     public long getDuration() {
         return duration;
     }
 
     public void setDuration(long duration) {
         this.duration = duration;
-    }
-
-    public long getEngine() {
-        return engine;
-    }
-
-    public void setEngine(long engine) {
-        this.engine = engine;
     }
 
     public long getFirstBloodTime() {
@@ -226,38 +239,6 @@ public class MatchFullInfo {
         this.lobbyType = lobbyType;
     }
 
-    public long getMatchSeqNum() {
-        return matchSeqNum;
-    }
-
-    public void setMatchSeqNum(long matchSeqNum) {
-        this.matchSeqNum = matchSeqNum;
-    }
-
-    public long getNegativeVotes() {
-        return negativeVotes;
-    }
-
-    public void setNegativeVotes(long negativeVotes) {
-        this.negativeVotes = negativeVotes;
-    }
-
-    public Object getObjectives() {
-        return objectives;
-    }
-
-    public void setObjectives(Object objectives) {
-        this.objectives = objectives;
-    }
-
-    public Object getPicksBans() {
-        return picksBans;
-    }
-
-    public void setPicksBans(Object picksBans) {
-        this.picksBans = picksBans;
-    }
-
     public long getPositiveVotes() {
         return positiveVotes;
     }
@@ -266,11 +247,11 @@ public class MatchFullInfo {
         this.positiveVotes = positiveVotes;
     }
 
-    public Object getRadiantGoldAdv() {
+    public List<Long> getRadiantGoldAdv() {
         return radiantGoldAdv;
     }
 
-    public void setRadiantGoldAdv(Object radiantGoldAdv) {
+    public void setRadiantGoldAdv(List<Long> radiantGoldAdv) {
         this.radiantGoldAdv = radiantGoldAdv;
     }
 
@@ -290,11 +271,11 @@ public class MatchFullInfo {
         this.radiantWin = radiantWin;
     }
 
-    public Object getRadiantXpAdv() {
+    public List<Long> getRadiantXpAdv() {
         return radiantXpAdv;
     }
 
-    public void setRadiantXpAdv(Object radiantXpAdv) {
+    public void setRadiantXpAdv(List<Long> radiantXpAdv) {
         this.radiantXpAdv = radiantXpAdv;
     }
 
@@ -314,14 +295,6 @@ public class MatchFullInfo {
         this.startTime = startTime;
     }
 
-    public Object getTeamfights() {
-        return teamfights;
-    }
-
-    public void setTeamfights(Object teamfights) {
-        this.teamfights = teamfights;
-    }
-
     public long getTowerStatusDire() {
         return towerStatusDire;
     }
@@ -338,11 +311,11 @@ public class MatchFullInfo {
         this.towerStatusRadiant = towerStatusRadiant;
     }
 
-    public Object getVersion() {
+    public long getVersion() {
         return version;
     }
 
-    public void setVersion(Object version) {
+    public void setVersion(long version) {
         this.version = version;
     }
 
@@ -371,7 +344,6 @@ public class MatchFullInfo {
     }
 
     class Benchmarks {
-
         @SerializedName("gold_per_min")
         @Expose
         private GoldPerMin goldPerMin;
@@ -451,8 +423,8 @@ public class MatchFullInfo {
         }
 
     }
+
     class GoldPerMin {
-
         @SerializedName("raw")
         @Expose
         private long raw;
@@ -477,8 +449,8 @@ public class MatchFullInfo {
         }
 
     }
+
     class HeroDamagePerMin {
-
         @SerializedName("raw")
         @Expose
         private double raw;
@@ -503,8 +475,8 @@ public class MatchFullInfo {
         }
 
     }
+
     class HeroHealingPerMin {
-
         @SerializedName("raw")
         @Expose
         private double raw;
@@ -529,34 +501,8 @@ public class MatchFullInfo {
         }
 
     }
-    class KillsPerMin {
 
-        @SerializedName("raw")
-        @Expose
-        private double raw;
-        @SerializedName("pct")
-        @Expose
-        private double pct;
-
-        public double getRaw() {
-            return raw;
-        }
-
-        public void setRaw(double raw) {
-            this.raw = raw;
-        }
-
-        public double getPct() {
-            return pct;
-        }
-
-        public void setPct(double pct) {
-            this.pct = pct;
-        }
-
-    }
-    class LastHitsPerMin {
-
+    public class KillsPerMin {
         @SerializedName("raw")
         @Expose
         private double raw;
@@ -582,8 +528,58 @@ public class MatchFullInfo {
 
     }
 
-    class TowerDamage {
+    public class LastHitsPerMin {
+        @SerializedName("raw")
+        @Expose
+        private double raw;
+        @SerializedName("pct")
+        @Expose
+        private double pct;
 
+        public double getRaw() {
+            return raw;
+        }
+
+        public void setRaw(double raw) {
+            this.raw = raw;
+        }
+
+        public double getPct() {
+            return pct;
+        }
+
+        public void setPct(double pct) {
+            this.pct = pct;
+        }
+
+    }
+
+    public class TowerDamage {
+        @SerializedName("raw")
+        @Expose
+        private long raw;
+        @SerializedName("pct")
+        @Expose
+        private double pct;
+
+        public long getRaw() {
+            return raw;
+        }
+
+        public void setRaw(long raw) {
+            this.raw = raw;
+        }
+
+        public double getPct() {
+            return pct;
+        }
+
+        public void setPct(double pct) {
+            this.pct = pct;
+        }
+    }
+
+    public class XpPerMin {
         @SerializedName("raw")
         @Expose
         private long raw;
@@ -608,32 +604,100 @@ public class MatchFullInfo {
         }
 
     }
-    class XpPerMin {
 
-        @SerializedName("raw")
+    public class DireTeam {
+        @SerializedName("team_id")
         @Expose
-        private long raw;
-        @SerializedName("pct")
+        private long teamId;
+        @SerializedName("name")
         @Expose
-        private double pct;
+        private String name;
+        @SerializedName("tag")
+        @Expose
+        private String tag;
+        @SerializedName("logo_url")
+        @Expose
+        private String logoUrl;
 
-        public long getRaw() {
-            return raw;
+        public long getTeamId() {
+            return teamId;
         }
 
-        public void setRaw(long raw) {
-            this.raw = raw;
+        public void setTeamId(long teamId) {
+            this.teamId = teamId;
         }
 
-        public double getPct() {
-            return pct;
+        public String getName() {
+            return name;
         }
 
-        public void setPct(double pct) {
-            this.pct = pct;
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getTag() {
+            return tag;
+        }
+
+        public void setTag(String tag) {
+            this.tag = tag;
+        }
+
+        public String getLogoUrl() {
+            return logoUrl;
+        }
+
+        public void setLogoUrl(String logoUrl) {
+            this.logoUrl = logoUrl;
         }
 
     }
 
+    public class RadiantTeam {
+        @SerializedName("team_id")
+        @Expose
+        private long teamId;
+        @SerializedName("name")
+        @Expose
+        private String name;
+        @SerializedName("tag")
+        @Expose
+        private String tag;
+        @SerializedName("logo_url")
+        @Expose
+        private String logoUrl;
+
+        public long getTeamId() {
+            return teamId;
+        }
+
+        public void setTeamId(long teamId) {
+            this.teamId = teamId;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getTag() {
+            return tag;
+        }
+
+        public void setTag(String tag) {
+            this.tag = tag;
+        }
+
+        public String getLogoUrl() {
+            return logoUrl;
+        }
+
+        public void setLogoUrl(String logoUrl) {
+            this.logoUrl = logoUrl;
+        }
+
+    }
 }
-

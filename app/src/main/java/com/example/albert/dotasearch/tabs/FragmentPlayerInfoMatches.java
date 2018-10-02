@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RVEmptyObserver;
 import com.example.albert.dotasearch.RecyclerTouchListener;
@@ -27,8 +28,10 @@ import com.example.albert.dotasearch.adapter.PlayerInfoMatchesAdapter;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 import com.example.albert.dotasearch.modelfactory.FactoryForPlayerInfoMatchesViewModel;
 import com.example.albert.dotasearch.viewModel.PlayerInfoMatchesViewModel;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -171,5 +174,7 @@ public class FragmentPlayerInfoMatches extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        RefWatcher refWatcher = App.getRefWatcher(Objects.requireNonNull(getActivity()));
+        refWatcher.watch(this);
     }
 }

@@ -23,13 +23,16 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.adapter.ProTeamAdapter;
 import com.example.albert.dotasearch.model.Team;
 import com.example.albert.dotasearch.viewModel.ProTeamsViewModel;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -136,5 +139,12 @@ public class TabProTeam extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        RefWatcher refWatcher = App.getRefWatcher(Objects.requireNonNull(getActivity()));
+        refWatcher.watch(this);
     }
 }

@@ -12,8 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.fragmentpageradapter.FragmentPagerAdapterForTabRecords;
 import com.example.albert.dotasearch.R;
+import com.squareup.leakcanary.RefWatcher;
+
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,6 +71,13 @@ public class FragmentRecords extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
         Log.d(TAG, "onDestroyView");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        RefWatcher refWatcher = App.getRefWatcher(Objects.requireNonNull(getActivity()));
+        refWatcher.watch(this);
     }
 }
 

@@ -1,38 +1,38 @@
 package com.example.albert.dotasearch.adapter;
 
 import android.content.Context;
-import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.albert.dotasearch.App;
+import com.example.albert.dotasearch.ClickListener;
 import com.example.albert.dotasearch.R;
+import com.example.albert.dotasearch.model.Hero;
 import com.example.albert.dotasearch.model.Item;
+import com.example.albert.dotasearch.model.ItemsWithMatchDetail;
+import com.example.albert.dotasearch.model.MatchFullInfo;
 import com.example.albert.dotasearch.model.Player;
 import com.example.albert.dotasearch.util.UtilDota;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.MyViewHolder> {
 
@@ -40,14 +40,19 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
     public static final int LAYOUT = R.layout.match_detail_list_row;
 
     private List<Player> players;
-    public List<Item> items;
-    public Context context;
-    private Map<Long, Item> itemsMap;
+    private SparseArray<Item> items;
+    private Context context;
     private RequestManager glide;
+    private MatchFullInfo matchFullInfo;
+    private SparseArray<Hero> heroSparseArray;
+    private boolean isRadiantWin;
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private int mExpandedPosition = -1;
+    private int previousExpandedPosition = -1;
 
-    class MyViewHolder extends RecyclerView.ViewHolder {
+    private ClickListener listener;
+
+    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.player_name)
         TextView playerName;
         @BindView(R.id.player_kda)
@@ -70,43 +75,75 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         TextView playerLvl;
         @BindView(R.id.imageView)
         ImageView imageView;
+        /*@BindView(R.id.cardView)
+        CardView cardView;*/
+        @BindView(R.id.header)
+        LinearLayout header;
+        @BindView(R.id.team_type)
+        TextView teamType;
+        @BindView(R.id.content)
+        LinearLayout content;
+        @BindView(R.id.trophy)
+        ImageView trophy;
 
-        @BindView(R.id.cardView)
-        CardView cardView;
+        @BindView(R.id.name_and_tier)
+        LinearLayout nameAndTier;
+        @BindView(R.id.lvl_and_kda)
+        LinearLayout lvlAndKDA;
+        @BindView(R.id.items)
+        LinearLayout blockItems;
 
-        @Nullable
+        @BindView(R.id.block_details)
+        LinearLayout blockDetail;
+        @BindView(R.id.btn_profile)
+        Button btnProfile;
+
         @BindView(R.id.player_gold_per_minute)
         TextView goldPerMinutes;
-        @Nullable
-        @BindView(R.id.player_experience_per_minute)
-        TextView xpPerMinuter;
-        @Nullable
-        @BindView(R.id.player_last_hit)
-        TextView lastHits;
-        @Nullable
-        @BindView(R.id.player_denies)
-        TextView denies;
-        @Nullable
-        @BindView(R.id.player_heal)
-        TextView heal;
-        @Nullable
         @BindView(R.id.player_hero_damage)
         TextView heroDamage;
-        @Nullable
+        @BindView(R.id.player_heal)
+        TextView heal;
+        @BindView(R.id.player_last_hit)
+        TextView lastHits;
+        @BindView(R.id.player_randomed)
+        TextView randomed;
+        @BindView(R.id.tower_damage)
+        TextView towerDamage;
+        @BindView(R.id.player_experience_per_minute)
+        TextView xpPerMinuter;
         @BindView(R.id.player_total_gold)
         TextView totalGold;
+        @BindView(R.id.player_denies)
+        TextView denies;
 
 
-        MyViewHolder(View view) {
+        private WeakReference<ClickListener> listenerRef;
+
+        MyViewHolder(View view, ClickListener listener) {
             super(view);
 
             ButterKnife.bind(this, view);
+
+            listenerRef = new WeakReference<>(listener);
+            btnProfile.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            boolean isGoToPlayerActivity = false;
+            if (view.getId() == btnProfile.getId()) {
+                isGoToPlayerActivity = true;
+            }
+
+            listenerRef.get().onPositionClicked(getAdapterPosition(), isGoToPlayerActivity);
         }
     }
 
-    public MatchDetailAdapter(Context context, RequestManager glide) {
+    public MatchDetailAdapter(Context context, RequestManager glide, ClickListener listener) {
         this.context = context;
         this.glide = glide;
+        this.listener = listener;
     }
 
     @NonNull
@@ -115,15 +152,36 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(LAYOUT, parent, false);
 
-        return new MatchDetailAdapter.MyViewHolder(itemView);
+        return new MatchDetailAdapter.MyViewHolder(itemView, listener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MatchDetailAdapter.MyViewHolder holder, int position) {
-
         Player currentPlayer = players.get(position);
+        String radiantTeam = matchFullInfo.getRadiantTeam() != null && matchFullInfo.getRadiantTeam().getName().trim().length() != 0 ? matchFullInfo.getRadiantTeam().getName() : context.getString(R.string.radiant);
+        String direTeam = matchFullInfo.getDireTeam() != null && matchFullInfo.getDireTeam().getName().trim().length() != 0 ? matchFullInfo.getDireTeam().getName() : context.getString(R.string.dire);
 
-        if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
+        if (position == 0) {
+            holder.teamType.setText(radiantTeam);
+            if (isRadiantWin) {
+                holder.trophy.setVisibility(View.VISIBLE);
+            } else {
+                holder.trophy.setVisibility(View.GONE);
+            }
+            holder.header.setVisibility(View.VISIBLE);
+        } else if (position == 5) {
+            holder.teamType.setText(direTeam);
+            if (!isRadiantWin) {
+                holder.trophy.setVisibility(View.VISIBLE);
+            } else {
+                holder.trophy.setVisibility(View.GONE);
+            }
+            holder.header.setVisibility(View.VISIBLE);
+        } else {
+            holder.header.setVisibility(View.GONE);
+        }
+
+        /*if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
             if (holder.goldPerMinutes != null) {
                 holder.goldPerMinutes.setText(context.getResources().getString(R.string.gold_per_min_value, currentPlayer.getGoldPerMin()));
             }
@@ -145,7 +203,7 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
             if (holder.totalGold != null) {
                 holder.totalGold.setText(context.getResources().getString(R.string.total_gold_value, currentPlayer.getTotalGold()));
             }
-        }
+        }*/
 
         List<String> urlList = new ArrayList<>();
         List<ImageView> imageViewList = new ArrayList<>();
@@ -160,17 +218,12 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         long countDeath = players.get(position).getDeaths();
         long countAssists = players.get(position).getAssists();
 
-        Log.d(TAG, items.toString());
-        Log.d(TAG, itemsMap.get(idItem0).getItemUrl() + "");
-        Log.e(TAG, currentPlayer.getItem0() + " id" + " position: " + position);
-        Log.e(TAG, currentPlayer.toString());
-
-        urlList.add(itemsMap.get(idItem0).getItemUrl());
-        urlList.add(itemsMap.get(idItem1).getItemUrl());
-        urlList.add(itemsMap.get(idItem2).getItemUrl());
-        urlList.add(itemsMap.get(idItem3).getItemUrl());
-        urlList.add(itemsMap.get(idItem4).getItemUrl());
-        urlList.add(itemsMap.get(idItem5).getItemUrl());
+        urlList.add(items.get((int) idItem0).getItemUrl());
+        urlList.add(items.get((int) idItem1).getItemUrl());
+        urlList.add(items.get((int) idItem2).getItemUrl());
+        urlList.add(items.get((int) idItem3).getItemUrl());
+        urlList.add(items.get((int) idItem4).getItemUrl());
+        urlList.add(items.get((int) idItem5).getItemUrl());
 
         imageViewList.add(holder.imageViewItem0);
         imageViewList.add(holder.imageViewItem1);
@@ -180,41 +233,70 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         imageViewList.add(holder.imageViewItem5);
 
         for (int i = 0; i < imageViewList.size(); i++) {
+            RequestOptions placeholder = new RequestOptions()
+                    .centerCrop()
+                    .placeholder(R.drawable.item_background);
+            RequestManager manager = Glide.with(context);
+            RequestBuilder<Drawable> load;
             if (!urlList.get(i).contains("empty_lg")) {
-                RequestOptions placeholder = new RequestOptions()
-                        .centerCrop()
-                        .placeholder(R.drawable.item_background);
-
-                Glide.with(context)
-                        .load(urlList.get(i))
-                        .apply(placeholder)
-                        .into(imageViewList.get(i));
+                load = manager.load(urlList.get(i));
+            } else {
+                load = manager.load(R.drawable.item_background);
             }
+            load.apply(placeholder).into(imageViewList.get(i));
         }
 
         if (currentPlayer.getRankTier() != 0) {
-            holder.playerRank.setText(UtilDota.getRankTier(currentPlayer.getRankTier()));
+            holder.playerRank.setText(context.getString(R.string.player_rank, UtilDota.getRankTier(currentPlayer.getRankTier())));
+        } else {
+            holder.playerRank.setText(context.getString(R.string.player_rank, context.getString(R.string.unknown)));
         }
 
-        if (currentPlayer.getPersonaname() != null) {
-            holder.playerName.setText(currentPlayer.getPersonaname());
+        holder.playerName.setText(getRealPlayerName(currentPlayer));
+
+       /* holder.nameAndTier.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context, getRealPlayerName(currentPlayer), Toast.LENGTH_LONG).show();
+            }
+        });*/
+
+        holder.playerKda.setText(context.getString(R.string.kda, countKill, countDeath, countAssists));
+
+        RequestOptions centerCrop = new RequestOptions()
+                .centerCrop();
+
+        Log.d(TAG, currentPlayer.getHeroId() + " glide");
+        if (heroSparseArray.get(currentPlayer.getHeroId()) != null) {
+            glide.load(heroSparseArray.get(currentPlayer.getHeroId()).getImg())
+                    .error(glide.load(R.drawable.avatar_unknown_medium))
+                    .apply(centerCrop)
+                    .into(holder.imageView);
         }
 
-        holder.playerLvl.setText(context.getResources().getString(R.string.level, players.get(position).getLevel()));
+        holder.goldPerMinutes.setText(context.getString(R.string.gold_per_min_value, currentPlayer.getGoldPerMin()));
+        holder.heroDamage.setText(context.getString(R.string.hero_damage_value, currentPlayer.getHeroDamage()));
+        holder.heal.setText(context.getString(R.string.heal_value, currentPlayer.getHeroHealing()));
+        holder.lastHits.setText(context.getString(R.string.last_hits_value, currentPlayer.getLastHits()));
+        holder.playerLvl.setText(context.getString(R.string.level, currentPlayer.getLevel()));
+        holder.randomed.setText(currentPlayer.isRandomed() ? context.getString(R.string.rand_hero_yes) : context.getString(R.string.rand_hero_no));
+        holder.towerDamage.setText(context.getString(R.string.tower_damage, currentPlayer.getTowerDamage()));
+        holder.xpPerMinuter.setText(context.getString(R.string.xp_per_min_value, currentPlayer.getXpPerMin()));
+        holder.totalGold.setText(context.getString(R.string.total_gold_value, currentPlayer.getTotalGold()));
+        holder.denies.setText(context.getString(R.string.denies_value, currentPlayer.getDenies()));
 
-        holder.playerKda.setText(context.getResources().getString(R.string.kda, countKill, countDeath, countAssists));
+        final boolean isExpanded = position == mExpandedPosition;
+        holder.blockDetail.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        holder.itemView.setActivated(isExpanded);
 
-        Disposable dis = App.get().getDB().heroDao().getHeroByIdRx(players.get(position).getHeroId())
-                .toObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        hero -> UtilDota.setImageView(hero.getImg(), R.drawable.avatar_unknown_medium, holder.imageView, glide),
-                        error -> Log.e(TAG, error.getLocalizedMessage()),
-                        () -> Log.d(TAG, "onComplete")
-                );
+        if (isExpanded)
+            previousExpandedPosition = position;
 
-        compositeDisposable.add(dis);
+        holder.itemView.setOnClickListener(v -> {
+            mExpandedPosition = isExpanded ? -1 : position;
+            notifyItemChanged(previousExpandedPosition);
+            notifyItemChanged(position);
+        });
     }
 
     @Override
@@ -226,21 +308,31 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         }
     }
 
-    public void setData(List<Player> players, List<Item> items) {
-        this.players = players;
-        this.items = items;
-        itemsMap = new HashMap<>();
+    public void setData(ItemsWithMatchDetail itemsWithMatchDetail) {
+        this.matchFullInfo = itemsWithMatchDetail.getMatchFullInfo();
+        this.players = itemsWithMatchDetail.getMatchFullInfo().getPlayers();
+        this.items = itemsWithMatchDetail.getItems();
+        this.heroSparseArray = itemsWithMatchDetail.getHeroes();
+        this.isRadiantWin = matchFullInfo.isRadiantWin();
 
-        for (int i = 0; i < items.size(); i++) {
-            itemsMap.put(items.get(i).getId(), items.get(i));
-        }
         notifyDataSetChanged();
+    }
+
+    private String getRealPlayerName(Player playerInfo) {
+        String name;
+        if (playerInfo.getName() != null) {
+            name = playerInfo.getName();
+        } else if (playerInfo.getPersonaname() != null) {
+            name = playerInfo.getPersonaname();
+        } else {
+            name = context.getResources().getString(R.string.anonymous);
+        }
+
+        return name;
     }
 
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
-        compositeDisposable.dispose();
     }
 }
-

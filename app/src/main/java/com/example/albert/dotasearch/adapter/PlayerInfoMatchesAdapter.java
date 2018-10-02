@@ -17,6 +17,7 @@ import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.MatchShortInfo;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -76,12 +77,11 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
             if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
                 long seconds = matchShortInfo.getDuration();
                 String duration = DateUtils.formatElapsedTime(seconds);
-                long secondsMatchEndTime = (seconds + matchShortInfo.getStartTime()) * 1000;
-                String matchStartDate = DateUtils.getRelativeTimeSpanString(secondsMatchEndTime).toString();
+                long secondsMatchStartTime = (matchShortInfo.getStartTime()) * 1000;
+                String matchStartDate = DateUtils.getRelativeTimeSpanString(secondsMatchStartTime).toString();
 
-                holder.duration.setText(context.getResources().getString(R.string.match_duration, duration));
-                holder.date.setText(matchStartDate);
-
+                Objects.requireNonNull(holder.duration).setText(context.getResources().getString(R.string.match_duration, duration));
+                Objects.requireNonNull(holder.date).setText(matchStartDate);
             }
 
             String heroImg = matchShortInfo.getHeroImageUrl();

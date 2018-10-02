@@ -13,6 +13,8 @@ public class App extends Application {
     public static App INSTANCE;
     private static final String DATABASE_NAME = "Dota.db";
 
+    private RefWatcher refWatcher;
+
     private AppDatabase database;
 
     public static App get() {
@@ -28,7 +30,12 @@ public class App extends Application {
 
         INSTANCE = this;
 
-        LeakCanary.install(this);
+        refWatcher = LeakCanary.install(this);
+    }
+
+    public static RefWatcher getRefWatcher(Context context) {
+        App application = (App) context.getApplicationContext();
+        return application.refWatcher;
     }
 
     public AppDatabase getDB() {

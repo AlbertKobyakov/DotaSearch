@@ -1,5 +1,6 @@
 package com.example.albert.dotasearch.dao;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -19,6 +20,9 @@ public interface ItemDao {
     List<Item> getAll();
 
     @Query("SELECT * FROM item")
+    LiveData<List<Item>> getAllLive();
+
+    @Query("SELECT * FROM item")
     Single<List<Item>> getAllRx();
 
     @Query("SELECT * FROM item")
@@ -36,7 +40,9 @@ public interface ItemDao {
     @Query("DELETE FROM item")
     void deleteAllItems();
 
-
     @Update
     void updateAll(List<Item> items);
+
+    @Query("SELECT * FROM item WHERE id IN(:itemIds)")
+    List<Item> itemFindByIds(List<Long> itemIds);
 }

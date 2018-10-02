@@ -30,6 +30,7 @@ import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RVEmptyObserver;
 import com.example.albert.dotasearch.RecyclerTouchListener;
@@ -38,8 +39,10 @@ import com.example.albert.dotasearch.activity.PlayerInfoActivity;
 import com.example.albert.dotasearch.adapter.FavoritePlayersAdapter;
 import com.example.albert.dotasearch.model.FavoritePlayer;
 import com.example.albert.dotasearch.viewModel.SearchViewModel;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -268,5 +271,12 @@ public class TabSearch extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
         compositeDisposable.dispose();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        RefWatcher refWatcher = App.getRefWatcher(Objects.requireNonNull(getActivity()));
+        refWatcher.watch(this);
     }
 }
