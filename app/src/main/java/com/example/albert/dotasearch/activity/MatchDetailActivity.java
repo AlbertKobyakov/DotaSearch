@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.modelfactory.FactoryForMatchDetailViewModel;
+import com.example.albert.dotasearch.tabs.FragmentMatchDetailCharts;
 import com.example.albert.dotasearch.tabs.FragmentMatchDetailOverview;
 import com.example.albert.dotasearch.viewModel.MatchDetailViewModel;
 
@@ -31,6 +32,7 @@ public class MatchDetailActivity extends AppCompatActivity {
     public static final int LAYOUT = R.layout.activity_match_detail;
 
     private FragmentMatchDetailOverview fragmentMatchDetailOverview;
+    private FragmentMatchDetailCharts fragmentMatchDetailCharts;
     private MatchDetailViewModel viewModel;
 
     @BindView(R.id.toolbar)
@@ -60,19 +62,23 @@ public class MatchDetailActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        navigation.setVisibility(View.GONE);
+
         matchId = getIntent().getLongExtra("matchId", 0);
 
         viewModel = ViewModelProviders.of(this, new FactoryForMatchDetailViewModel(matchId)).get(MatchDetailViewModel.class);
         viewModel.getStatusCode().observe(this, statusCode -> {
-            Log.d(TAG, statusCode + " status");
+            Log.d(TAG, statusCode + " status " + " fragment size " + getSupportFragmentManager().getFragments().size());
             if (statusCode != null) {
-                if (statusCode == 200 && savedInstanceState == null) {
+                if (statusCode == 200 && getSupportFragmentManager().getFragments().size() == 0) {
                     progressBar.setVisibility(View.GONE);
                     frameLayout.setVisibility(View.VISIBLE);
+                    navigation.setVisibility(View.VISIBLE);
                     navigation.setSelectedItemId(R.id.match_overview);
                 } else if (statusCode == 200) {
                     progressBar.setVisibility(View.GONE);
                     frameLayout.setVisibility(View.VISIBLE);
+                    navigation.setVisibility(View.VISIBLE);
                 } else if (statusCode == -200) {
                     progressBar.setVisibility(View.GONE);
                     blockError.setVisibility(View.VISIBLE);
@@ -86,11 +92,16 @@ public class MatchDetailActivity extends AppCompatActivity {
         });
 
         fragmentMatchDetailOverview = FragmentMatchDetailOverview.newInstance(matchId);
+        fragmentMatchDetailCharts = FragmentMatchDetailCharts.newInstance(matchId);
 
         navigation.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.match_overview:
                     changeFragment(fragmentMatchDetailOverview, "fragmentMatchOverview");
+                    return true;
+
+                case R.id.charts:
+                    changeFragment(fragmentMatchDetailCharts, "fragmentMatchDetailCharts");
                     return true;
             }
             return false;

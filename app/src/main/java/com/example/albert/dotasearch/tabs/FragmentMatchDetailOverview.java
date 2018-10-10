@@ -26,7 +26,6 @@ import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.ClickListener;
 import com.example.albert.dotasearch.R;
-import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.activity.PlayerInfoActivity;
 import com.example.albert.dotasearch.adapter.MatchDetailAdapter;
 import com.example.albert.dotasearch.model.ItemsWithMatchDetail;
@@ -102,15 +101,6 @@ public class FragmentMatchDetailOverview extends Fragment {
         if (getArguments() != null) {
             matchId = getArguments().getLong(MATCH_ID);
         }
-
-        viewModel = ViewModelProviders.of(this, new FactoryForMatchDetailOverviewViewModel(matchId)).get(MatchDetailOverviewViewModel.class);
-        viewModel.getItemsWithMatchDetailLiveData().observe(this, itemsWithMatchDetail -> {
-            if (itemsWithMatchDetail != null) {
-                Log.d(TAG, itemsWithMatchDetail.getItems().size() + " ");
-                showData(itemsWithMatchDetail);
-                mAdapter.setData(itemsWithMatchDetail);
-            }
-        });
     }
 
     @Nullable
@@ -118,11 +108,21 @@ public class FragmentMatchDetailOverview extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
 
-        Log.e(TAG, "onCreateView");
+        Log.e(TAG, "onCreateView " + matchId);
 
         unbinder = ButterKnife.bind(this, view);
 
         setAdapterAndRecyclerView();
+
+        viewModel = ViewModelProviders.of(this, new FactoryForMatchDetailOverviewViewModel(matchId)).get(MatchDetailOverviewViewModel.class);
+
+        viewModel.getItemsWithMatchDetailLiveData().observe(this, itemsWithMatchDetail -> {
+            if (itemsWithMatchDetail != null) {
+                Log.d(TAG, itemsWithMatchDetail.getItems().size() + " ");
+                showData(itemsWithMatchDetail);
+                mAdapter.setData(itemsWithMatchDetail);
+            }
+        });
 
         return view;
     }
@@ -195,7 +195,7 @@ public class FragmentMatchDetailOverview extends Fragment {
             matchDuration.setText(getResources().getString(R.string.match_duration, duration));
 
             long secondsDateStart = matchFullInfo.getStartTime();
-            long secondsDateEnd = secondsDateStart + secondsDuration;
+            //long secondsDateEnd = secondsDateStart + secondsDuration;
             String dateMatchStart = DateUtils.getRelativeTimeSpanString(secondsDateStart * 1000).toString();
             dateStart.setText(dateMatchStart);
         } else {

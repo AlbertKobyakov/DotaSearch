@@ -7,12 +7,7 @@
         android:title="@string/overview" />
 
     <item
-        android:id="@+id/pros"
-        android:icon="@drawable/professional_hexagon"
-        android:title="@string/fragment_pro_players" />
-
-    <item
-        android:id="@+id/navigation_notifications"
-        android:icon="@drawable/hero"
-        android:title="@string/heroes" />
+        android:id="@+id/charts"
+        android:icon="@drawable/chart_line"
+        android:title="@string/charts" />
 </menu>

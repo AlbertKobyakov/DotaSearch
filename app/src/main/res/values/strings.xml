@@ -69,7 +69,7 @@
     <string name="total_gold_value">Всего золота: %1$d</string>
     <string name="damage">DMG</string>
     <string name="nickname">Прозвище</string>
-    <string name="no_internet">Интернет соединение отсутствует…</string>
+    <string name="no_internet">Интернет соединение нестабильное или отсутствует вовсе…</string>
     <string name="errors_500">Ошибка сервера…</string>
     <string name="errors_400">Ошибка клиента…</string>
     <string name="result_search_query">найденно %1$d совпадений</string>
@@ -142,4 +142,12 @@
     <string name="img_hero">Фото героя</string>
     <string name="item">Предмет</string>
     <string name="go_to_player_profile">Перейти в профиль</string>
+    <string name="charts">Графики</string>
+    <string name="gold_title">Золото</string>
+    <string name="total_gold_title">Всего золота</string>
+    <string name="exp_title">Опыт</string>
+
+    <string name="gold_and_xp_marker">Преимущество %1$s на %2$d минуте составило %3$d</string>
+    <string name="no_data_for_chart">Данные для постраения графика отсутствуют :(</string>
+    <string name="server_not_response">Сервер не отвечает. Пожалуйста, попробуйте позже.</string>
 </resources>

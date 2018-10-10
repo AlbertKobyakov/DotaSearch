@@ -1,6 +1,5 @@
 package com.example.albert.dotasearch.tabs;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
@@ -62,6 +61,8 @@ public class FragmentPlayerInfoMatches extends Fragment {
     TextView text_network_error;
     @BindView(R.id.for_empty_recycler_size)
     TextView forEmptyRecyclerSize;
+    @BindView(R.id.server_not_response)
+    TextView serverNotResponse;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,20 +95,17 @@ public class FragmentPlayerInfoMatches extends Fragment {
         Log.d(TAG, accountId + " idididididView");
 
         viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoMatchesViewModel(accountId)).get(PlayerInfoMatchesViewModel.class);
-        viewModel.getMatches().observe(this, new Observer<List<MatchShortInfo>>() {
-            @Override
-            public void onChanged(@Nullable List<MatchShortInfo> matchShortInfos) {
-                Log.d(TAG, "onChanged");
-                if (matchShortInfos != null) {
-                    if (matchShortInfos.size() > 0) {
-                        matchList = matchShortInfos;
-                        mAdapter.setData(matchList/*, heroList*/);
-                        progressBar.setVisibility(View.GONE);
-                        recyclerView.setVisibility(View.VISIBLE);
-                    } else {
-                        progressBar.setVisibility(View.GONE);
-                        forEmptyRecyclerSize.setVisibility(View.VISIBLE);
-                    }
+        viewModel.getMatches().observe(this, matchShortInfos -> {
+            Log.d(TAG, "onChanged");
+            if (matchShortInfos != null) {
+                if (matchShortInfos.size() > 0) {
+                    matchList = matchShortInfos;
+                    mAdapter.setData(matchList/*, heroList*/);
+                    progressBar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                    forEmptyRecyclerSize.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -126,6 +124,9 @@ public class FragmentPlayerInfoMatches extends Fragment {
                 } else if (fistNumberStatusCode == -2) {
                     blockError.setVisibility(View.VISIBLE);
                     text_no_internet.setVisibility(View.VISIBLE);
+                } else if (fistNumberStatusCode == -3) {
+                    blockError.setVisibility(View.VISIBLE);
+                    serverNotResponse.setVisibility(View.VISIBLE);
                 }
             }
         });

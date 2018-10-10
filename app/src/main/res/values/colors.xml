@@ -7,17 +7,30 @@
 
     <!--<color name="colorAccent">#FF4081</color>-->
     <color name="colorAccent">#222222</color>
-    <color name="colorBackground">#E1E2E1</color>
+    <!--<color name="colorBackground">#E1E2E1</color>-->
+    <color name="colorBackground">#eeeeee</color>
 
 
     <color name="year">#999999</color>
     <color name="titleTab">#222222</color>
-    <color name="win">#a8fa74</color>
-    <color name="lose">#f1745e</color>
+    <color name="win">#90cc00</color>
+    <color name="lose">#C23C2A</color>
     <color name="gray">#484747</color>
     <color name="one">#01579b</color>
     <color name="two">#E1E2E1</color>
     <color name="background_image_view">#292828</color>
     <color name="white">#ffffff</color>
     <color name="zebra">#4f5b62</color>
+
+
+    <color name="color_1">#94D4D4</color>
+    <color name="color_2">#C0FF8C</color>
+    <color name="color_3">#FFF78C</color>
+    <color name="color_4">#8CEAFF</color>
+    <color name="color_5">#FF8C9D</color>
+    <color name="color_6">#D9508A</color>
+    <color name="color_7">#FE9507</color>
+    <color name="color_8">#35C2D1</color>
+    <color name="color_9">#B36435</color>
+    <color name="color_10">#6A961F</color>
 </resources>

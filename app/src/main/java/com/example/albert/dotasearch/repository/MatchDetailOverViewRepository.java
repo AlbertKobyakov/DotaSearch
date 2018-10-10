@@ -33,7 +33,7 @@ public class MatchDetailOverViewRepository {
     private AppDatabase db;
     private long matchId;
 
-    private MutableLiveData<ItemsWithMatchDetail> itemsWithMatchDetailMutableLiveData = new MutableLiveData<>();
+    private MutableLiveData<ItemsWithMatchDetail> itemsWithMatchDetailMutableLiveData;
 
     public MatchDetailOverViewRepository(long matchId) {
         this.matchId = matchId;
@@ -41,14 +41,14 @@ public class MatchDetailOverViewRepository {
         itemDao = db.itemDao();
         matchFullInfoDao = db.matchFullInfoDao();
         heroDao = db.heroDao();
-        getMatchDetailAndItems();
+        //getMatchDetailAndItems();
     }
 
     public MutableLiveData<ItemsWithMatchDetail> getItemsWithMatchDetailMutableLiveData() {
-        return itemsWithMatchDetailMutableLiveData;
-    }
+        if (itemsWithMatchDetailMutableLiveData == null) {
+            itemsWithMatchDetailMutableLiveData = new MutableLiveData<>();
+        }
 
-    private void getMatchDetailAndItems(){
         Log.d(TAG, "DB REQUEST");
         Single<List<Item>> itemsSingle = itemDao.getAllRx();
         Single<MatchFullInfo> matchFullInfoSingle = matchFullInfoDao.getMatchByIdRx(matchId);
@@ -56,7 +56,7 @@ public class MatchDetailOverViewRepository {
         Disposable disposable = Single.zip(itemsSingle, matchFullInfoSingle, (items, match) -> {
             SparseArray<Hero> heroesSparse = new SparseArray<>();
             SparseArray<Item> itemsSparse = new SparseArray<>();
-            if ( match.getPlayers() != null && match.getPlayers().size() == 10){
+            if (match.getPlayers() != null && match.getPlayers().size() == 10) {
 
                 List<Integer> heroIds = new ArrayList<>();
                 List<Long> itemIds = new ArrayList<>();
@@ -80,7 +80,7 @@ public class MatchDetailOverViewRepository {
                 }
                 List<Item> itemList = itemDao.itemFindByIds(itemIds);
                 for (Item item : itemList) {
-                    itemsSparse.put((int)item.getId(), item);
+                    itemsSparse.put((int) item.getId(), item);
                 }
                 Log.d(TAG, itemList.toString());
             }
@@ -91,9 +91,10 @@ public class MatchDetailOverViewRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        itemsWithMatchDetailSingle -> {
-                            itemsWithMatchDetailMutableLiveData.postValue(itemsWithMatchDetailSingle);
-                        }, Throwable::printStackTrace
+                        itemsWithMatchDetailSingle -> itemsWithMatchDetailMutableLiveData.postValue(itemsWithMatchDetailSingle),
+                        Throwable::printStackTrace
                 );
+
+        return itemsWithMatchDetailMutableLiveData;
     }
 }

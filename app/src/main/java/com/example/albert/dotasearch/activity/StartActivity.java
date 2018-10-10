@@ -1,6 +1,5 @@
 package com.example.albert.dotasearch.activity;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -48,26 +47,21 @@ public class StartActivity extends AppCompatActivity {
         intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
 
         viewModel = ViewModelProviders.of(this).get(StartActivityViewModel.class);
-        viewModel.getIsLoadMainActivity().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                if (aBoolean) {
-                    loadMainActivity(aBoolean);
-                } else {
-                    textViewLoading.setText(R.string.no_internet);
-                    //btnExit.setVisibility(View.VISIBLE);
-                    btnRefresh.setVisibility(View.VISIBLE);
-                }
+        viewModel.getIsLoadMainActivity().observe(this, aBoolean -> {
+            if (aBoolean != null && aBoolean) {
+                loadMainActivity();
+            } else {
+                textViewLoading.setText(R.string.no_internet);
+                //btnExit.setVisibility(View.VISIBLE);
+                btnRefresh.setVisibility(View.VISIBLE);
             }
         });
     }
 
-    public void loadMainActivity(boolean isRun) {
-        if (isRun) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
+    public void loadMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override

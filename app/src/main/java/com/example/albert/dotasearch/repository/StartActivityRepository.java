@@ -203,7 +203,7 @@ public class StartActivityRepository {
         return Single.fromCallable(() -> {
             try {
                 // Connect to Google DNS to checkValidateTeamsData for connection
-                int timeoutMs = 1500;
+                int timeoutMs = 4000;
                 Socket socket = new Socket();
                 InetSocketAddress socketAddress = new InetSocketAddress("8.8.8.8", 53);
 

@@ -85,7 +85,11 @@ public class PlayerInfoMatchesRepository {
                         },
                         err -> {
                             Log.e(TAG, err.getLocalizedMessage());
-                            statusCode.setValue(-200);
+                            if (err.getLocalizedMessage().contains("timeout")) {
+                                statusCode.setValue(-300);
+                            } else {
+                                statusCode.setValue(-200);
+                            }
                         }
                 );
     }

@@ -1,6 +1,5 @@
 package com.example.albert.dotasearch.tabs;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -73,21 +72,20 @@ public class RankingCountyFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(LAYOUT, container, false);
-        Log.d(TAG, "start");
+        Log.d(TAG, "start " + division);
 
         unbinder = ButterKnife.bind(this, view);
 
         setRecyclerViewAdapter();
 
         viewModel = ViewModelProviders.of(this, new FactoryForLeaderboardViewModel(division)).get(LeaderBoardViewModel.class);
-        viewModel.getTimeRefreshLeaderBoardLiveData().observe(this, new Observer<TimeRefreshLeaderBoard>() {
-            @Override
-            public void onChanged(@Nullable TimeRefreshLeaderBoard timeRefreshLeaderBoard) {
-                if (timeRefreshLeaderBoard != null && timeRefreshLeaderBoard.getLeaderboard() != null) {
-                    Log.d(TAG, "onChanged " + timeRefreshLeaderBoard.getLeaderboard().size() + " " + division);
-                    timeRefreshLeaderBoardTemp = timeRefreshLeaderBoard;
-                    mAdapter.setData(timeRefreshLeaderBoard);
-                }
+        viewModel.getTimeRefreshLeaderBoardLiveData().observe(this, timeRefreshLeaderBoard -> {
+            if (timeRefreshLeaderBoard != null && timeRefreshLeaderBoard.getLeaderboard() != null) {
+                Log.d(TAG, "onChanged " + timeRefreshLeaderBoard.getLeaderboard().size() + " " + division);
+                timeRefreshLeaderBoardTemp = timeRefreshLeaderBoard;
+                mAdapter.setData(timeRefreshLeaderBoard);
+            } else {
+                Log.d(TAG, (timeRefreshLeaderBoard == null) + " ");
             }
         });
 

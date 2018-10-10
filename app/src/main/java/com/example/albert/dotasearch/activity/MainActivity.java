@@ -1,7 +1,6 @@
 package com.example.albert.dotasearch.activity;
 
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
@@ -11,7 +10,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.WindowManager;
 
 import com.example.albert.dotasearch.R;
@@ -55,28 +53,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(LAYOUT);
         ButterKnife.bind(this);
 
-        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.player_overview:
-                        changeFragment(tabSearch, "tabSearch");
-                        return true;
-                    case R.id.pros:
-                        changeFragment(tabProPlayers, "tabProPlayers");
-                        return true;
-                    case R.id.navigation_notifications:
-                        changeFragment(tabRanking, "tabRanking");
-                        return true;
-                    case R.id.navigation_notifications1:
-                        changeFragment(tabProTeam, "tabProTeam");
-                        return true;
-                    case R.id.navigation_notifications2:
-                        changeFragment(tabProMatch, "tabProMatch");
-                        return true;
-                }
-                return false;
+        navigation.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.player_overview:
+                    changeFragment(tabSearch, "tabSearch");
+                    return true;
+                case R.id.pros:
+                    changeFragment(tabProPlayers, "tabProPlayers");
+                    return true;
+                case R.id.navigation_notifications:
+                    changeFragment(tabRanking, "tabRanking");
+                    return true;
+                case R.id.navigation_notifications1:
+                    changeFragment(tabProTeam, "tabProTeam");
+                    return true;
+                case R.id.navigation_notifications2:
+                    changeFragment(tabProMatch, "tabProMatch");
+                    return true;
             }
+            return false;
         });
 
 
