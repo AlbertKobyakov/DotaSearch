@@ -20,6 +20,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -36,6 +39,7 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class TabProTeam extends Fragment {
@@ -47,6 +51,14 @@ public class TabProTeam extends Fragment {
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
+    @BindView(R.id.block_error)
+    LinearLayout blockError;
+    @BindView(R.id.no_internet)
+    TextView noInternet;
+    @BindView(R.id.network_error)
+    TextView networkError;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,12 +86,40 @@ public class TabProTeam extends Fragment {
             @Override
             public void onChanged(@Nullable List<Team> teams) {
                 if (teams != null) {
-                    mAdapter.setData(teams);
+                    if(teams.size() > 0){
+                        mAdapter.setData(teams);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                    }
                 }
             }
         });
 
+        viewModel.getStatusCode().observe(this, responseStatusCode -> {
+            Log.d(TAG, "responseCode: " + responseStatusCode);
+
+            if(responseStatusCode != null){
+                if(responseStatusCode > 200){
+                    blockError.setVisibility(View.VISIBLE);
+                    networkError.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                } else if(responseStatusCode == -200){
+                    blockError.setVisibility(View.VISIBLE);
+                    noInternet.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                }
+            }
+
+        });
+
         return view;
+    }
+
+    @OnClick(R.id.btn_refresh)
+    public void refresh() {
+        viewModel.repeatRequest();
+        blockError.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     private void setToolbarTitle() {
@@ -96,14 +136,14 @@ public class TabProTeam extends Fragment {
         recyclerView.setAdapter(mAdapter);
         recyclerView.hasFixedSize();
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
+        /*recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 if (mAdapter.getTeamsForAdapter() != null && mAdapter.getTeamsForAdapter().size() >= position) {
                     Toast.makeText(getContext(), mAdapter.getTeamsForAdapter().get(position).getTeamId() + "", Toast.LENGTH_SHORT).show();
                 }
             }
-        }));
+        }));*/
     }
 
     public static int calculateNoOfColumns(Context context) {
@@ -120,6 +160,7 @@ public class TabProTeam extends Fragment {
         MenuItem item = menu.findItem(R.id.menu_search);
 
         SearchView searchView = (SearchView) item.getActionView();
+        searchView.setQueryHint(getString(R.string.team_search));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

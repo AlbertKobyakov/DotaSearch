@@ -5,38 +5,34 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:src="@drawable/ic_logo_start_activity" />
+
     <TextView
         android:id="@+id/loading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="20dp"
         android:text="@string/loading"
         android:textAlignment="center"
-        android:textSize="30sp" />
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        android:textColor="@color/black"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btn_refresh"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="25dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btn_refresh"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/refresh"
-            android:visibility="gone"/>
-
-        <Button
-            android:id="@+id/btn_exit"
-            style="?android:attr/buttonBarStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/exit"
-            android:visibility="gone" />
-
-    </LinearLayout>
+        android:background="@drawable/ripple"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="5dp"
+        android:text="@string/refresh"
+        android:textColor="@android:color/white"
+        android:visibility="gone"/>
 
 </LinearLayout>

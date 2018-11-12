@@ -1,6 +1,7 @@
 package com.example.albert.dotasearch.repository;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 
 import com.example.albert.dotasearch.App;
@@ -11,6 +12,7 @@ import com.example.albert.dotasearch.model.UpdateInfoDB;
 import com.example.albert.dotasearch.util.UtilDota;
 
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -22,10 +24,12 @@ public class ProTeamRepository {
     private LiveData<List<Team>> teams;
     private static final String TAG = "ProTeamRepository";
     private static final long MILLIS_IN_DAY = 86400000;
+    private MutableLiveData<Integer> statusCode;
 
     public ProTeamRepository() {
         db = App.get().getDB();
         teams = db.teamDao().getAllTeamLiveData();
+        statusCode = new MutableLiveData<>();
     }
 
     public LiveData<List<Team>> getTeams() {
@@ -57,26 +61,41 @@ public class ProTeamRepository {
     public void getTeamsWithRetrofitAndStoreToDB(boolean isInsert) {
         Log.d(TAG, "NETWORK REQUEST");
         Disposable disposable = UtilDota.initRetrofitRx()
-                .getAllProTeam()
+                .getAllProTeamResponse()
                 .flatMap(
                         allTeam -> {
                             if (isInsert) {
                                 Log.d(TAG, "insert");
-                                db.teamDao().insertAll(allTeam);
+                                db.teamDao().insertAll(allTeam.body());
                                 db.updateInfoDBDao().insert(new UpdateInfoDB(Table.TEAM.ordinal(), Table.TEAM.name(), (System.currentTimeMillis() + MILLIS_IN_DAY)));
                             } else {
                                 Log.d(TAG, "update");
-                                db.teamDao().updateAll(allTeam);
+                                db.teamDao().updateAll(allTeam.body());
                                 db.updateInfoDBDao().update(new UpdateInfoDB(Table.TEAM.ordinal(), Table.TEAM.name(), (System.currentTimeMillis() + MILLIS_IN_DAY)));
                             }
                             return Single.just(allTeam);
                         }
                 )
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                //.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        teamsResponse -> Log.d(TAG, teamsResponse.size() + " all teamsize"),
-                        err -> Log.e(TAG, err.getLocalizedMessage())
+                        teamsResponse -> {
+                            Log.d(TAG, Objects.requireNonNull(teamsResponse.body()).size() + " all teamsize");
+                            if (teamsResponse.code() != 200) {
+                                statusCode.postValue(teamsResponse.code());
+                            }
+                        },
+                        err -> {
+                            Log.e(TAG, err.getLocalizedMessage());
+
+                            if (db.teamDao().getAllTeam().size() == 0) {
+                                statusCode.postValue(-200);
+                            }
+                        }
                 );
+    }
+
+    public MutableLiveData<Integer> getStatusCode() {
+        return statusCode;
     }
 }

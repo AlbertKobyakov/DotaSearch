@@ -83,6 +83,7 @@ public class FragmentMatchDetailCharts extends Fragment {
             FragmentPagerAdapterMatchCharts adapter = new FragmentPagerAdapterMatchCharts(getActivity(), getChildFragmentManager(), matchId);
             viewPager.setAdapter(adapter);
             tabLayout.setupWithViewPager(viewPager);
+            tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         }
     }
 

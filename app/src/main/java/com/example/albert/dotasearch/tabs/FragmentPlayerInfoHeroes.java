@@ -16,13 +16,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.App;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.RVEmptyObserver;
-import com.example.albert.dotasearch.RecyclerTouchListener;
 import com.example.albert.dotasearch.adapter.PlayerInfoHeroesAdapter;
 import com.example.albert.dotasearch.model.PlayerHero;
 import com.example.albert.dotasearch.modelfactory.FactoryForPlayerInfoHeroViewModel;
@@ -58,7 +56,7 @@ public class FragmentPlayerInfoHeroes extends Fragment {
     @BindView(R.id.network_error)
     TextView text_network_error;
     @BindView(R.id.for_empty_recycler_size)
-    TextView forEmptyRecyclerSize;
+    LinearLayout forEmptyRecyclerSize;
 
     public static FragmentPlayerInfoHeroes newInstance(long accountId) {
         FragmentPlayerInfoHeroes fragmentPlayerInfoHeroes = new FragmentPlayerInfoHeroes();
@@ -135,12 +133,12 @@ public class FragmentPlayerInfoHeroes extends Fragment {
         recyclerView.setAdapter(mAdapter);
         mAdapter.registerAdapterDataObserver(new RVEmptyObserver(recyclerView, progressBar, recyclerView));
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
+        /*recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Toast.makeText(getContext(), mAdapter.getPlayerHeroByPosition(position).getHeroId() + "", Toast.LENGTH_SHORT).show();
             }
-        }));
+        }));*/
     }
 
     @OnClick(R.id.btn_refresh)

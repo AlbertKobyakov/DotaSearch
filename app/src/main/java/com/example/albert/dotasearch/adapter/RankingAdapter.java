@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.albert.dotasearch.AnimationForRecyclerViewItems;
 import com.example.albert.dotasearch.R;
 import com.example.albert.dotasearch.model.Leaderboard;
 import com.example.albert.dotasearch.model.TimeRefreshLeaderBoard;
@@ -23,7 +22,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHolder> implements AnimationForRecyclerViewItems {
+public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHolder> /*implements AnimationForRecyclerViewItems*/ {
     private static final String TAG = "RankingAdapter";
     private static final int LAYOUT = R.layout.leader_board_list_row;
 
@@ -116,7 +115,7 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.MyViewHo
                 glide.clear(holder.countryFlag);
             }
 
-            setFadeAnimationVerTwo(holder.itemView);
+            //setFadeAnimationVerTwo(holder.itemView);
         }
     }
 

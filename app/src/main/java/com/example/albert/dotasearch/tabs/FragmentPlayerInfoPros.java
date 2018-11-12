@@ -1,6 +1,5 @@
 package com.example.albert.dotasearch.tabs;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
@@ -41,10 +40,12 @@ public class FragmentPlayerInfoPros extends Fragment {
     private static final String TAG = "FragmentPlayerInfoPros";
     private static final int LAYOUT = R.layout.fragment_player_overview;
     private static final String ACCOUNT_ID = "account_id";
+    private static final String NAME = "name";
 
     public PlayerProsAdapter mAdapter;
     public List<Pros> allPros;
     private long accountId;
+    private String name;
     private PlayerInfoProsViewModel viewModel;
 
     @BindView(R.id.recycler_view)
@@ -52,7 +53,7 @@ public class FragmentPlayerInfoPros extends Fragment {
     @BindView(R.id.empty_progress_bar)
     ProgressBar progressBar;
     @BindView(R.id.for_empty_recycler_size)
-    TextView forEmptyRecyclerSize;
+    LinearLayout forEmptyRecyclerSize;
     @BindView(R.id.btn_refresh)
     Button btnRefresh;
     @BindView(R.id.block_error)
@@ -61,14 +62,23 @@ public class FragmentPlayerInfoPros extends Fragment {
     TextView text_no_internet;
     @BindView(R.id.network_error)
     TextView text_network_error;
+    @BindView(R.id.no_data_text)
+    TextView text_no_data;
 
-    public static FragmentPlayerInfoPros newInstance(long accountId) {
+    private ExpandedAppBarListener expandedAppBarListener;
+
+    public static FragmentPlayerInfoPros newInstance(long accountId, String personalName) {
         FragmentPlayerInfoPros fragmentPlayerInfoPros = new FragmentPlayerInfoPros();
         Bundle bundle = new Bundle();
         bundle.putLong(ACCOUNT_ID, accountId);
+        bundle.putString(NAME, personalName);
         fragmentPlayerInfoPros.setArguments(bundle);
 
         return fragmentPlayerInfoPros;
+    }
+
+    public interface ExpandedAppBarListener {
+        void onExpandedAppBar();
     }
 
     @Nullable
@@ -76,35 +86,47 @@ public class FragmentPlayerInfoPros extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.e(TAG, "onCreateView");
 
+        expandedAppBarListener = (ExpandedAppBarListener) getActivity();
+
         View view = inflater.inflate(LAYOUT, container, false);
 
         ButterKnife.bind(this, view);
 
         if (getArguments() != null) {
             accountId = getArguments().getLong(ACCOUNT_ID);
+            name = getArguments().getString(NAME);
+            Log.d(TAG, "personal name: " + name);
         }
 
         setAdapterAndRecyclerView();
 
         viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoProsViewModel(accountId)).get(PlayerInfoProsViewModel.class);
 
-        viewModel.getPros().observe(this, new Observer<List<Pros>>() {
-            @Override
-            public void onChanged(@Nullable List<Pros> pros) {
-                if (pros != null) {
-                    if (pros.size() > 0/* && allPros == null*/) {
-                        Log.d(TAG, pros.size() + "");
-                        allPros = pros;
-                        mAdapter.setData(pros);
-                        progressBar.setVisibility(View.GONE);
-                        recyclerView.setVisibility(View.VISIBLE);
-                    } else {
-                        progressBar.setVisibility(View.GONE);
-                        forEmptyRecyclerSize.setVisibility(View.VISIBLE);
+        viewModel.getPros().observe(this, pros -> {
+            if (pros != null) {
+                if (pros.size() > 0) {
+                    /*Log.d(TAG, pros.size() + "");*/
+                    allPros = pros;
+
+                    //remove first list item if it equals name current player
+                    Log.d(TAG, pros.get(0).getName() + " " + name);
+                    if (pros.get(0).getName().equals(name)){
+                        pros.remove(0);
                     }
+
+                    mAdapter.setData(pros);
+                    progressBar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                    forEmptyRecyclerSize.setVisibility(View.VISIBLE);
+                    Log.e(TAG, "expanded");
+                    expandedAppBarListener.onExpandedAppBar();
                 }
             }
         });
+
+        //text_no_data.setText(getString(R.string.no_games_with_pro));
 
         viewModel.getStatusCode().observe(this, statusCode -> {
             if (statusCode != null && allPros == null) {
@@ -116,9 +138,11 @@ public class FragmentPlayerInfoPros extends Fragment {
                 if (fistNumberStatusCode > 2) {
                     blockError.setVisibility(View.VISIBLE);
                     text_network_error.setVisibility(View.VISIBLE);
+                    expandedAppBarListener.onExpandedAppBar();
                 } else if (fistNumberStatusCode == -2) {
                     blockError.setVisibility(View.VISIBLE);
                     text_no_internet.setVisibility(View.VISIBLE);
+                    expandedAppBarListener.onExpandedAppBar();
                 }
             }
         });
@@ -145,18 +169,14 @@ public class FragmentPlayerInfoPros extends Fragment {
         recyclerView.setAdapter(mAdapter);
         //mAdapter.registerAdapterDataObserver(new RVEmptyObserver(recyclerView, progressBar, recyclerView));
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                toPlayerInfoActivity(position);
-            }
-        }));
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, (view, position)
+                -> toPlayerInfoActivity(position)));
     }
 
     public void toPlayerInfoActivity(int position) {
         Intent intent = new Intent(getActivity(), PlayerInfoActivity.class);
         intent.putExtra("accountId", allPros.get(position).getAccountId());
-        intent.putExtra("personalName", allPros.get(position).getName());
+        intent.putExtra(NAME, allPros.get(position).getName());
         intent.putExtra("urlPlayer", allPros.get(position).getAvatarmedium());
         startActivity(intent);
     }

@@ -10,6 +10,10 @@
     <!--<color name="colorBackground">#E1E2E1</color>-->
     <color name="colorBackground">#eeeeee</color>
 
+    <color name="black">#000000</color>
+
+    <color name="orange">#FD6A02</color>
+    <color name="background_app_icon">#252525</color>
 
     <color name="year">#999999</color>
     <color name="titleTab">#222222</color>

@@ -1,10 +1,12 @@
+
 <resources>
-    <string name="app_name">DotaSearch</string>
+    <string name="app_name">D2S</string>
     <string name="search">Поиск</string>
+    <string name="search_with_app_name">%1$s/%2$s</string>
     <string name="search_players">Поиск игроков</string>
-    <string name="fragment_pro_players">Про Игроки</string>
+    <string name="fragment_pro_players">PRO Игроки</string>
     <string name="fragment_ranking">Таблица лидеров</string>
-    <string name="fragment_pro_teams">Про Команды</string>
+    <string name="fragment_pro_teams">Команды</string>
     <string name="fragment_records">Рекорды</string>
     <string name="search_title">Поиск</string>
     <string name="toolbar_for_ranking">Рейтинг %1$s</string>
@@ -69,10 +71,10 @@
     <string name="total_gold_value">Всего золота: %1$d</string>
     <string name="damage">DMG</string>
     <string name="nickname">Прозвище</string>
-    <string name="no_internet">Интернет соединение нестабильное или отсутствует вовсе…</string>
+    <string name="no_internet">Нет доступа к Интернету</string>
     <string name="errors_500">Ошибка сервера…</string>
     <string name="errors_400">Ошибка клиента…</string>
-    <string name="result_search_query">найденно %1$d совпадений</string>
+    <string name="result_search_query">найдено %1$d совпадений</string>
     <string name="by_query">По запросу:</string>
     <string name="found">\"%1$s\"</string>
     <string name="favorite_players">Избранные игроки:</string>
@@ -89,8 +91,11 @@
     <string name="country_title">Страна</string>
     <string name="logo_player_desc">Лого игрока</string>
     <string name="empty_data_by_match">Данные о текущем матче отсутствуют</string>
+    <string name="empty_data">Данные отсутствуют</string>
     <string name="game_mod_and_lobby_type">%1s / %2s</string>
     <string name="double_click_to_exit">Нажмите еще раз для выхода</string>
+    <string name="player_remove_with_favorite_list">%1$s удален из избранного"</string>
+
 
     <string name="duration_title">Длительность</string>
     <string name="last_hits_title">Ластхит</string>
@@ -120,7 +125,7 @@
     <string name="hero_name_title">Герой</string>
     <string name="result_title">Результат</string>
     <string name="kda_title">K/D/A</string>
-    <string name="refresh">Обновить</string>
+    <string name="refresh">Повторить попытку</string>
     <string name="star">звезда</string>
     <string name="list_favorite_player_is_empty">Список избранных игроков пуст</string>
     <string name="name_title">Имя</string>
@@ -146,8 +151,19 @@
     <string name="gold_title">Золото</string>
     <string name="total_gold_title">Всего золота</string>
     <string name="exp_title">Опыт</string>
+    <string name="removed_from_favorites">Игрок удален из избранного</string>
+    <string name="add_to_favorites">Игрок добавлен в избранное</string>
+    <string name="not_fully_loaded">Пожалуйста дождитесь полной загрузки профиля игрока</string>
+    <string name="no_player_data">Данные об игроке отсутствуют</string>
+    <string name="search_by_name_and_team">Поиск по имени или команде</string>
+    <string name="search_by_name">Поиск игрока по имени</string>
+    <string name="team_search">Поиск команды</string>
+    <string name="least_3_characters">Запрос должен состоять минимум из 3 символов</string>
+    <string name="favorite">Избранный</string>
 
     <string name="gold_and_xp_marker">Преимущество %1$s на %2$d минуте составило %3$d</string>
-    <string name="no_data_for_chart">Данные для постраения графика отсутствуют :(</string>
+    <string name="no_data_for_chart">Данные для построения графика отсутствуют :(</string>
     <string name="server_not_response">Сервер не отвечает. Пожалуйста, попробуйте позже.</string>
+    <string name="no_games_with_pro">Не играл с PRO игроками</string>
+    <string name="network_error">Во время загрузки информации произошла сетевая ошибка. Пожалуйста нажмите на кнопку \'Обновить\'. Если ошибка не пропадает, попробуйте позже.</string>
 </resources>

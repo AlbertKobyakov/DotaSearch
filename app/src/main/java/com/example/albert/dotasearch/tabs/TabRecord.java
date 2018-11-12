@@ -1,6 +1,5 @@
 package com.example.albert.dotasearch.tabs;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +17,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -36,6 +38,7 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static android.widget.LinearLayout.VERTICAL;
@@ -54,6 +57,14 @@ public class TabRecord extends Fragment {
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
+    @BindView(R.id.block_error)
+    LinearLayout blockError;
+    @BindView(R.id.no_internet)
+    TextView noInternet;
+    @BindView(R.id.network_error)
+    TextView networkError;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
 
     public static TabRecord newInstance(String titleRecord, String titleTab) {
         TabRecord tabRecord = new TabRecord();
@@ -100,17 +111,39 @@ public class TabRecord extends Fragment {
         setRecyclerViewAdapter();
 
         viewModel = ViewModelProviders.of(this, new FactoryForRecordViewModel(titleRecord)).get(RecordViewModel.class);
-        viewModel.getRecordListLiveData().observe(this, new Observer<List<Record>>() {
-            @Override
-            public void onChanged(@Nullable List<Record> records) {
-                if (records != null) {
+        viewModel.getRecordListLiveData().observe(this, records -> {
+            if (records != null) {
+                if(records.size() > 0){
                     Log.d(TAG, records.size() + " = size record");
                     mAdapter.setData(records);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        viewModel.getStatusCode().observe(this, responseStatusCode -> {
+            if(responseStatusCode != null){
+                if(responseStatusCode > 200){
+                    blockError.setVisibility(View.VISIBLE);
+                    networkError.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                } else if(responseStatusCode == -200){
+                    blockError.setVisibility(View.VISIBLE);
+                    noInternet.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         });
 
         return view;
+    }
+
+    @OnClick(R.id.btn_refresh)
+    public void refresh() {
+        viewModel.repeatRequest();
+        blockError.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override

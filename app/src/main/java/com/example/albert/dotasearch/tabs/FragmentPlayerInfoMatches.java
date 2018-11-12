@@ -60,9 +60,11 @@ public class FragmentPlayerInfoMatches extends Fragment {
     @BindView(R.id.network_error)
     TextView text_network_error;
     @BindView(R.id.for_empty_recycler_size)
-    TextView forEmptyRecyclerSize;
+    LinearLayout forEmptyRecyclerSize;
     @BindView(R.id.server_not_response)
     TextView serverNotResponse;
+
+    private FragmentPlayerInfoPros.ExpandedAppBarListener expandedAppBarListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,6 +87,8 @@ public class FragmentPlayerInfoMatches extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(LAYOUT, container, false);
 
+        expandedAppBarListener = (FragmentPlayerInfoPros.ExpandedAppBarListener) getActivity();
+
         Log.e(TAG, "onCreateView");
         ButterKnife.bind(this, view);
 
@@ -106,6 +110,7 @@ public class FragmentPlayerInfoMatches extends Fragment {
                 } else {
                     progressBar.setVisibility(View.GONE);
                     forEmptyRecyclerSize.setVisibility(View.VISIBLE);
+                    expandedAppBarListener.onExpandedAppBar();
                 }
             }
         });
@@ -121,12 +126,15 @@ public class FragmentPlayerInfoMatches extends Fragment {
                 if (fistNumberStatusCode > 2) {
                     blockError.setVisibility(View.VISIBLE);
                     text_network_error.setVisibility(View.VISIBLE);
+                    expandedAppBarListener.onExpandedAppBar();
                 } else if (fistNumberStatusCode == -2) {
                     blockError.setVisibility(View.VISIBLE);
                     text_no_internet.setVisibility(View.VISIBLE);
+                    expandedAppBarListener.onExpandedAppBar();
                 } else if (fistNumberStatusCode == -3) {
                     blockError.setVisibility(View.VISIBLE);
                     serverNotResponse.setVisibility(View.VISIBLE);
+                    expandedAppBarListener.onExpandedAppBar();
                 }
             }
         });

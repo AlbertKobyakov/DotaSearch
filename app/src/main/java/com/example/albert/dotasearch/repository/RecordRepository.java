@@ -30,12 +30,14 @@ public class RecordRepository {
     private LiveData<List<Record>> recordListLiveData;
     private String titleRecord;
     private List<Record> emptyRecordList = new ArrayList<>();
+    private MutableLiveData<Integer> statusCode;
 
     public RecordRepository(String recordTitle) {
         this.titleRecord = recordTitle;
         db = App.get().getDB();
         //recordListLiveData = db.recordDao().getAllRecordsByTitleLiveData(recordTitle);
         recordListLiveData = getRecordsMutable();
+        statusCode = new MutableLiveData<>();
     }
 
     public LiveData<List<Record>> getRecordListLiveData() {
@@ -102,14 +104,18 @@ public class RecordRepository {
         if (recordsMutable == null) {
             recordsMutable = new MutableLiveData<>();
         }
+        sendRequest();
+        return recordsMutable;
+    }
 
+    public void sendRequest(){
         Disposable disposable = UtilDota.initRetrofitRx()
-                .getRecordsByTitle(titleRecord)
+                .getRecordsByTitleResponse(titleRecord)
                 .flatMap(records -> {
-                    if (records.get(0).getHeroId().trim().length() > 0) {
+                    if (records.body().get(0).getHeroId().trim().length() > 0) {
                         SparseArray<Hero> heroes = sortHeroes(db.heroDao().getAll());
 
-                        for (Record record : records) {
+                        for (Record record : records.body()) {
                             int heroId = Integer.parseInt(record.getHeroId());
                             record.setHeroImgUrl(heroes.get(heroId).getImg());
                             record.setHeroName(heroes.get(heroId).getLocalizedName());
@@ -120,11 +126,17 @@ public class RecordRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        recordsResponse -> recordsMutable.setValue(recordsResponse),
-                        err -> recordsMutable.setValue(emptyRecordList)
+                        recordsResponse -> {
+                            recordsMutable.setValue(recordsResponse.body());
+                            if(recordsResponse.code() != 200){
+                                statusCode.setValue(recordsResponse.code());
+                            }
+                        },
+                        err -> {
+                            recordsMutable.setValue(emptyRecordList);
+                            statusCode.setValue(-200);
+                        }
                 );
-
-        return recordsMutable;
     }
 
     private SparseArray<Hero> sortHeroes(List<Hero> heroes) {
@@ -133,5 +145,9 @@ public class RecordRepository {
             sortedHeroes.put(heroes.get(i).getId(), heroes.get(i));
         }
         return sortedHeroes;
+    }
+
+    public MutableLiveData<Integer> getStatusCode() {
+        return statusCode;
     }
 }

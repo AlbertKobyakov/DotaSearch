@@ -132,19 +132,13 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
     public void filter(String text) {
         List<ProPlayer> proPlayersFiltered = new ArrayList<>();
 
-        if (!text.isEmpty()) {
+        if (!text.isEmpty() && proPlayersTempAll != null && proPlayersTempAll.size() > 0) {
             text = text.toLowerCase();
             for (ProPlayer proPlayer : proPlayersTempAll) {
-                if (proPlayer.getName() != null) {
-                    if (proPlayer.getName().toLowerCase().trim().contains(text)) {
-                        proPlayersFiltered.add(proPlayer);
-                    }
-                }
-
-                if (proPlayer.getTeamName() != null) {
-                    if (proPlayer.getTeamName().toLowerCase().trim().contains(text)) {
-                        proPlayersFiltered.add(proPlayer);
-                    }
+                if (proPlayer.getName() != null && proPlayer.getName().toLowerCase().trim().contains(text)) {
+                    proPlayersFiltered.add(proPlayer);
+                } else if (proPlayer.getTeamName() != null && proPlayer.getTeamName().toLowerCase().trim().contains(text)) {
+                    proPlayersFiltered.add(proPlayer);
                 }
             }
         } else {

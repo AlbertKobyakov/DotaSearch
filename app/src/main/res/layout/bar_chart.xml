@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:layout_margin="16dp"
     android:orientation="vertical"
-    android:background="@color/colorBackground">
+    android:background="@color/colorBackground"
+    android:gravity="center">
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/chart_view"
@@ -13,11 +14,18 @@
 
     </com.github.mikephil.charting.charts.BarChart>
 
+    <ImageView
+        android:id="@+id/emotion_sad"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/emoticon_sad"
+        android:visibility="gone"/>
+
     <TextView
         android:id="@+id/no_data_for_chart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
         android:text="@string/no_data_for_chart"
-        android:gravity="center"
-        android:textColor="@color/white"/>
+        android:textColor="@color/colorPrimaryDark"
+        android:visibility="gone"/>
 </LinearLayout>

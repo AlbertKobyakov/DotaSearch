@@ -42,13 +42,13 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PlayerInfoActivity extends AppCompatActivity {
+public class PlayerInfoActivity extends AppCompatActivity implements FragmentPlayerInfoPros.ExpandedAppBarListener {
 
     public static final String TAG = "PlayerInfoActivity";
     public static final int LAYOUT = R.layout.activity_player_info;
 
     public long accountId;
-    public String personalName;
+    public String name;
     public PlayerInfoViewModel viewModel;
 
     private FragmentPlayerInfoMatches fragmentPlayerInfoMatches;
@@ -97,13 +97,13 @@ public class PlayerInfoActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         accountId = getIntent().getLongExtra("accountId", 0);
-        personalName = getIntent().getStringExtra("personalName");
+        name = getIntent().getStringExtra("name");
 
         glide = Glide.with(this);
 
         fragmentPlayerInfoMatches = FragmentPlayerInfoMatches.newInstance(accountId);
         fragmentPlayerInfoHeroes = FragmentPlayerInfoHeroes.newInstance(accountId);
-        fragmentPlayerInfoPros = FragmentPlayerInfoPros.newInstance(accountId);
+        fragmentPlayerInfoPros = FragmentPlayerInfoPros.newInstance(accountId, name);
 
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -191,7 +191,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
         }
 
         glide.load(urlPlayerImg)
-                .error(glide.load(R.drawable.avatar_unknown_medium).apply(RequestOptions.circleCropTransform()))
+                .error(glide.load(R.drawable.help).apply(RequestOptions.circleCropTransform()))
                 .apply(RequestOptions.circleCropTransform())
                 .into(playerImg);
         playerName.setText(name);
@@ -300,14 +300,14 @@ public class PlayerInfoActivity extends AppCompatActivity {
         if (id == R.id.star && isFavorite.getValue() != null && isFavorite.getValue()) {
             item.setIcon(getResources().getDrawable(R.mipmap.ic_star_outline_white_48dp));
             viewModel.deletePlayerWithFavoriteList(accountId);
-            Snackbar.make(findViewById(R.id.navigation), "Пользователь удален из избранного", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.navigation), getString(R.string.removed_from_favorites), Snackbar.LENGTH_SHORT).show();
         } else if (id == R.id.star && !isFavorite.getValue()) {
             if (playerInfo != null) {
                 viewModel.insertPlayerToFavoriteList(new FavoritePlayer(accountId, urlPlayerImg, getRealPlayerName(playerInfo)));
                 item.setIcon(getResources().getDrawable(R.mipmap.ic_star_white_48dp));
-                Snackbar.make(findViewById(R.id.navigation), "Пользователь добавлен в избранное", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.navigation), getString(R.string.add_to_favorites), Snackbar.LENGTH_SHORT).show();
             } else {
-                Snackbar.make(findViewById(R.id.navigation), "Пожалуйста дождитесь полной загрузки профиля игрока", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.navigation), getString(R.string.not_fully_loaded), Snackbar.LENGTH_SHORT).show();
             }
         }
         return super.onOptionsItemSelected(item);
@@ -319,7 +319,7 @@ public class PlayerInfoActivity extends AppCompatActivity {
             if (playerInfo.getProfile().getName() != null) {
                 name = playerInfo.getProfile().getName();
             } else {
-                name = personalName;
+                name = playerInfo.getProfile().getPersonaname();
             }
         }
 
@@ -330,5 +330,10 @@ public class PlayerInfoActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
+    }
+
+    @Override
+    public void onExpandedAppBar() {
+        appBarLayout.setExpanded(false, true);
     }
 }

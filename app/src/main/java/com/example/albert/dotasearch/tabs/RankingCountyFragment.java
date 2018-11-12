@@ -17,6 +17,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.App;
@@ -31,6 +34,7 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static android.widget.LinearLayout.VERTICAL;
@@ -47,6 +51,16 @@ public class RankingCountyFragment extends Fragment {
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
+    @BindView(R.id.for_empty_recycler_size)
+    LinearLayout forEmptyRecyclerSize;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
+    @BindView(R.id.block_error)
+    LinearLayout blockError;
+    @BindView(R.id.no_internet)
+    TextView noInternet;
+    @BindView(R.id.network_error)
+    TextView networkError;
 
     public RankingCountyFragment() {
     }
@@ -72,7 +86,6 @@ public class RankingCountyFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(LAYOUT, container, false);
-        Log.d(TAG, "start " + division);
 
         unbinder = ButterKnife.bind(this, view);
 
@@ -81,15 +94,37 @@ public class RankingCountyFragment extends Fragment {
         viewModel = ViewModelProviders.of(this, new FactoryForLeaderboardViewModel(division)).get(LeaderBoardViewModel.class);
         viewModel.getTimeRefreshLeaderBoardLiveData().observe(this, timeRefreshLeaderBoard -> {
             if (timeRefreshLeaderBoard != null && timeRefreshLeaderBoard.getLeaderboard() != null) {
-                Log.d(TAG, "onChanged " + timeRefreshLeaderBoard.getLeaderboard().size() + " " + division);
-                timeRefreshLeaderBoardTemp = timeRefreshLeaderBoard;
-                mAdapter.setData(timeRefreshLeaderBoard);
-            } else {
-                Log.d(TAG, (timeRefreshLeaderBoard == null) + " ");
+                if (timeRefreshLeaderBoard.getLeaderboard().size() > 0) {
+                    timeRefreshLeaderBoardTemp = timeRefreshLeaderBoard;
+                    mAdapter.setData(timeRefreshLeaderBoard);
+                    progressBar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        viewModel.getStatusCode().observe(this, responseStatusCode -> {
+            if (responseStatusCode != null) {
+                if (responseStatusCode > 200) {
+                    blockError.setVisibility(View.VISIBLE);
+                    networkError.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                } else if (responseStatusCode == -200) {
+                    blockError.setVisibility(View.VISIBLE);
+                    noInternet.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                }
             }
         });
 
         return view;
+    }
+
+    @OnClick(R.id.btn_refresh)
+    public void refresh() {
+        viewModel.repeatRequest();
+        blockError.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     public void setRecyclerViewAdapter() {
@@ -111,6 +146,7 @@ public class RankingCountyFragment extends Fragment {
         MenuItem item = menu.findItem(R.id.menu_search);
 
         SearchView searchView = (SearchView) item.getActionView();
+        searchView.setQueryHint(getString(R.string.search_by_name));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -130,18 +166,6 @@ public class RankingCountyFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop " + getTitle());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume " + getTitle());
     }
 
     @Override

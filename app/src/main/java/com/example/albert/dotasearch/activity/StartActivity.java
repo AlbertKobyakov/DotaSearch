@@ -29,8 +29,6 @@ public class StartActivity extends AppCompatActivity {
 
     @BindView(R.id.loading)
     TextView textViewLoading;
-    @BindView(R.id.btn_exit)
-    Button btnExit;
     @BindView(R.id.btn_refresh)
     Button btnRefresh;
 
@@ -47,12 +45,11 @@ public class StartActivity extends AppCompatActivity {
         intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
 
         viewModel = ViewModelProviders.of(this).get(StartActivityViewModel.class);
-        viewModel.getIsLoadMainActivity().observe(this, aBoolean -> {
-            if (aBoolean != null && aBoolean) {
+        viewModel.getIsLoadMainActivity().observe(this, isDataReceived -> {
+            if (isDataReceived != null && isDataReceived) {
                 loadMainActivity();
             } else {
                 textViewLoading.setText(R.string.no_internet);
-                //btnExit.setVisibility(View.VISIBLE);
                 btnRefresh.setVisibility(View.VISIBLE);
             }
         });
@@ -70,15 +67,9 @@ public class StartActivity extends AppCompatActivity {
         viewModel = null;
     }
 
-    @OnClick(R.id.btn_exit)
-    public void onClick(View view) {
-        finish();
-    }
-
     @OnClick(R.id.btn_refresh)
     public void refresh() {
         viewModel.refresh();
-        btnExit.setVisibility(View.GONE);
         btnRefresh.setVisibility(View.GONE);
         textViewLoading.setText(R.string.loading);
     }

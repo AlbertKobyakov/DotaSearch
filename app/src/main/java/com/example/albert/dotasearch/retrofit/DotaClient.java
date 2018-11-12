@@ -28,8 +28,14 @@ public interface DotaClient {
     @GET("/api/proPlayers/")
     Single<List<ProPlayer>> getAllProPlayerRx();
 
+    @GET("/api/proPlayers/")
+    Single<Response<List<ProPlayer>>> getAllProPlayerResponse();
+
     @GET("/api/teams/")
     Single<List<Team>> getAllProTeam();
+
+    @GET("/api/teams/")
+    Single<Response<List<Team>>> getAllProTeamResponse();
 
     @GET("/api/search")
     Single<List<FoundPlayer>> getFoundPlayersRx(
@@ -42,7 +48,7 @@ public interface DotaClient {
     );
 
     @GET("/webapi/ILeaderboard/GetDivisionLeaderboard/v0001")
-    Single<TimeRefreshLeaderBoard> getLeaderBorderRx(
+    Single<Response<TimeRefreshLeaderBoard>> getLeaderBorderRx(
             @Query("division") String division
     );
 
@@ -63,6 +69,11 @@ public interface DotaClient {
 
     @GET("/api/records/{title}")
     Single<List<Record>> getRecordsByTitle(
+            @Path("title") String titleRecord
+    );
+
+    @GET("/api/records/{title}")
+    Single<Response<List<Record>>> getRecordsByTitleResponse(
             @Path("title") String titleRecord
     );
 
@@ -95,6 +106,9 @@ public interface DotaClient {
     @GET("/api/heroStats")
     Single<List<Hero>> getAllHeroesRx();
 
+    @GET("/api/heroStats")
+    Single<Response<List<Hero>>> getAllHeroesRxResponse();
+
     @GET("/api/matches/{match_id}")
     Observable<MatchFullInfo> getMatchFullInfoRx(
             @Path("match_id") long matchId
@@ -107,6 +121,11 @@ public interface DotaClient {
 
     @GET("/IEconDOTA2_570/GetGameItems/v0001/")
     Single<ItemsInfoWithSteam> getItemInfoSteamRx(
+            @Query("key") String key
+    );
+
+    @GET("/IEconDOTA2_570/GetGameItems/v0001/")
+    Single<Response<ItemsInfoWithSteam>> getItemInfoSteamRxResponse(
             @Query("key") String key
     );
 }

@@ -1,6 +1,5 @@
 package com.example.albert.dotasearch.tabs;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +18,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.albert.dotasearch.App;
@@ -35,6 +37,7 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class TabProPlayers extends Fragment {
@@ -49,6 +52,16 @@ public class TabProPlayers extends Fragment {
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
+    @BindView(R.id.for_empty_recycler_size)
+    LinearLayout forEmptyRecyclerSize;
+    @BindView(R.id.block_error)
+    LinearLayout blockError;
+    @BindView(R.id.no_internet)
+    TextView noInternet;
+    @BindView(R.id.network_error)
+    TextView networkError;
 
     private ProPlayersViewModel viewModel;
 
@@ -75,19 +88,44 @@ public class TabProPlayers extends Fragment {
         setAdapterAndRecyclerView();
 
         viewModel = ViewModelProviders.of(this).get(ProPlayersViewModel.class);
-        viewModel.getProPlayers().observe(this, new Observer<List<ProPlayer>>() {
-            @Override
-            public void onChanged(@Nullable List<ProPlayer> proPlayersResponse) {
-                if (proPlayersResponse != null) {
+        viewModel.getProPlayers().observe(this, proPlayersResponse -> {
+            if (proPlayersResponse != null) {
+                if (proPlayersResponse.size() > 0) {
                     proPlayers = proPlayersResponse;
                     mAdapter.setData(proPlayers);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
+        });
+
+        viewModel.getStatusCode().observe(this, responseStatusCode -> {
+            Log.d(TAG, "responseCode: " + responseStatusCode);
+
+            if(responseStatusCode != null){
+                if(responseStatusCode > 200){
+                    blockError.setVisibility(View.VISIBLE);
+                    networkError.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                } else if(responseStatusCode == -200){
+                    blockError.setVisibility(View.VISIBLE);
+                    noInternet.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                }
+            }
+
         });
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(view.getContext(), recyclerView, (view, position)
                 -> goToPlayerInfoActivity(mAdapter.getProPlayers().get(position))));//Toast.makeText(getActivity(), mAdapter.getProPlayers().get(position).getAccountId() + "", Toast.LENGTH_SHORT).show()));
         return view;
+    }
+
+    @OnClick(R.id.btn_refresh)
+    public void refresh() {
+        viewModel.repeatRequest();
+        blockError.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     private void setToolbarTitle() {
@@ -100,7 +138,7 @@ public class TabProPlayers extends Fragment {
     public void goToPlayerInfoActivity(ProPlayer proPlayer) {
         Intent intent = new Intent(getContext(), PlayerInfoActivity.class);
         intent.putExtra("accountId", proPlayer.getAccountId());
-        intent.putExtra("personalName", proPlayer.getPersonaname());
+        intent.putExtra("name", proPlayer.getName());
         intent.putExtra("urlPlayer", proPlayer.getAvatarfull());
         startActivity(intent);
     }
@@ -113,7 +151,7 @@ public class TabProPlayers extends Fragment {
         MenuItem item = menu.findItem(R.id.menu_search);
 
         SearchView searchView = (SearchView) item.getActionView();
-        searchView.setQueryHint("Поиск по имени и команде");
+        searchView.setQueryHint(getString(R.string.search_by_name_and_team));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

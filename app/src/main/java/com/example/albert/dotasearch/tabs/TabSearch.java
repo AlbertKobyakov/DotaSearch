@@ -3,6 +3,7 @@ package com.example.albert.dotasearch.tabs;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -18,10 +19,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -142,6 +148,14 @@ public class TabSearch extends Fragment {
             }
         });
 
+        searchEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                onClick();
+                return true;
+            }
+            return false;
+        });
+
         /*int id = getResources().getIdentifier("ic_dashboard_black_24dp", "drawable", getActivity().getPackageName());
         imageView.setImageResource(id);*/
 
@@ -217,7 +231,7 @@ public class TabSearch extends Fragment {
                 viewModel.deletePlayerWithFavoriteList(currentAccountId);
 
                 if (activity != null) {
-                    Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), "Игрок " + currentPlayerName + " удален из избранного", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), getString(R.string.player_remove_with_favorite_list, currentPlayerName), Snackbar.LENGTH_SHORT).show();
                     Log.d(TAG, "item deleted " + favoritePlayerList.size() + " " + mAdapter.getFavoritePlayers().get(0).getPersonaname());
 
                     Log.d(TAG, "last item deleted");
@@ -240,7 +254,7 @@ public class TabSearch extends Fragment {
     public void goToPlayerInfoActivity(FavoritePlayer favoritePlayer) {
         Intent intent = new Intent(activity, PlayerInfoActivity.class);
         intent.putExtra("accountId", favoritePlayer.getAccountId());
-        intent.putExtra("personalName", favoritePlayer.getPersonaname());
+        intent.putExtra("name", favoritePlayer.getPersonaname());
         intent.putExtra("urlPlayer", favoritePlayer.getAvatarfull());
         startActivity(intent);
     }
@@ -251,7 +265,7 @@ public class TabSearch extends Fragment {
 
         Log.d(TAG, "onClick btn_search");
         if (query.trim().length() == 0 || query.trim().length() < 3) {
-            Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), "Запрос должен состоять минимум из 3 символов", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), getString(R.string.least_3_characters), Snackbar.LENGTH_SHORT).show();
         } else {
             viewModel.searchRequest(query);
 
@@ -259,6 +273,7 @@ public class TabSearch extends Fragment {
             progressBar.setVisibility(View.VISIBLE);
         }
     }
+
 
     public void goToFoundPlayerActivity(String query) {
         Log.d(TAG, "goToFoundPlayerActivity");

@@ -26,61 +26,39 @@
             android:id="@+id/empty_progress_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="168dp" />
+            android:paddingBottom="168dp"
+            android:visibility="visible"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/for_empty_recycler_size"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:drawableTop="@drawable/account_off_96"
+            android:visibility="gone"
             android:gravity="center"
-            android:paddingBottom="80dp"
-            android:text="Данный игрок никогда не играл с про игроками"
-            android:visibility="gone" />
+            android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/block_error"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingBottom="80dp"
-            android:visibility="gone">
+            <ImageView
+                android:id="@+id/emotion_sad"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/emoticon_sad"/>
 
             <TextView
-                android:id="@+id/network_error"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Во время загрузки информации произошла сетевая ошибка. Пожалуйста нажмите на кнопку 'Обновить'. Если ошибка не пропадает, попробуйте позже."
-                android:textAlignment="center"
-                android:textSize="12sp"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/no_internet"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/no_internet"
-                android:textAlignment="center"
-                android:textSize="12sp"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/server_not_response"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/server_not_response"
-                android:textAlignment="center"
-                android:textSize="12sp"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/btn_refresh"
+                android:id="@+id/no_data_text"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/refresh" />
+                android:layout_height="50dp"
+                android:text="@string/empty_data"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginTop="20dp"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
 
         </LinearLayout>
+
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/block_errors"/>
 
     </LinearLayout>
 

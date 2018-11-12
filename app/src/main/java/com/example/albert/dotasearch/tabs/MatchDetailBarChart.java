@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.albert.dotasearch.AbstractChartFragment;
@@ -47,6 +48,8 @@ public class MatchDetailBarChart extends AbstractChartFragment {
     BarChart chart;
     @BindView(R.id.no_data_for_chart)
     TextView noData;
+    @BindView(R.id.emotion_sad)
+    ImageView emotionSad;
 
     public MatchDetailBarChart() {
     }
@@ -82,6 +85,8 @@ public class MatchDetailBarChart extends AbstractChartFragment {
                 drawChart(dataForDrawChart);
             } else {
                 chart.setVisibility(View.GONE);
+                emotionSad.setVisibility(View.VISIBLE);
+                noData.setVisibility(View.VISIBLE);
                 Log.d(TAG, "Данные для постраения графика отсутствуют :( ");
             }
         });
