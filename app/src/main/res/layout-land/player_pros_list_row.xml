@@ -6,7 +6,6 @@
     android:layout_marginLeft="7dp"
     android:layout_marginRight="7dp"
     android:layout_marginTop="4dp"
-    card_view:cardBackgroundColor="@color/cardview_light_background"
     card_view:cardCornerRadius="3dp"
     card_view:contentPadding="10dp">
 
@@ -79,7 +78,7 @@
                 style="@style/TextViewTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Матчей" />
+                android:text="@string/games_title" />
 
             <TextView
                 android:id="@+id/pro_all_matches"
@@ -102,7 +101,7 @@
                 style="@style/TextViewTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Вместе" />
+                android:text="@string/together" />
 
             <TextView
                 android:id="@+id/matches_with_win"
@@ -125,7 +124,7 @@
                 style="@style/TextViewTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Против" />
+                android:text="@string/against" />
 
             <TextView
                 android:id="@+id/matches_against_win"

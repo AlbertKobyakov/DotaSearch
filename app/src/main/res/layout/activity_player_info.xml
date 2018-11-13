@@ -248,7 +248,7 @@
         android:background="@color/colorAccent"
         app:itemIconTint="@color/bottom_nav_color"
         app:itemTextColor="@color/bottom_nav_color"
-        app:layout_behavior="com.example.albert.dotasearch.BottomNavigationBehavior"
+        app:layout_behavior="com.kobyakov.d2s.BottomNavigationBehavior"
         app:menu="@menu/menu_player_info" />
 
 </android.support.design.widget.CoordinatorLayout>

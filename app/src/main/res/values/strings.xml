@@ -160,6 +160,8 @@
     <string name="team_search">Поиск команды</string>
     <string name="least_3_characters">Запрос должен состоять минимум из 3 символов</string>
     <string name="favorite">Избранный</string>
+    <string name="together">Вместе</string>
+    <string name="against">Против</string>
 
     <string name="gold_and_xp_marker">Преимущество %1$s на %2$d минуте составило %3$d</string>
     <string name="no_data_for_chart">Данные для построения графика отсутствуют :(</string>

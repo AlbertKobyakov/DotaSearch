@@ -159,8 +159,10 @@
     <string name="team_search">Search team</string>
     <string name="least_3_characters">Request must be at least 3 characters</string>
     <string name="favorite">Favorite</string>
+    <string name="together">Together</string>
+    <string name="against">Against</string>
 
-    <string name="gold_and_xp_marker">The advantage of %1$s in %2$d minutes was  %3$d</string>
+    <string name="gold_and_xp_marker">The advantage of %1$s at %2$d minutes was  %3$d</string>
     <string name="no_data_for_chart">No chart data available :(</string>
     <string name="server_not_response">The server is not responding. Please try again later.</string>
     <string name="no_games_with_pro">Did not play with PRO players</string>

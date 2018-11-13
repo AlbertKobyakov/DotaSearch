@@ -10,7 +10,7 @@ repositories {
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.example.albert.dotasearch"
+        applicationId "com.kobyakov.d2s"
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
@@ -76,8 +76,4 @@ dependencies {
 
     implementation 'com.android.support:multidex:1.0.3'
     //implementation 'uk.co.samuelwall:material-tap-target-prompt:2.12.1'
-
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.1'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
-    testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
 }
