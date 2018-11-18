@@ -41,7 +41,7 @@ public class PlayerInfoRepository {
         return playerFullInfo;
     }
 
-    private void sendRequestForDataPlayerFullInfo() {
+    public void sendRequestForDataPlayerFullInfo() {
         Log.d(TAG, "NETWORK REQUEST");
         Single<PlayerInfo> playerInfo = UtilDota.initRetrofitRx()
                 .getPlayerInfoById(accountId)

@@ -26,8 +26,9 @@
             android:gravity="center">
 
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
                 android:id="@+id/imageView"
                 android:contentDescription="@string/logo_player_desc" />
 

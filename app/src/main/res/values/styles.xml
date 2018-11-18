@@ -25,6 +25,13 @@
         <item name="android:ellipsize">end</item>
     </style>
 
+    <style name="TextViewValueLeague" parent="android:Widget.TextView">
+        <item name="android:gravity">center</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
     <style name="TextViewBlockMatchDetail" parent="android:Widget.TextView">
         <item name="android:gravity">center</item>
         <item name="android:padding">3dp</item>

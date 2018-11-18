@@ -72,8 +72,7 @@ public class ProTeamAdapter extends RecyclerView.Adapter<ProTeamAdapter.MyViewHo
 
             RequestOptions fitCenter = new RequestOptions()
                     .fitCenter()
-                    .override(100, 100)
-                    /*.diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)*/;
+                    .override(100, 100);
 
             glide.load(team.getLogoUrl())
                     .error(glide.load(R.drawable.help))

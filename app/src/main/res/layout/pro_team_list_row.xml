@@ -1,56 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
-<android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="85dp"
     android:layout_height="wrap_content"
     android:layout_margin="2dp"
-    card_view:cardBackgroundColor="#3d3f42"
+    card_view:cardBackgroundColor="@color/colorPrimary"
     card_view:cardCornerRadius="3dp">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/team_logo"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:padding="10dp"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/team_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/white"
             android:gravity="center"
-            android:orientation="vertical">
+            android:lines="2"
+            android:padding="5dp" />
+    </LinearLayout>
 
-            <ImageView
-                android:id="@+id/team_logo"
-                android:layout_width="match_parent"
-                android:layout_height="90dp"
-                android:scaleType="centerCrop"
-                android:padding="10dp"/>
-
-            <!--<TextView
-                android:id="@+id/team_win"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center" />
-
-            <TextView
-                android:id="@+id/team_lose"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center" />-->
-
-            <TextView
-                android:padding="5dp"
-                android:id="@+id/team_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:lines="2"
-                android:background="@android:color/white"/>
-
-            <!--<TextView
-                android:id="@+id/team_tag"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />-->
-        </LinearLayout>
-
-    </android.support.v7.widget.CardView>
+</android.support.v7.widget.CardView>

@@ -11,6 +11,9 @@ import com.kobyakov.d2s.model.Record;
 import com.kobyakov.d2s.model.ProPlayer;
 import com.kobyakov.d2s.model.Pros;
 import com.kobyakov.d2s.model.Team;
+import com.kobyakov.d2s.model.TeamHero;
+import com.kobyakov.d2s.model.TeamMatch;
+import com.kobyakov.d2s.model.TeamPlayer;
 import com.kobyakov.d2s.model.TimeRefreshLeaderBoard;
 import com.kobyakov.d2s.model.WinLose;
 
@@ -67,6 +70,11 @@ public interface DotaClient {
             @Path("Id") long playerId
     );
 
+    @GET("/api/teams/{Id}/players")
+    Single<Response<List<TeamPlayer>>> getTeamPlayerResponse(
+            @Path("Id") long playerId
+    );
+
     @GET("/api/records/{title}")
     Single<List<Record>> getRecordsByTitle(
             @Path("title") String titleRecord
@@ -87,6 +95,11 @@ public interface DotaClient {
             @Path("Id") long playerId
     );
 
+    @GET("/api/teams/{Id}/heroes")
+    Single<Response<List<TeamHero>>> getTeamHeroesResponse(
+            @Path("Id") long playerId
+    );
+
     @GET("/api/players/{Id}/wl")
     Single<WinLose> getPlayerWinLoseById(
             @Path("Id") long playerId
@@ -101,6 +114,11 @@ public interface DotaClient {
     @GET("/api/players/{Id}/matches")
     Single<Response<List<MatchShortInfo>>> getMatchesPlayerResponse(
             @Path("Id") long playerId
+    );
+
+    @GET("/api/teams/{Id}/matches")
+    Single<Response<List<TeamMatch>>> getMatchesTeamResponse(
+            @Path("Id") long teamId
     );
 
     @GET("/api/heroStats")

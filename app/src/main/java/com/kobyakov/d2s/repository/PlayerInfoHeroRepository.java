@@ -67,7 +67,11 @@ public class PlayerInfoHeroRepository {
                         },
                         err -> {
                             Log.e(TAG, err.getLocalizedMessage());
-                            statusCode.setValue(-200);
+                            if (err.getLocalizedMessage().contains("timeout")) {
+                                statusCode.setValue(-300);
+                            } else {
+                                statusCode.setValue(-200);
+                            }
                         }
                 );
     }
@@ -83,7 +87,6 @@ public class PlayerInfoHeroRepository {
     private SparseArray<Hero> sortHeroes(List<Hero> heroes) {
         SparseArray<Hero> sortedHeroes = new SparseArray<>();
         for (int i = 0; i < heroes.size(); i++) {
-            System.out.println("id = " + heroes.get(i).getId() + " HERO = " + heroes.get(i));
             sortedHeroes.put(heroes.get(i).getId(), heroes.get(i));
         }
         return sortedHeroes;

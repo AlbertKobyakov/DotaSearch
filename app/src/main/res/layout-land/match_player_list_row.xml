@@ -7,7 +7,6 @@
     android:layout_marginLeft="7dp"
     android:layout_marginRight="7dp"
     android:layout_marginTop="4dp"
-    card_view:cardBackgroundColor="@color/cardview_light_background"
     card_view:cardCornerRadius="3dp"
     card_view:contentPadding="10dp">
 
@@ -18,8 +17,9 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="@dimen/logo_hero_width"
-            android:layout_height="@dimen/logo_hero_height"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:contentDescription="@string/logo_hero_title" />
 
         <LinearLayout

@@ -7,4 +7,8 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="row_padding_vertical">5dp</dimen>
     <integer name="gallery_columns">8</integer>
+    <dimen name="logo_team_opposing_width">60dp</dimen>
+    <dimen name="logo_team_opposing_height">60dp</dimen>
+
+    <dimen name="hero_img_height_record">50dp</dimen>
 </resources>

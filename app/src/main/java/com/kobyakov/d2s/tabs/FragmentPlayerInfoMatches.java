@@ -22,9 +22,12 @@ import com.kobyakov.d2s.R;
 import com.kobyakov.d2s.RVEmptyObserver;
 import com.kobyakov.d2s.RecyclerTouchListener;
 import com.kobyakov.d2s.activity.MatchDetailActivity;
+import com.kobyakov.d2s.activity.PlayerInfoActivity;
 import com.kobyakov.d2s.adapter.PlayerInfoMatchesAdapter;
 import com.kobyakov.d2s.model.MatchShortInfo;
 import com.kobyakov.d2s.modelfactory.FactoryForPlayerInfoMatchesViewModel;
+import com.kobyakov.d2s.util.CheckLoadedData;
+import com.kobyakov.d2s.util.ExpandedAppBarListener;
 import com.kobyakov.d2s.viewModel.PlayerInfoMatchesViewModel;
 
 import java.util.List;
@@ -61,7 +64,7 @@ public class FragmentPlayerInfoMatches extends Fragment {
     @BindView(R.id.server_not_response)
     TextView serverNotResponse;
 
-    private FragmentPlayerInfoPros.ExpandedAppBarListener expandedAppBarListener;
+    private ExpandedAppBarListener expandedAppBarListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,11 +85,12 @@ public class FragmentPlayerInfoMatches extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.e(TAG, "onCreateView");
+
+        expandedAppBarListener = (ExpandedAppBarListener) getActivity();
+
         View view = inflater.inflate(LAYOUT, container, false);
 
-        expandedAppBarListener = (FragmentPlayerInfoPros.ExpandedAppBarListener) getActivity();
-
-        Log.e(TAG, "onCreateView");
         ButterKnife.bind(this, view);
 
         if (getArguments() != null) {
@@ -104,16 +108,16 @@ public class FragmentPlayerInfoMatches extends Fragment {
                     mAdapter.setData(matchList/*, heroList*/);
                     progressBar.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
+                    //expandedAppBarListener.onExpandAppBar(true);
                 } else {
                     progressBar.setVisibility(View.GONE);
                     forEmptyRecyclerSize.setVisibility(View.VISIBLE);
-                    expandedAppBarListener.onExpandedAppBar();
+                    expandedAppBarListener.onExpandAppBar(false);
                 }
             }
         });
 
         viewModel.getStatusCode().observe(this, statusCode -> {
-            Log.d(TAG, statusCode + " ");
             if (statusCode != null && matchList == null) {
                 Log.d(TAG, statusCode + "");
                 int fistNumberStatusCode = statusCode / 100;
@@ -123,16 +127,14 @@ public class FragmentPlayerInfoMatches extends Fragment {
                 if (fistNumberStatusCode > 2) {
                     blockError.setVisibility(View.VISIBLE);
                     text_network_error.setVisibility(View.VISIBLE);
-                    expandedAppBarListener.onExpandedAppBar();
                 } else if (fistNumberStatusCode == -2) {
                     blockError.setVisibility(View.VISIBLE);
                     text_no_internet.setVisibility(View.VISIBLE);
-                    expandedAppBarListener.onExpandedAppBar();
                 } else if (fistNumberStatusCode == -3) {
                     blockError.setVisibility(View.VISIBLE);
                     serverNotResponse.setVisibility(View.VISIBLE);
-                    expandedAppBarListener.onExpandedAppBar();
                 }
+                expandedAppBarListener.onExpandAppBar(false);
             }
         });
 
@@ -148,12 +150,7 @@ public class FragmentPlayerInfoMatches extends Fragment {
         recyclerView.setAdapter(mAdapter);
         mAdapter.registerAdapterDataObserver(new RVEmptyObserver(recyclerView, progressBar, recyclerView));
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                toMatchDetailActivity(position);
-            }
-        }));
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, (view, position) -> toMatchDetailActivity(position)));
     }
 
     public void toMatchDetailActivity(int position) {
@@ -165,6 +162,13 @@ public class FragmentPlayerInfoMatches extends Fragment {
 
     @OnClick(R.id.btn_refresh)
     public void refresh() {
+
+        PlayerInfoActivity activity = (PlayerInfoActivity) getActivity();
+        if (activity != null && !activity.isLoadPlayerOverviewCombine) {
+            CheckLoadedData checkLoadedData = ((CheckLoadedData) getActivity());
+            checkLoadedData.repeat();
+        }
+
         viewModel.repeatedRequest();
         progressBar.setVisibility(View.VISIBLE);
         blockError.setVisibility(View.GONE);

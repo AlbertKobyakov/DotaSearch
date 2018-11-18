@@ -54,70 +54,39 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2.2"
-                        android:orientation="vertical">
-
-                        <!--<TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />-->
+                        android:orientation="vertical"
+                        android:gravity="center">
 
                         <TextView
                             android:id="@+id/player_name"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:gravity="center"
                             android:maxLines="2"
                             android:text="@string/unknown"
                             android:textSize="30sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:visibility="visible"
+                            android:gravity="center"/>
+
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/refresh"/>
                     </LinearLayout>
 
-                    <RelativeLayout
-
+                    <include
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:gravity="center">
+                        layout="@layout/rank_tier_with_leaderboard_score"/>
 
-                        <ImageView
-                            android:id="@+id/player_rank_tier_image"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/unkalibrated" />
-
-                        <ImageView
-                            android:id="@+id/player_rank_tier_image_star"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                    </RelativeLayout>
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/linear_layout_2"
                     android:layout_width="match_parent"
                     android:layout_height="75dp"
-                    android:layout_weight="0.5">
-
-                    <!-- <LinearLayout
-                         android:layout_width="0dp"
-                         android:layout_height="match_parent"
-                         android:layout_weight="1"
-                         android:orientation="vertical">
-
-                         <TextView
-                             android:id="@+id/last_match_value"
-                             android:layout_width="match_parent"
-                             android:layout_height="wrap_content"
-                             android:gravity="center"
-                             android:text="@string/unknown"
-                             android:textStyle="bold"/>
-
-                         <TextView
-                             android:layout_width="match_parent"
-                             android:layout_height="wrap_content"
-                             android:gravity="center"
-                             android:text="Last Match" />
-
-                     </LinearLayout>-->
+                    android:baselineAligned="true">
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -129,7 +98,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Solo MMR" />
+                            android:text="@string/solo_mmr_title" />
 
                         <TextView
                             android:id="@+id/solo_mmr_value"
@@ -146,14 +115,14 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="2.2"
+                        android:layout_weight="2"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Record" />
+                            android:text="@string/wins_loses" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -168,8 +137,8 @@
                                 android:layout_marginRight="10dp"
                                 android:gravity="center"
                                 android:text="@string/default_count"
-                                android:textColor="@color/win"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:layout_marginEnd="10dp" />
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -183,8 +152,8 @@
                                 android:layout_marginLeft="10dp"
                                 android:gravity="center"
                                 android:text="@string/default_count"
-                                android:textColor="@color/lose"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:layout_marginStart="10dp" />
 
                         </LinearLayout>
 
@@ -193,14 +162,14 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
+                        android:layout_weight="1.2"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Win Rate" />
+                            android:text="@string/win_rate" />
 
                         <TextView
                             android:id="@+id/win_rate_value"
@@ -231,7 +200,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingBottom="?android:attr/actionBarSize"
-        app:behavior_overlapTop="80dp"
+        app:behavior_overlapTop="70dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <FrameLayout

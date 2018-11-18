@@ -53,7 +53,9 @@
     <string name="solo_mmr">%1$d</string>
     <string name="profile_hidden">This profile is hidden</string>
     <string name="radiant">Radiant</string>
+    <string name="radiant_title_chart">Radiant</string>
     <string name="dire">Dire</string>
+    <string name="dire_title_chart">Dire</string>
     <string name="skip">-</string>
     <string name="gold_per_min">GPM</string>
     <string name="xp_per_min">XPM</string>
@@ -117,7 +119,7 @@
     <string name="matches_against_win">%1s%%</string>
     <string name="team_mame">%1s</string>
     <string name="fragment_home">Home</string>
-    <string name="payer_image">Player Photo</string>
+    <string name="player_image">Player Photo</string>
     <string name="vector_icon">Vector icon Selected players</string>
     <string name="last_match_time_title">Last match</string>
     <string name="logo_hero_title">Hero logo</string>
@@ -161,10 +163,25 @@
     <string name="favorite">Favorite</string>
     <string name="together">Together</string>
     <string name="against">Against</string>
+    <string name="wins_title">Wins</string>
 
     <string name="gold_and_xp_marker">The advantage of %1$s at %2$d minutes was  %3$d</string>
     <string name="no_data_for_chart">No chart data available :(</string>
     <string name="server_not_response">The server is not responding. Please try again later.</string>
     <string name="no_games_with_pro">Did not play with PRO players</string>
     <string name="network_error">A network error occurred while downloading information. Please click on the \'Refresh\' button. If the error persists, try again later.</string>
+    <string name="player_rank_tier_image">Player rank tier image</string>
+    <string name="player_rank_tier_image_star">Player rank tier image star</string>
+    <string name="wins_loses">Wins/Losses</string>
+    <string name="solo_mmr_title">Solo MMR</string>
+    <string name="win_rate">Win Rate</string>
+    <string name="opposing_team_logo">Opposing team logo</string>
+    <string name="opposing_team_title">Opposing team</string>
+    <string name="current_team">Current Players</string>
+    <string name="former_players">Former Players</string>
+    <string name="team_logo">Team logo</string>
+    <string name="losses_title">Losses</string>
+    <string name="rating_title">Rating</string>
+
+    <string name="only_digital_value">%1$d</string>
 </resources>

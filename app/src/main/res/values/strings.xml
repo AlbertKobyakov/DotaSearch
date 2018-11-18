@@ -53,7 +53,9 @@
     <string name="solo_mmr">%1$d</string>
     <string name="profile_hidden">Этот профиль скрыт</string>
     <string name="radiant">Свет</string>
+    <string name="radiant_title_chart">Сил Света</string>
     <string name="dire">Тьма</string>
+    <string name="dire_title_chart">Сил Тьмы</string>
     <string name="skip">-</string>
     <string name="gold_per_min">GPM</string>
     <string name="xp_per_min">XPM</string>
@@ -96,7 +98,6 @@
     <string name="double_click_to_exit">Нажмите еще раз для выхода</string>
     <string name="player_remove_with_favorite_list">%1$s удален из избранного"</string>
 
-
     <string name="duration_title">Длительность</string>
     <string name="last_hits_title">Ластхит</string>
     <string name="gold_per_min_title">GPM</string>
@@ -118,7 +119,7 @@
     <string name="matches_against_win">%1s%%</string>
     <string name="team_mame">%1s</string>
     <string name="fragment_home">Главная</string>
-    <string name="payer_image">Фото игрока</string>
+    <string name="player_image">Фото игрока</string>
     <string name="vector_icon">Векторная иконка Избранные игроки</string>
     <string name="last_match_time_title">Последний матч</string>
     <string name="logo_hero_title">Логотип героя</string>
@@ -162,10 +163,25 @@
     <string name="favorite">Избранный</string>
     <string name="together">Вместе</string>
     <string name="against">Против</string>
+    <string name="wins_title">Побед</string>
 
     <string name="gold_and_xp_marker">Преимущество %1$s на %2$d минуте составило %3$d</string>
     <string name="no_data_for_chart">Данные для построения графика отсутствуют :(</string>
     <string name="server_not_response">Сервер не отвечает. Пожалуйста, попробуйте позже.</string>
     <string name="no_games_with_pro">Не играл с PRO игроками</string>
     <string name="network_error">Во время загрузки информации произошла сетевая ошибка. Пожалуйста нажмите на кнопку \'Обновить\'. Если ошибка не пропадает, попробуйте позже.</string>
+    <string name="player_rank_tier_image">Картинка ранга игрока</string>
+    <string name="player_rank_tier_image_star">Картинка звезд ранга</string>
+    <string name="wins_loses">Выиграл/Проиграл</string>
+    <string name="solo_mmr_title">Соло ММР</string>
+    <string name="win_rate">Доля Побед</string>
+    <string name="opposing_team_logo">Команда Противника Лого</string>
+    <string name="opposing_team_title">Противник</string>
+    <string name="current_team">Текущий состав</string>
+    <string name="former_players">Бывшие игроки</string>
+    <string name="team_logo">Логотип Команды</string>
+    <string name="losses_title">Поражений</string>
+    <string name="rating_title">Рейтинг</string>
+
+    <string name="only_digital_value">%1$d</string>
 </resources>

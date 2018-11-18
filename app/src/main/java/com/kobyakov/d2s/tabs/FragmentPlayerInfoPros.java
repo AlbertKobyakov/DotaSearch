@@ -25,6 +25,8 @@ import com.kobyakov.d2s.activity.PlayerInfoActivity;
 import com.kobyakov.d2s.adapter.PlayerProsAdapter;
 import com.kobyakov.d2s.model.Pros;
 import com.kobyakov.d2s.modelfactory.FactoryForPlayerInfoProsViewModel;
+import com.kobyakov.d2s.util.CheckLoadedData;
+import com.kobyakov.d2s.util.ExpandedAppBarListener;
 import com.kobyakov.d2s.viewModel.PlayerInfoProsViewModel;
 
 import java.util.List;
@@ -61,6 +63,8 @@ public class FragmentPlayerInfoPros extends Fragment {
     TextView text_network_error;
     @BindView(R.id.no_data_text)
     TextView text_no_data;
+    @BindView(R.id.server_not_response)
+    TextView serverNotResponse;
 
     private ExpandedAppBarListener expandedAppBarListener;
 
@@ -72,10 +76,6 @@ public class FragmentPlayerInfoPros extends Fragment {
         fragmentPlayerInfoPros.setArguments(bundle);
 
         return fragmentPlayerInfoPros;
-    }
-
-    public interface ExpandedAppBarListener {
-        void onExpandedAppBar();
     }
 
     @Nullable
@@ -102,23 +102,19 @@ public class FragmentPlayerInfoPros extends Fragment {
         viewModel.getPros().observe(this, pros -> {
             if (pros != null) {
                 if (pros.size() > 0) {
-                    /*Log.d(TAG, pros.size() + "");*/
                     allPros = pros;
 
-                    //remove first list item if it equals name current player
-                    Log.d(TAG, pros.get(0).getName() + " " + name);
-                    if (pros.get(0).getName().equals(name)){
-                        pros.remove(0);
-                    }
+                    removeRepeatFirstProPlayer(pros);
 
                     mAdapter.setData(pros);
                     progressBar.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
+                    //expandedAppBarListener.onExpandAppBar(true);
                 } else {
                     progressBar.setVisibility(View.GONE);
                     forEmptyRecyclerSize.setVisibility(View.VISIBLE);
                     Log.e(TAG, "expanded");
-                    expandedAppBarListener.onExpandedAppBar();
+                    expandedAppBarListener.onExpandAppBar(false);
                 }
             }
         });
@@ -135,12 +131,14 @@ public class FragmentPlayerInfoPros extends Fragment {
                 if (fistNumberStatusCode > 2) {
                     blockError.setVisibility(View.VISIBLE);
                     text_network_error.setVisibility(View.VISIBLE);
-                    expandedAppBarListener.onExpandedAppBar();
                 } else if (fistNumberStatusCode == -2) {
                     blockError.setVisibility(View.VISIBLE);
                     text_no_internet.setVisibility(View.VISIBLE);
-                    expandedAppBarListener.onExpandedAppBar();
+                } else if (fistNumberStatusCode == -3) {
+                    blockError.setVisibility(View.VISIBLE);
+                    serverNotResponse.setVisibility(View.VISIBLE);
                 }
+                expandedAppBarListener.onExpandAppBar(false);
             }
         });
 
@@ -149,6 +147,13 @@ public class FragmentPlayerInfoPros extends Fragment {
 
     @OnClick(R.id.btn_refresh)
     public void refresh() {
+
+        PlayerInfoActivity activity = (PlayerInfoActivity) getActivity();
+        if (activity != null && !activity.isLoadPlayerOverviewCombine) {
+            CheckLoadedData checkLoadedData = ((CheckLoadedData) getActivity());
+            checkLoadedData.repeat();
+        }
+
         viewModel.repeatedRequest();
         progressBar.setVisibility(View.VISIBLE);
         blockError.setVisibility(View.GONE);
@@ -157,6 +162,13 @@ public class FragmentPlayerInfoPros extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    private void removeRepeatFirstProPlayer(List<Pros> prosList) {
+        //remove first list item if it equals name current player
+        if (prosList.get(0).getName().equals(name)) {
+            prosList.remove(0);
+        }
     }
 
     public void setAdapterAndRecyclerView() {

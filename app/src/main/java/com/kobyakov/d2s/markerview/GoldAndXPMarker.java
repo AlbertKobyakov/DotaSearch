@@ -23,7 +23,7 @@ public class GoldAndXPMarker extends MarkerView {
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         float currentValue = e.getY();
-        String typeTeam = e.getY() > 0 ? context.getString(R.string.radiant) : context.getString(R.string.dire);
+        String typeTeam = e.getY() > 0 ? context.getString(R.string.radiant_title_chart) : context.getString(R.string.dire_title_chart);
         int minute = (int)e.getX();
         int value = e.getY() > 0 ? (int)e.getY() : (int)e.getY() * -1;
         String tooltip = context.getString(R.string.gold_and_xp_marker, typeTeam, minute, value);

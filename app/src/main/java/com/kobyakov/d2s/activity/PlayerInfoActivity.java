@@ -1,11 +1,8 @@
 package com.kobyakov.d2s.activity;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -34,6 +31,8 @@ import com.kobyakov.d2s.modelfactory.FactoryForPlayerInfoViewModel;
 import com.kobyakov.d2s.tabs.FragmentPlayerInfoPros;
 import com.kobyakov.d2s.tabs.FragmentPlayerInfoHeroes;
 import com.kobyakov.d2s.tabs.FragmentPlayerInfoMatches;
+import com.kobyakov.d2s.util.CheckLoadedData;
+import com.kobyakov.d2s.util.ExpandedAppBarListener;
 import com.kobyakov.d2s.viewModel.PlayerInfoViewModel;
 
 import java.text.DecimalFormat;
@@ -42,7 +41,7 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PlayerInfoActivity extends AppCompatActivity implements FragmentPlayerInfoPros.ExpandedAppBarListener {
+public class PlayerInfoActivity extends AppCompatActivity implements ExpandedAppBarListener, CheckLoadedData {
 
     public static final String TAG = "PlayerInfoActivity";
     public static final int LAYOUT = R.layout.activity_player_info;
@@ -61,6 +60,8 @@ public class PlayerInfoActivity extends AppCompatActivity implements FragmentPla
 
     private LiveData<Boolean> isFavorite;
     private RequestManager glide;
+
+    public boolean isLoadPlayerOverviewCombine;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -86,6 +87,8 @@ public class PlayerInfoActivity extends AppCompatActivity implements FragmentPla
     BottomNavigationView navigation;
     @BindView(R.id.appBar)
     AppBarLayout appBarLayout;
+    @BindView(R.id.leaderboard_score)
+    TextView leaderboardScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,22 +108,19 @@ public class PlayerInfoActivity extends AppCompatActivity implements FragmentPla
         fragmentPlayerInfoHeroes = FragmentPlayerInfoHeroes.newInstance(accountId);
         fragmentPlayerInfoPros = FragmentPlayerInfoPros.newInstance(accountId, name);
 
-        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.player_overview:
-                        changeFragment(fragmentPlayerInfoMatches, "fragmentPlayerInfoMatches");
-                        return true;
-                    case R.id.pros:
-                        changeFragment(fragmentPlayerInfoPros, "fragmentPlayerInfoPros");
-                        return true;
-                    case R.id.navigation_notifications:
-                        changeFragment(fragmentPlayerInfoHeroes, "fragmentPlayerInfoHeroes");
-                        return true;
-                }
-                return false;
+        navigation.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.player_overview:
+                    changeFragment(fragmentPlayerInfoMatches, "fragmentPlayerInfoMatches");
+                    return true;
+                case R.id.pros:
+                    changeFragment(fragmentPlayerInfoPros, "fragmentPlayerInfoPros");
+                    return true;
+                case R.id.navigation_notifications:
+                    changeFragment(fragmentPlayerInfoHeroes, "fragmentPlayerInfoHeroes");
+                    return true;
             }
+            return false;
         });
 
         if (savedInstanceState == null) {
@@ -129,21 +129,19 @@ public class PlayerInfoActivity extends AppCompatActivity implements FragmentPla
 
         viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoViewModel(accountId)).get(PlayerInfoViewModel.class);
         LiveData<PlayerOverviewCombine> playerFullInfo = viewModel.getPlayerFullInfo();
-        playerFullInfo.observe(this, new Observer<PlayerOverviewCombine>() {
-            @Override
-            public void onChanged(@Nullable PlayerOverviewCombine playerOverviewCombine) {
-                Log.e("FRAGMENT", "777777777777777777777");
+        playerFullInfo.observe(this, playerOverviewCombine -> {
+            if (playerOverviewCombine != null) {
 
-                if (playerOverviewCombine != null) {
+                playerInfo = playerOverviewCombine.getPlayerInfo();
+                winLose = playerOverviewCombine.getWinLose();
 
-                    playerInfo = playerOverviewCombine.getPlayerInfo();
-                    winLose = playerOverviewCombine.getWinLose();
-
-                    if (playerInfo.getErrorMessage() == null && winLose.getErrorMessage() == null) {
-                        setToolbarTitle(getRealPlayerName(playerInfo));
-                        setPlayerSoloMMRNameImgAndRankTier(playerInfo);
-                        setPlayerRecordAndWinRate(winLose);
-                    }
+                if (playerInfo.getErrorMessage() == null && winLose.getErrorMessage() == null) {
+                    setToolbarTitle(getRealPlayerName(playerInfo));
+                    setPlayerSoloMMRNameImgAndRankTier(playerInfo);
+                    setPlayerRecordAndWinRate(winLose);
+                    isLoadPlayerOverviewCombine = true;
+                } else {
+                    isLoadPlayerOverviewCombine = false;
                 }
             }
         });
@@ -203,18 +201,21 @@ public class PlayerInfoActivity extends AppCompatActivity implements FragmentPla
             long first = rank / 10;
             long second = rank - (first * 10);
 
-            if (leaderBoard == 1) {
+            if (leaderBoard != 0) {
+                leaderboardScore.setText(new StringBuilder().append(leaderBoard));
+            }
+
+            if (leaderBoard > 1 && leaderBoard <= 10) {
                 playerRankTierImage.setImageResource(R.drawable.top_1_rank);
+            } else if (leaderBoard > 10 && leaderBoard <= 100) {
+                playerRankTierImage.setImageResource(R.drawable.top_11_100_rank);
+            } else if (leaderBoard > 100 && leaderBoard <= 1000) {
+                playerRankTierImage.setImageResource(R.drawable.rank_icon_8);
             } else if (first == 7 && second == 6) {
 
                 String nameGeneralImg;
-                if (leaderBoard <= 10) {
-                    nameGeneralImg = "rank_icon_" + first + "c";
-                } else if (leaderBoard <= 100) {
-                    nameGeneralImg = "rank_icon_" + first + "b";
-                } else {
-                    nameGeneralImg = "rank_icon_" + first + "a";
-                }
+
+                nameGeneralImg = "rank_icon_" + first + "a";
 
                 int id = getResources().getIdentifier(nameGeneralImg, "drawable", getPackageName());
                 playerRankTierImage.setImageResource(id);
@@ -235,12 +236,6 @@ public class PlayerInfoActivity extends AppCompatActivity implements FragmentPla
     }
 
     private void initToolbar() {
-        /*if (Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation) {
-            appBarLayout.setExpanded(false, true);
-        } else {
-            appBarLayout.setExpanded(true, true);
-        }*/
-
         toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -301,8 +296,8 @@ public class PlayerInfoActivity extends AppCompatActivity implements FragmentPla
             item.setIcon(getResources().getDrawable(R.mipmap.ic_star_outline_white_48dp));
             viewModel.deletePlayerWithFavoriteList(accountId);
             Snackbar.make(findViewById(R.id.navigation), getString(R.string.removed_from_favorites), Snackbar.LENGTH_SHORT).show();
-        } else if (id == R.id.star && !isFavorite.getValue()) {
-            if (playerInfo != null) {
+        } else if (id == R.id.star && isFavorite.getValue() != null && !isFavorite.getValue()) {
+            if (playerInfo != null && playerInfo.getProfile() != null) {
                 viewModel.insertPlayerToFavoriteList(new FavoritePlayer(accountId, urlPlayerImg, getRealPlayerName(playerInfo)));
                 item.setIcon(getResources().getDrawable(R.mipmap.ic_star_white_48dp));
                 Snackbar.make(findViewById(R.id.navigation), getString(R.string.add_to_favorites), Snackbar.LENGTH_SHORT).show();
@@ -318,8 +313,10 @@ public class PlayerInfoActivity extends AppCompatActivity implements FragmentPla
         if (playerInfo.getProfile() != null) {
             if (playerInfo.getProfile().getName() != null) {
                 name = playerInfo.getProfile().getName();
-            } else {
+            } else if (playerInfo.getProfile().getPersonaname() != null) {
                 name = playerInfo.getProfile().getPersonaname();
+            } else {
+                name = getString(R.string.unknown);
             }
         }
 
@@ -333,7 +330,12 @@ public class PlayerInfoActivity extends AppCompatActivity implements FragmentPla
     }
 
     @Override
-    public void onExpandedAppBar() {
-        appBarLayout.setExpanded(false, true);
+    public void onExpandAppBar(boolean isExpand) {
+        appBarLayout.setExpanded(isExpand, true);
+    }
+
+    @Override
+    public void repeat() {
+        viewModel.repeatRequestGetPlayerFullInfo();
     }
 }

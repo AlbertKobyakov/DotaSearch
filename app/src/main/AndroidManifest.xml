@@ -25,6 +25,7 @@
         <activity android:name="com.kobyakov.d2s.activity.FoundPlayerActivity" />
         <activity android:name="com.kobyakov.d2s.activity.PlayerInfoActivity" />
         <activity android:name="com.kobyakov.d2s.activity.MatchDetailActivity" />
+        <activity android:name=".activity.TeamInfoActivity" />
     </application>
 
 </manifest>

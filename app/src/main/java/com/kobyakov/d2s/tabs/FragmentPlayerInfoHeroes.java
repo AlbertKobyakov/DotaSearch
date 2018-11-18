@@ -1,6 +1,5 @@
 package com.kobyakov.d2s.tabs;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,9 +19,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.kobyakov.d2s.R;
 import com.kobyakov.d2s.RVEmptyObserver;
+import com.kobyakov.d2s.activity.PlayerInfoActivity;
 import com.kobyakov.d2s.adapter.PlayerInfoHeroesAdapter;
 import com.kobyakov.d2s.model.PlayerHero;
 import com.kobyakov.d2s.modelfactory.FactoryForPlayerInfoHeroViewModel;
+import com.kobyakov.d2s.util.CheckLoadedData;
+import com.kobyakov.d2s.util.ExpandedAppBarListener;
 import com.kobyakov.d2s.viewModel.PlayerInfoHeroesViewModel;
 
 import java.util.List;
@@ -54,6 +56,10 @@ public class FragmentPlayerInfoHeroes extends Fragment {
     TextView text_network_error;
     @BindView(R.id.for_empty_recycler_size)
     LinearLayout forEmptyRecyclerSize;
+    @BindView(R.id.server_not_response)
+    TextView serverNotResponse;
+
+    private ExpandedAppBarListener expandedAppBarListener;
 
     public static FragmentPlayerInfoHeroes newInstance(long accountId) {
         FragmentPlayerInfoHeroes fragmentPlayerInfoHeroes = new FragmentPlayerInfoHeroes();
@@ -69,6 +75,8 @@ public class FragmentPlayerInfoHeroes extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.e(TAG, "onCreateView");
 
+        expandedAppBarListener = (ExpandedAppBarListener) getActivity();
+
         view = inflater.inflate(LAYOUT, container, false);
 
         ButterKnife.bind(this, view);
@@ -79,19 +87,18 @@ public class FragmentPlayerInfoHeroes extends Fragment {
 
         viewModel = ViewModelProviders.of(this, new FactoryForPlayerInfoHeroViewModel(accountId)).get(PlayerInfoHeroesViewModel.class);
 
-        viewModel.getPlayerHeroes().observe(this, new Observer<List<PlayerHero>>() {
-            @Override
-            public void onChanged(@Nullable List<PlayerHero> playerHeroesResponse) {
-                if (playerHeroesResponse != null) {
-                    if (playerHeroesResponse.size() > 0) {
-                        playerHeroes = playerHeroesResponse;
-                        mAdapter.setData(playerHeroesResponse/*, heroList*/);
-                        progressBar.setVisibility(View.GONE);
-                        recyclerView.setVisibility(View.VISIBLE);
-                    } else {
-                        progressBar.setVisibility(View.GONE);
-                        forEmptyRecyclerSize.setVisibility(View.VISIBLE);
-                    }
+        viewModel.getPlayerHeroes().observe(this, playerHeroesResponse -> {
+            if (playerHeroesResponse != null) {
+                if (playerHeroesResponse.size() > 0) {
+                    playerHeroes = playerHeroesResponse;
+                    mAdapter.setData(playerHeroesResponse/*, heroList*/);
+                    progressBar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    //expandedAppBarListener.onExpandAppBar(true);
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                    forEmptyRecyclerSize.setVisibility(View.VISIBLE);
+                    expandedAppBarListener.onExpandAppBar(false);
                 }
             }
         });
@@ -109,7 +116,11 @@ public class FragmentPlayerInfoHeroes extends Fragment {
                 } else if (fistNumberStatusCode == -2) {
                     blockError.setVisibility(View.VISIBLE);
                     text_no_internet.setVisibility(View.VISIBLE);
+                } else if (fistNumberStatusCode == -3) {
+                    blockError.setVisibility(View.VISIBLE);
+                    serverNotResponse.setVisibility(View.VISIBLE);
                 }
+                expandedAppBarListener.onExpandAppBar(false);
             }
         });
 
@@ -140,6 +151,13 @@ public class FragmentPlayerInfoHeroes extends Fragment {
 
     @OnClick(R.id.btn_refresh)
     public void refresh() {
+
+        PlayerInfoActivity activity = (PlayerInfoActivity) getActivity();
+        if (activity != null && !activity.isLoadPlayerOverviewCombine) {
+            CheckLoadedData checkLoadedData = ((CheckLoadedData) getActivity());
+            checkLoadedData.repeat();
+        }
+
         viewModel.repeatedRequest();
         progressBar.setVisibility(View.VISIBLE);
         blockError.setVisibility(View.GONE);

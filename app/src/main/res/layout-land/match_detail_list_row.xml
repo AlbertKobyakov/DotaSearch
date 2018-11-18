@@ -60,7 +60,7 @@
                 android:id="@+id/text_view_1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
+                android:layout_weight="0.3"
                 android:gravity="center"
                 android:text="@string/hero_name_title"
                 android:textColor="@color/white"

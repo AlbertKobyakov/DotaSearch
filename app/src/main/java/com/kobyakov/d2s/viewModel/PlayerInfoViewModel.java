@@ -8,8 +8,6 @@ import com.kobyakov.d2s.model.FavoritePlayer;
 import com.kobyakov.d2s.model.PlayerOverviewCombine;
 import com.kobyakov.d2s.repository.PlayerInfoRepository;
 
-import io.reactivex.Single;
-
 public class PlayerInfoViewModel extends ViewModel {
     private static final String TAG = "PlayerInfoViewModel";
 
@@ -47,7 +45,7 @@ public class PlayerInfoViewModel extends ViewModel {
         repository.deletePlayerWithFavoriteList(accountId);
     }
 
-    public Single<Boolean> hasInternet() {
-        return repository.hasInternetConnection();
+    public void repeatRequestGetPlayerFullInfo() {
+        repository.sendRequestForDataPlayerFullInfo();
     }
 }

@@ -1,8 +1,8 @@
 package com.kobyakov.d2s.tabs;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,12 +25,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.kobyakov.d2s.R;
+import com.kobyakov.d2s.RecyclerTouchListener;
+import com.kobyakov.d2s.activity.TeamInfoActivity;
 import com.kobyakov.d2s.adapter.ProTeamAdapter;
 import com.kobyakov.d2s.model.Team;
 import com.kobyakov.d2s.viewModel.ProTeamsViewModel;
 
-import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -77,15 +80,12 @@ public class TabProTeam extends Fragment {
 
         viewModel = ViewModelProviders.of(this).get(ProTeamsViewModel.class);
 
-        viewModel.getTeams().observe(this, new Observer<List<Team>>() {
-            @Override
-            public void onChanged(@Nullable List<Team> teams) {
-                if (teams != null) {
-                    if(teams.size() > 0){
-                        mAdapter.setData(teams);
-                        recyclerView.setVisibility(View.VISIBLE);
-                        progressBar.setVisibility(View.GONE);
-                    }
+        viewModel.getTeams().observe(this, teams -> {
+            if (teams != null) {
+                if (teams.size() > 0) {
+                    mAdapter.setData(teams);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         });
@@ -93,12 +93,12 @@ public class TabProTeam extends Fragment {
         viewModel.getStatusCode().observe(this, responseStatusCode -> {
             Log.d(TAG, "responseCode: " + responseStatusCode);
 
-            if(responseStatusCode != null){
-                if(responseStatusCode > 200){
+            if (responseStatusCode != null) {
+                if (responseStatusCode > 200) {
                     blockError.setVisibility(View.VISIBLE);
                     networkError.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
-                } else if(responseStatusCode == -200){
+                } else if (responseStatusCode == -200) {
                     blockError.setVisibility(View.VISIBLE);
                     noInternet.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
@@ -126,19 +126,25 @@ public class TabProTeam extends Fragment {
 
     public void setAdapterAndRecyclerView() {
         mAdapter = new ProTeamAdapter(getActivity(), Glide.with(this));
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), calculateNoOfColumns(getContext())));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), calculateNoOfColumns(Objects.requireNonNull(getContext()))));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
         recyclerView.hasFixedSize();
 
-        /*recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                if (mAdapter.getTeamsForAdapter() != null && mAdapter.getTeamsForAdapter().size() >= position) {
-                    Toast.makeText(getContext(), mAdapter.getTeamsForAdapter().get(position).getTeamId() + "", Toast.LENGTH_SHORT).show();
-                }
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, (view, position) -> {
+            if (mAdapter.getTeamsForAdapter() != null && mAdapter.getTeamsForAdapter().size() >= position) {
+                Team team = mAdapter.getTeamsForAdapter().get(position);
+                goToTeamInfoActivity(team);
             }
-        }));*/
+        }));
+    }
+
+    public void goToTeamInfoActivity(Team team) {
+        Intent intent = new Intent(getContext(), TeamInfoActivity.class);
+        Gson gson = new Gson();
+        String teamGson = gson.toJson(team);
+        intent.putExtra("teamGson", teamGson);
+        startActivity(intent);
     }
 
     public static int calculateNoOfColumns(Context context) {
