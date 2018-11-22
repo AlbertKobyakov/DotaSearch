@@ -1,9 +1,7 @@
 package com.kobyakov.d2s.adapter;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,7 +39,6 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
         TextView teamNameProPlayer;
         @BindView(R.id.imageView)
         ImageView imageView;
-        @Nullable
         @BindView(R.id.country_pro_player)
         TextView countryProPlayer;
 
@@ -104,13 +101,11 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.imageView);
 
-            if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
-                if (holder.countryProPlayer != null) {
-                    if (proPlayer.getCountryCode().trim().length() > 0) {
-                        holder.countryProPlayer.setText(proPlayer.getCountryCode());
-                    } else {
-                        holder.countryProPlayer.setText(context.getResources().getString(R.string.unknown));
-                    }
+            if (holder.countryProPlayer != null) {
+                if (proPlayer.getCountryCode().trim().length() > 0) {
+                    holder.countryProPlayer.setText(proPlayer.getCountryCode());
+                } else {
+                    holder.countryProPlayer.setText(context.getResources().getString(R.string.unknown));
                 }
             }
 
@@ -120,8 +115,6 @@ public class ProPlayerAdapter extends RecyclerView.Adapter<ProPlayerAdapter.MyVi
 
     @Override
     public int getItemCount() {
-
-        Log.e(TAG, (proPlayers != null) + "kkkk");
         if (proPlayers != null) {
             return proPlayers.size();
         } else {

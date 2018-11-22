@@ -35,7 +35,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.disposables.CompositeDisposable;
+import butterknife.Unbinder;
 
 public class FragmentPlayerInfoMatches extends Fragment {
 
@@ -45,9 +45,9 @@ public class FragmentPlayerInfoMatches extends Fragment {
 
     private PlayerInfoMatchesAdapter mAdapter;
     private List<MatchShortInfo> matchList;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private PlayerInfoMatchesViewModel viewModel;
     private long accountId;
+    private Unbinder unbinder;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -91,7 +91,7 @@ public class FragmentPlayerInfoMatches extends Fragment {
 
         View view = inflater.inflate(LAYOUT, container, false);
 
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         if (getArguments() != null) {
             accountId = getArguments().getLong(ACCOUNT_ID);
@@ -177,7 +177,6 @@ public class FragmentPlayerInfoMatches extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        compositeDisposable.dispose();
-        //Toast.makeText(getContext(), "onDestroyView", Toast.LENGTH_SHORT).show();
+        unbinder.unbind();
     }
 }

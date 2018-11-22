@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +30,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 
 public class FragmentTeamInfoHeroes extends Fragment {
     private static final String TAG = "FragmentTeamInfoHeroes";
@@ -42,6 +43,7 @@ public class FragmentTeamInfoHeroes extends Fragment {
     private TeamInfoHeroesViewModel viewModel;
 
     private ExpandedAppBarListener expandedAppBarListener;
+    private Unbinder unbinder;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -76,7 +78,7 @@ public class FragmentTeamInfoHeroes extends Fragment {
 
         View view = inflater.inflate(LAYOUT, container, false);
 
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         if (getArguments() != null) {
             accountId = getArguments().getLong(ACCOUNT_ID);
@@ -133,17 +135,10 @@ public class FragmentTeamInfoHeroes extends Fragment {
 
     public void setAdapterAndRecyclerView() {
         mAdapter = new TeamInfoHeroesAdapter(getActivity(), Glide.with(this));
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.number_row_in_line_heroes_team)));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
         mAdapter.registerAdapterDataObserver(new RVEmptyObserver(recyclerView, progressBar, recyclerView));
-
-        /*recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                Toast.makeText(getContext(), mAdapter.getPlayerHeroByPosition(position).getHeroId() + "", Toast.LENGTH_SHORT).show();
-            }
-        }));*/
     }
 
     @OnClick(R.id.btn_refresh)
@@ -151,5 +146,11 @@ public class FragmentTeamInfoHeroes extends Fragment {
         viewModel.repeatedRequest();
         progressBar.setVisibility(View.VISIBLE);
         blockError.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

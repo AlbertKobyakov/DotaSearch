@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -99,12 +99,12 @@ public class TabProPlayers extends Fragment {
         viewModel.getStatusCode().observe(this, responseStatusCode -> {
             Log.d(TAG, "responseCode: " + responseStatusCode);
 
-            if(responseStatusCode != null){
-                if(responseStatusCode > 200){
+            if (responseStatusCode != null) {
+                if (responseStatusCode > 200) {
                     blockError.setVisibility(View.VISIBLE);
                     networkError.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
-                } else if(responseStatusCode == -200){
+                } else if (responseStatusCode == -200) {
                     blockError.setVisibility(View.VISIBLE);
                     noInternet.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
@@ -169,7 +169,7 @@ public class TabProPlayers extends Fragment {
     public void setAdapterAndRecyclerView() {
         Log.e(TAG, "setAdapterAndRecyclerView");
         mAdapter = new ProPlayerAdapter(getActivity(), Glide.with(this));
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.number_row_in_line_tab_pro_players)));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
     }

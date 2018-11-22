@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinator_player_info"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -68,10 +69,10 @@
                     </LinearLayout>
 
                     <include
+                        layout="@layout/rank_tier_with_leaderboard_score"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        layout="@layout/rank_tier_with_leaderboard_score"/>
+                        android:layout_weight="1" />
 
                 </LinearLayout>
 
@@ -127,11 +128,11 @@
                                 android:id="@+id/count_win"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginEnd="10dp"
                                 android:layout_marginRight="10dp"
                                 android:gravity="center"
                                 android:text="@string/default_count"
-                                android:textStyle="bold"
-                                android:layout_marginEnd="10dp" />
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -142,11 +143,11 @@
                                 android:id="@+id/count_lose"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
                                 android:layout_marginLeft="10dp"
                                 android:gravity="center"
                                 android:text="@string/default_count"
-                                android:textStyle="bold"
-                                android:layout_marginStart="10dp" />
+                                android:textStyle="bold" />
 
                         </LinearLayout>
 
@@ -194,7 +195,8 @@
         android:orientation="vertical"
         android:paddingBottom="?android:attr/actionBarSize"
         app:behavior_overlapTop="70dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="MissingPrefix">
 
         <FrameLayout
             android:id="@+id/content"

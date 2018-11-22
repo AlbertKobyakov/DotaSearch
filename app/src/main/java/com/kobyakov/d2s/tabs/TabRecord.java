@@ -5,10 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,11 +31,14 @@ import com.kobyakov.d2s.adapter.RecordAdapter;
 import com.kobyakov.d2s.modelfactory.FactoryForRecordViewModel;
 import com.kobyakov.d2s.viewModel.RecordViewModel;
 
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
+import static android.widget.LinearLayout.HORIZONTAL;
 import static android.widget.LinearLayout.VERTICAL;
 
 public class TabRecord extends Fragment {
@@ -107,7 +111,7 @@ public class TabRecord extends Fragment {
         viewModel = ViewModelProviders.of(this, new FactoryForRecordViewModel(titleRecord)).get(RecordViewModel.class);
         viewModel.getRecordListLiveData().observe(this, records -> {
             if (records != null) {
-                if(records.size() > 0){
+                if (records.size() > 0) {
                     Log.d(TAG, records.size() + " = size record");
                     mAdapter.setData(records);
                     recyclerView.setVisibility(View.VISIBLE);
@@ -117,12 +121,12 @@ public class TabRecord extends Fragment {
         });
 
         viewModel.getStatusCode().observe(this, responseStatusCode -> {
-            if(responseStatusCode != null){
-                if(responseStatusCode > 200){
+            if (responseStatusCode != null) {
+                if (responseStatusCode > 200) {
                     blockError.setVisibility(View.VISIBLE);
                     networkError.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
-                } else if(responseStatusCode == -200){
+                } else if (responseStatusCode == -200) {
                     blockError.setVisibility(View.VISIBLE);
                     noInternet.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
@@ -146,67 +150,52 @@ public class TabRecord extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         MenuItem itemSortByDateUp = menu.findItem(R.id.sort_date_up);
-        itemSortByDateUp.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                mAdapter.sortByDateUp();
-                return false;
-            }
+        itemSortByDateUp.setOnMenuItemClickListener(menuItem -> {
+            mAdapter.sortByDateUp();
+            return false;
         });
 
         MenuItem itemSortByDateDown = menu.findItem(R.id.sort_date_down);
-        itemSortByDateDown.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                mAdapter.sortByDateDown();
-                return false;
-            }
+        itemSortByDateDown.setOnMenuItemClickListener(menuItem -> {
+            mAdapter.sortByDateDown();
+            return false;
         });
 
         MenuItem itemSortByScoreUp = menu.findItem(R.id.sort_score_up);
-        itemSortByScoreUp.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                mAdapter.sortByScoreUp();
-                return false;
-            }
+        itemSortByScoreUp.setOnMenuItemClickListener(menuItem -> {
+            mAdapter.sortByScoreUp();
+            return false;
         });
 
         MenuItem itemSortByScoreDown = menu.findItem(R.id.sort_score_down);
-        itemSortByScoreDown.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                mAdapter.sortByScoreDown();
-                return false;
-            }
+        itemSortByScoreDown.setOnMenuItemClickListener(menuItem -> {
+            mAdapter.sortByScoreDown();
+            return false;
         });
     }
 
     public void setRecyclerViewAdapter() {
         mAdapter = new RecordAdapter(getActivity(), titleTab, titleRecord, Glide.with(this));
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.number_row_in_line_record));
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
         if (getContext() != null) {
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), VERTICAL));
+            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), HORIZONTAL));
         }
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                long matchId = mAdapter.getMatchIdByPosition(position);
-                if (matchId > 0) {
-                    goToMatchDetailActivity(matchId);
-                } else {
-                    Toast.makeText(getContext(), "Нет данных о матче", Toast.LENGTH_SHORT).show();
-                }
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, (view, position) -> {
+            long matchId = mAdapter.getMatchIdByPosition(position);
+            if (matchId > 0) {
+                goToMatchDetailActivity(matchId);
+            } else {
+                Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.bottom_navigation_view), R.string.no_data_about_the_game, Snackbar.LENGTH_SHORT).show();
             }
         }));
     }
 
     public void goToMatchDetailActivity(long matchId) {
-        Log.e("44444444", "444444444444442");
         Intent intent = new Intent(getActivity(), MatchDetailActivity.class);
         intent.putExtra("matchId", matchId);
         startActivity(intent);

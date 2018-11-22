@@ -1,9 +1,7 @@
 package com.kobyakov.d2s.adapter;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -40,10 +38,8 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
         @BindView(R.id.imageView)
         ImageView imageView;
 
-        @Nullable
         @BindView(R.id.match_duration)
         TextView duration;
-        @Nullable
         @BindView(R.id.match_date)
         TextView date;
 
@@ -74,15 +70,15 @@ public class PlayerInfoMatchesAdapter extends RecyclerView.Adapter<PlayerInfoMat
         if (matchesCopy != null) {
             MatchShortInfo matchShortInfo = matchesCopy.get(position);
 
-            if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
-                long seconds = matchShortInfo.getDuration();
-                String duration = DateUtils.formatElapsedTime(seconds);
-                long secondsMatchStartTime = (matchShortInfo.getStartTime()) * 1000;
-                String matchStartDate = DateUtils.getRelativeTimeSpanString(secondsMatchStartTime).toString();
+            //if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
+            long seconds = matchShortInfo.getDuration();
+            String duration = DateUtils.formatElapsedTime(seconds);
+            long secondsMatchStartTime = (matchShortInfo.getStartTime()) * 1000;
+            String matchStartDate = DateUtils.getRelativeTimeSpanString(secondsMatchStartTime).toString();
 
-                Objects.requireNonNull(holder.duration).setText(context.getResources().getString(R.string.match_duration, duration));
-                Objects.requireNonNull(holder.date).setText(matchStartDate);
-            }
+            Objects.requireNonNull(holder.duration).setText(context.getResources().getString(R.string.match_duration, duration));
+            Objects.requireNonNull(holder.date).setText(matchStartDate);
+            //}
 
             String heroImg = matchShortInfo.getHeroImageUrl();
             String heroName = matchShortInfo.getHeroName();

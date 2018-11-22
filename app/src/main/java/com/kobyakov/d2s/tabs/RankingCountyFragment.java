@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -32,6 +33,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
+import static android.widget.LinearLayout.HORIZONTAL;
 import static android.widget.LinearLayout.VERTICAL;
 
 public class RankingCountyFragment extends Fragment {
@@ -124,12 +126,13 @@ public class RankingCountyFragment extends Fragment {
 
     public void setRecyclerViewAdapter() {
         mAdapter = new RankingAdapter(getActivity(), Glide.with(this));
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.number_row_in_line_ranking));
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
         if (getContext() != null) {
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), VERTICAL));
+            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), HORIZONTAL));
         }
     }
 

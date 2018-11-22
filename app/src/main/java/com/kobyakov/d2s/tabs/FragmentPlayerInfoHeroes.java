@@ -32,6 +32,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 
 public class FragmentPlayerInfoHeroes extends Fragment {
     private static final String TAG = "FragmentPlayerHeroes";
@@ -43,6 +44,7 @@ public class FragmentPlayerInfoHeroes extends Fragment {
     private long accountId;
     private List<PlayerHero> playerHeroes;
     private PlayerInfoHeroesViewModel viewModel;
+    private Unbinder unbinder;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -79,7 +81,7 @@ public class FragmentPlayerInfoHeroes extends Fragment {
 
         view = inflater.inflate(LAYOUT, container, false);
 
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         if (getArguments() != null) {
             accountId = getArguments().getLong(ACCOUNT_ID);
@@ -140,13 +142,6 @@ public class FragmentPlayerInfoHeroes extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
         mAdapter.registerAdapterDataObserver(new RVEmptyObserver(recyclerView, progressBar, recyclerView));
-
-        /*recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                Toast.makeText(getContext(), mAdapter.getPlayerHeroByPosition(position).getHeroId() + "", Toast.LENGTH_SHORT).show();
-            }
-        }));*/
     }
 
     @OnClick(R.id.btn_refresh)
@@ -161,5 +156,11 @@ public class FragmentPlayerInfoHeroes extends Fragment {
         viewModel.repeatedRequest();
         progressBar.setVisibility(View.VISIBLE);
         blockError.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

@@ -1,6 +1,5 @@
 package com.kobyakov.d2s.activity;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,14 +7,13 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -28,7 +26,6 @@ import com.kobyakov.d2s.viewModel.FoundPlayerViewModel;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -77,43 +74,37 @@ public class FoundPlayerActivity extends AppCompatActivity {
         initToolbar();
 
         viewModel = ViewModelProviders.of(this).get(FoundPlayerViewModel.class);
-        viewModel.getFoundPlayers().observe(this, new Observer<List<FoundPlayer>>() {
-            @Override
-            public void onChanged(@Nullable List<FoundPlayer> foundPlayers) {
-                if (foundPlayers != null && foundPlayers.size() > 0) {
-                    mAdapter.setData(foundPlayers);
-                    textToolbarParallax2.setText(getResources().getString(R.string.found, query));
-                    textToolbarParallax3.setText(getResources().getString(R.string.result_search_query, foundPlayers.size()));
-                }
+        viewModel.getFoundPlayers().observe(this, foundPlayers -> {
+            if (foundPlayers != null && foundPlayers.size() > 0) {
+                mAdapter.setData(foundPlayers);
+                textToolbarParallax2.setText(getResources().getString(R.string.found, query));
+                textToolbarParallax3.setText(getResources().getString(R.string.result_search_query, foundPlayers.size()));
             }
         });
     }
 
     public void setAdapterAndRecyclerView() {
         mAdapter = new FoundPlayerAdapter(getApplicationContext(), Glide.with(this));
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getApplicationContext(), getResources().getInteger(R.integer.number_row_in_line_found_players));
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                foundPlayer = mAdapter.getFoundPlayerByPosition(position);
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, (view, position) -> {
+            foundPlayer = mAdapter.getFoundPlayerByPosition(position);
 
-                Disposable dis = hasInternetConnection().subscribe(
-                        isInternet -> {
-                            if (isInternet) {
-                                goToPlayerInfoActivity(foundPlayer);
-                            } else {
-                                Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
-                            }
-                        },
-                        err -> System.out.println(err.getLocalizedMessage())
-                );
+            Disposable dis = hasInternetConnection().subscribe(
+                    isInternet -> {
+                        if (isInternet) {
+                            goToPlayerInfoActivity(foundPlayer);
+                        } else {
+                            Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
+                        }
+                    },
+                    err -> System.out.println(err.getLocalizedMessage())
+            );
 
-                compositeDisposable.add(dis);
-            }
+            compositeDisposable.add(dis);
         }));
     }
 
@@ -154,12 +145,7 @@ public class FoundPlayerActivity extends AppCompatActivity {
         toolbar.setTitle(R.string.search_players);
         toolbar.setNavigationIcon(getResources().getDrawable(R.mipmap.ic_arrow_left));
         setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 
     @Override

@@ -3,19 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingBottom="@dimen/row_padding_vertical"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/row_padding_vertical">
+    android:paddingLeft="@dimen/padding_LR_pro_player"
+    android:paddingTop="@dimen/row_padding_vertical"
+    android:paddingRight="@dimen/padding_LR_pro_player"
+    android:paddingBottom="@dimen/row_padding_vertical">
 
-    <android.support.v7.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="2dp"
         card_view:cardBackgroundColor="@android:color/white"
         card_view:cardCornerRadius="3dp"
-        card_view:contentPadding="5dp"
-        android:layout_margin="2dp">
+        card_view:contentPadding="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -23,71 +22,91 @@
             android:gravity="center">
 
             <ImageView
+                android:id="@+id/imageView"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
-                android:id="@+id/imageView"
                 android:contentDescription="@string/logo_player_desc" />
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
+                android:paddingStart="15dp"
                 android:paddingLeft="15dp"
-                android:paddingStart="15dp">
+                android:paddingEnd="15dp">
+
                 <TextView
                     android:id="@+id/name_pro_player_title"
-                    android:layout_height="wrap_content"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:text="@string/player"
-                    android:textSize="12sp"
-                    />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/name_pro_player"
-                    android:layout_height="wrap_content"
+                    style="@style/TextViewValuePros"
                     android:layout_width="match_parent"
-                    android:text="@string/unknown"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:lines="2"
+                    android:layout_height="match_parent"
                     android:gravity="center|start"
-                    />
+                    android:lines="1"
+                    android:text="@string/unknown" />
             </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_gravity="center">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/team_name_pro_player_title"
+                <TextView
+                    android:id="@+id/team_name_pro_player_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/team"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/team_name_pro_player"
+                    style="@style/TextViewValuePros"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unknown" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:gravity="center"
-                android:text="@string/team"
-                android:textSize="12sp"/>
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/team_name_pro_player"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:gravity="center"
-                android:text="@string/unknown"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:lines="2"/>
+                <TextView
+                    android:id="@+id/country_pro_player_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/country_title"
+                    android:textSize="12sp" />
 
+                <TextView
+                    android:id="@+id/country_pro_player"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:text="@string/unknown"
+                    android:textAllCaps="true"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
         </LinearLayout>
-
-
-        </LinearLayout>
-
     </android.support.v7.widget.CardView>
-
 </LinearLayout>

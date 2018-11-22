@@ -75,8 +75,6 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         TextView playerLvl;
         @BindView(R.id.imageView)
         ImageView imageView;
-        /*@BindView(R.id.cardView)
-        CardView cardView;*/
         @BindView(R.id.header)
         LinearLayout header;
         @BindView(R.id.team_type)
@@ -85,11 +83,6 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         LinearLayout content;
         @BindView(R.id.trophy)
         ImageView trophy;
-
-        @BindView(R.id.name_and_tier)
-        LinearLayout nameAndTier;
-        @BindView(R.id.lvl_and_kda)
-        LinearLayout lvlAndKDA;
         @BindView(R.id.items)
         LinearLayout blockItems;
 
@@ -107,11 +100,11 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         @BindView(R.id.player_last_hit)
         TextView lastHits;
         @BindView(R.id.player_randomed)
-        TextView randomed;
+        TextView random;
         @BindView(R.id.tower_damage)
         TextView towerDamage;
         @BindView(R.id.player_experience_per_minute)
-        TextView xpPerMinuter;
+        TextView xpPerMinutes;
         @BindView(R.id.player_total_gold)
         TextView totalGold;
         @BindView(R.id.player_denies)
@@ -181,30 +174,6 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
             holder.header.setVisibility(View.GONE);
         }
 
-        /*if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
-            if (holder.goldPerMinutes != null) {
-                holder.goldPerMinutes.setText(context.getResources().getString(R.string.gold_per_min_value, currentPlayer.getGoldPerMin()));
-            }
-            if (holder.xpPerMinuter != null) {
-                holder.xpPerMinuter.setText(context.getResources().getString(R.string.xp_per_min_value, currentPlayer.getXpPerMin()));
-            }
-            if (holder.lastHits != null) {
-                holder.lastHits.setText(context.getResources().getString(R.string.last_hits_value, currentPlayer.getLastHits()));
-            }
-            if (holder.denies != null) {
-                holder.denies.setText(context.getResources().getString(R.string.denies_value, currentPlayer.getDenies()));
-            }
-            if (holder.heal != null) {
-                holder.heal.setText(context.getResources().getString(R.string.heal_value, currentPlayer.getHeroHealing()));
-            }
-            if (holder.heroDamage != null) {
-                holder.heroDamage.setText(context.getResources().getString(R.string.hero_damage_value, currentPlayer.getHeroDamage()));
-            }
-            if (holder.totalGold != null) {
-                holder.totalGold.setText(context.getResources().getString(R.string.total_gold_value, currentPlayer.getTotalGold()));
-            }
-        }*/
-
         List<String> urlList = new ArrayList<>();
         List<ImageView> imageViewList = new ArrayList<>();
 
@@ -247,19 +216,12 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
         }
 
         if (currentPlayer.getRankTier() != 0) {
-            holder.playerRank.setText(context.getString(R.string.player_rank, UtilDota.getRankTier(currentPlayer.getRankTier())));
+            holder.playerRank.setText(context.getString(R.string.only_string_value, UtilDota.getRankTier(currentPlayer.getRankTier())));
         } else {
-            holder.playerRank.setText(context.getString(R.string.player_rank, context.getString(R.string.unknown)));
+            holder.playerRank.setText(context.getString(R.string.only_string_value, context.getString(R.string.unknown)));
         }
 
         holder.playerName.setText(getRealPlayerName(currentPlayer));
-
-       /* holder.nameAndTier.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(context, getRealPlayerName(currentPlayer), Toast.LENGTH_LONG).show();
-            }
-        });*/
 
         holder.playerKda.setText(context.getString(R.string.kda, countKill, countDeath, countAssists));
 
@@ -274,16 +236,16 @@ public class MatchDetailAdapter extends RecyclerView.Adapter<MatchDetailAdapter.
                     .into(holder.imageView);
         }
 
-        holder.goldPerMinutes.setText(context.getString(R.string.gold_per_min_value, currentPlayer.getGoldPerMin()));
-        holder.heroDamage.setText(context.getString(R.string.hero_damage_value, currentPlayer.getHeroDamage()));
-        holder.heal.setText(context.getString(R.string.heal_value, currentPlayer.getHeroHealing()));
-        holder.lastHits.setText(context.getString(R.string.last_hits_value, currentPlayer.getLastHits()));
-        holder.playerLvl.setText(context.getString(R.string.level, currentPlayer.getLevel()));
-        holder.randomed.setText(currentPlayer.isRandomed() ? context.getString(R.string.rand_hero_yes) : context.getString(R.string.rand_hero_no));
-        holder.towerDamage.setText(context.getString(R.string.tower_damage, currentPlayer.getTowerDamage()));
-        holder.xpPerMinuter.setText(context.getString(R.string.xp_per_min_value, currentPlayer.getXpPerMin()));
-        holder.totalGold.setText(context.getString(R.string.total_gold_value, currentPlayer.getTotalGold()));
-        holder.denies.setText(context.getString(R.string.denies_value, currentPlayer.getDenies()));
+        holder.goldPerMinutes.setText(context.getString(R.string.only_digital_value, currentPlayer.getGoldPerMin()));
+        holder.heroDamage.setText(context.getString(R.string.only_digital_value, currentPlayer.getHeroDamage()));
+        holder.heal.setText(context.getString(R.string.only_digital_value, currentPlayer.getHeroHealing()));
+        holder.lastHits.setText(context.getString(R.string.only_digital_value, currentPlayer.getLastHits()));
+        holder.playerLvl.setText(context.getString(R.string.only_digital_value, currentPlayer.getLevel()));
+        holder.random.setText(currentPlayer.isRandomed() ? context.getString(R.string.yes) : context.getString(R.string.no));
+        holder.towerDamage.setText(context.getString(R.string.only_digital_value, currentPlayer.getTowerDamage()));
+        holder.xpPerMinutes.setText(context.getString(R.string.only_digital_value, currentPlayer.getXpPerMin()));
+        holder.totalGold.setText(context.getString(R.string.only_digital_value, currentPlayer.getTotalGold()));
+        holder.denies.setText(context.getString(R.string.only_digital_value, currentPlayer.getDenies()));
 
         final boolean isExpanded = position == mExpandedPosition;
         holder.blockDetail.setVisibility(isExpanded ? View.VISIBLE : View.GONE);

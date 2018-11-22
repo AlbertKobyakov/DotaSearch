@@ -3,7 +3,7 @@
     <string name="app_name">D2S</string>
     <string name="search">Search</string>
     <string name="search_with_app_name">%1$s/%2$s</string>
-    <string name="search_players">Search for players</string>
+    <string name="search_players">Search</string>
     <string name="fragment_pro_players">PRO players</string>
     <string name="fragment_ranking">Leaderboard</string>
     <string name="fragment_pro_teams">Teams</string>
@@ -22,7 +22,7 @@
     <string name="win">win</string>
     <string name="lose">lose</string>
     <string name="kda">%1$d/%2$d/%3$d</string>
-    <string name="player_rank">Rank: %1$s</string>
+    <string name="player_rank">Rank:</string>
     <string name="match_duration">%1$s</string>
     <string name="radiant_score">%1$d</string>
     <string name="dire_score">%1$d</string>
@@ -42,7 +42,7 @@
     <string name="dire_victory">Dire Victory</string>
     <string name="game_mode_and_lobby_type">%1$s, %2$s</string>
     <string name="score_and_duration">%1$d   %2$d:%3$d   %4$d</string>
-    <string name="level">Hero level: %1$d</string>
+    <string name="level">Hero level:</string>
     <string name="default_level">Lvl. 1</string>
     <string name="tab_match_detail_radiant">Radiant</string>
     <string name="tab_match_detail_dire">Dire</string>
@@ -64,13 +64,12 @@
     <string name="heal">HEAL</string>
     <string name="hero_damage">TD</string>
     <string name="total_gold">GOLD</string>
-    <string name="gold_per_min_value">GPM: %1$d</string>
-    <string name="xp_per_min_value">XPM: %1$d</string>
-    <string name="last_hits_value">Last Hits: %1$d</string>
-    <string name="denies_value">Denies: %1$d</string>
-    <string name="heal_value">Heal: %1$d</string>
-    <string name="hero_damage_value">Damage: %1$d</string>
-    <string name="total_gold_value">Total gold farmed: %1$d</string>
+    <string name="gold_per_min_value">GPM:</string>
+    <string name="xp_per_min_value">XPM:</string>
+    <string name="last_hits_value">Last Hits:</string>
+    <string name="denies_value">Denies:</string>
+    <string name="hero_damage_value">Damage:</string>
+    <string name="total_gold_value">Total gold:</string>
     <string name="damage">DMG</string>
     <string name="nickname">Nickname</string>
     <string name="no_internet">No internet access</string>
@@ -108,8 +107,10 @@
     <string name="assists_title">Assists</string>
     <string name="denies_title">Denies</string>
     <string name="hero_damage_title">Damage to heroes</string>
-    <string name="tower_damage_title">Damage to buildings</string>
-    <string name="hero_healing_title">Healing friendly Heroes</string>
+    <string name="tower_damage_title">Tower Damage</string>
+    <string name="tower_damage_title_match">Tower Damage:</string>
+    <string name="hero_healing_title">Hero Healing</string>
+    <string name="hero_healing_title_match">Hero Healing:</string>
     <string name="sort_by_date">by date</string>
     <string name="sort_by_score">by value</string>
     <string name="games_hero">%1d</string>
@@ -141,9 +142,7 @@
     <string name="items_title">Items</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="rand_hero_yes">Random Hero: Yes</string>
-    <string name="rand_hero_no">Random Hero: No</string>
-    <string name="tower_damage">Damage to buildings: %1d</string>
+    <string name="rand_hero">Random Hero:</string>
     <string name="trophy_title">Trophy</string>
     <string name="img_hero">Hero image</string>
     <string name="item">Item</string>
@@ -184,4 +183,9 @@
     <string name="rating_title">Rating</string>
 
     <string name="only_digital_value">%1$d</string>
+    <string name="only_string_value">%1$s</string>
+    <string name="no_data_about_the_game">Нет данных об игре</string>
+    <string name="logo_img">logo image</string>
+    <string name="first_team_logo_title">First team logo</string>
+    <string name="second_team_logo_title">Second team logo</string>
 </resources>

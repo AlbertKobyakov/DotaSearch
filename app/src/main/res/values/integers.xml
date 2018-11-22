@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="number_row_in_line_record">1</integer>
+    <integer name="number_row_in_line_matches_team">1</integer>
+    <integer name="number_row_in_line_tab_pro_players">1</integer>
+
+    <integer name="number_row_in_line_heroes_player">1</integer>
+    <integer name="number_row_in_line_pros_player">1</integer>
+    <integer name="number_row_in_line_heroes_team">1</integer>
+    <integer name="number_row_in_line_ranking">1</integer>
+    <integer name="number_row_in_line_matches_player">1</integer>
+    <integer name="number_row_in_line_found_players">1</integer>
+</resources>

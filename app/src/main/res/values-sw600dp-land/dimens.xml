@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_LR_pro_player">10dp</dimen>
+    <dimen name="logo_width_height_start_activity">300dp</dimen>
+    <dimen name="search_bar_size">250dp</dimen>
+</resources>

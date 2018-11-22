@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +33,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.disposables.CompositeDisposable;
+import butterknife.Unbinder;
 
 public class FragmentTeamInfoMatches extends Fragment {
 
@@ -43,10 +43,10 @@ public class FragmentTeamInfoMatches extends Fragment {
 
     private TeamInfoMatchesAdapter mAdapter;
     private List<TeamMatch> matchList;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private TeamInfoMatchesViewModel viewModel;
     private long teamId;
     private ExpandedAppBarListener expandedAppBarListener;
+    private Unbinder unbinder;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -66,8 +66,6 @@ public class FragmentTeamInfoMatches extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.e(TAG, "onCreate");
     }
 
     public static FragmentTeamInfoMatches newInstance(long teamId) {
@@ -88,13 +86,11 @@ public class FragmentTeamInfoMatches extends Fragment {
 
         View view = inflater.inflate(LAYOUT, container, false);
 
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         if (getArguments() != null) {
             teamId = getArguments().getLong(TEAM_ID);
         }
-
-        Log.d(TAG, teamId + " idididididView");
 
         viewModel = ViewModelProviders.of(this, new FactoryForTeamInfoMatchesViewModel(teamId)).get(TeamInfoMatchesViewModel.class);
         viewModel.getMatches().observe(this, matchShortInfos -> {
@@ -143,7 +139,7 @@ public class FragmentTeamInfoMatches extends Fragment {
 
     public void setAdapterAndRecyclerView() {
         mAdapter = new TeamInfoMatchesAdapter(getActivity(), Glide.with(this));
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.number_row_in_line_matches_team)));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
         mAdapter.registerAdapterDataObserver(new RVEmptyObserver(recyclerView, progressBar, recyclerView));
@@ -152,7 +148,6 @@ public class FragmentTeamInfoMatches extends Fragment {
     }
 
     public void toMatchDetailActivity(int position) {
-        Log.e("44444444", "444444444444442");
         Intent intent = new Intent(getActivity(), MatchDetailActivity.class);
         intent.putExtra("matchId", matchList.get(position).getMatchId());
         startActivity(intent);
@@ -168,7 +163,6 @@ public class FragmentTeamInfoMatches extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        compositeDisposable.dispose();
-        //Toast.makeText(getContext(), "onDestroyView", Toast.LENGTH_SHORT).show();
+        unbinder.unbind();
     }
 }

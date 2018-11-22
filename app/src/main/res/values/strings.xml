@@ -3,9 +3,9 @@
     <string name="app_name">D2S</string>
     <string name="search">Поиск</string>
     <string name="search_with_app_name">%1$s/%2$s</string>
-    <string name="search_players">Поиск игроков</string>
+    <string name="search_players">Поиск</string>
     <string name="fragment_pro_players">PRO Игроки</string>
-    <string name="fragment_ranking">Таблица лидеров</string>
+    <string name="fragment_ranking">Лидеры</string>
     <string name="fragment_pro_teams">Команды</string>
     <string name="fragment_records">Рекорды</string>
     <string name="search_title">Поиск</string>
@@ -22,7 +22,7 @@
     <string name="win">win</string>
     <string name="lose">lose</string>
     <string name="kda">%1$d/%2$d/%3$d</string>
-    <string name="player_rank">Ранг: %1$s</string>
+    <string name="player_rank">Ранг:</string>
     <string name="match_duration">%1$s</string>
     <string name="radiant_score">%1$d</string>
     <string name="dire_score">%1$d</string>
@@ -42,7 +42,7 @@
     <string name="dire_victory">Тьма победила</string>
     <string name="game_mode_and_lobby_type">%1$s, %2$s</string>
     <string name="score_and_duration">%1$d   %2$d:%3$d   %4$d</string>
-    <string name="level">Уровень героя: %1$d</string>
+    <string name="level">Уровень героя:</string>
     <string name="default_level">Ур. 1</string>
     <string name="tab_match_detail_radiant">Свет</string>
     <string name="tab_match_detail_dire">Тьма</string>
@@ -64,13 +64,12 @@
     <string name="heal">HEAL</string>
     <string name="hero_damage">TD</string>
     <string name="total_gold">GOLD</string>
-    <string name="gold_per_min_value">Золото в минуту: %1$d</string>
-    <string name="xp_per_min_value">Опыта в минуту: %1$d</string>
-    <string name="last_hits_value">Добито крипов: %1$d</string>
-    <string name="denies_value">Не отдано крипов: %1$d</string>
-    <string name="heal_value">Восстановлено хп: %1$d</string>
-    <string name="hero_damage_value">Урон по героям: %1$d</string>
-    <string name="total_gold_value">Всего золота: %1$d</string>
+    <string name="gold_per_min_value">Золото в минуту:</string>
+    <string name="xp_per_min_value">Опыта в минуту:</string>
+    <string name="last_hits_value">Добито крипов:</string>
+    <string name="denies_value">Не отдано крипов:</string>
+    <string name="hero_damage_value">Урон по героям:</string>
+    <string name="total_gold_value">Всего золота:</string>
     <string name="damage">DMG</string>
     <string name="nickname">Прозвище</string>
     <string name="no_internet">Нет доступа к Интернету</string>
@@ -109,7 +108,9 @@
     <string name="denies_title">Не отдано крипов</string>
     <string name="hero_damage_title">Урон по героям</string>
     <string name="tower_damage_title">Урон по строениям</string>
+    <string name="tower_damage_title_match">Урон по строениям:</string>
     <string name="hero_healing_title">Восстановлено хп</string>
+    <string name="hero_healing_title_match">Восстановлено хп:</string>
     <string name="sort_by_date">по дате</string>
     <string name="sort_by_score">по значению</string>
     <string name="games_hero">%1d</string>
@@ -124,7 +125,7 @@
     <string name="last_match_time_title">Последний матч</string>
     <string name="logo_hero_title">Логотип героя</string>
     <string name="hero_name_title">Герой</string>
-    <string name="result_title">Результат</string>
+    <string name="result_title">Исход</string>
     <string name="kda_title">K/D/A</string>
     <string name="refresh">Повторить попытку</string>
     <string name="star">звезда</string>
@@ -141,9 +142,7 @@
     <string name="items_title">Предметы</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-    <string name="rand_hero_yes">Рандомный герой: Да</string>
-    <string name="rand_hero_no">Рандомный герой: Нет</string>
-    <string name="tower_damage">Урон по строениям: %1d</string>
+    <string name="rand_hero">Рандомный герой:</string>
     <string name="trophy_title">Трофей</string>
     <string name="img_hero">Фото героя</string>
     <string name="item">Предмет</string>
@@ -174,7 +173,7 @@
     <string name="player_rank_tier_image_star">Картинка звезд ранга</string>
     <string name="wins_loses">Выиграл/Проиграл</string>
     <string name="solo_mmr_title">Соло ММР</string>
-    <string name="win_rate">Доля Побед</string>
+    <string name="win_rate">Побед</string>
     <string name="opposing_team_logo">Команда Противника Лого</string>
     <string name="opposing_team_title">Противник</string>
     <string name="current_team">Текущий состав</string>
@@ -184,4 +183,9 @@
     <string name="rating_title">Рейтинг</string>
 
     <string name="only_digital_value">%1$d</string>
+    <string name="only_string_value">%1$s</string>
+    <string name="no_data_about_the_game">No data about the game</string>
+    <string name="logo_img">Логотип</string>
+    <string name="first_team_logo_title">Логотип первой команды</string>
+    <string name="second_team_logo_title">Логотип второй команды</string>
 </resources>

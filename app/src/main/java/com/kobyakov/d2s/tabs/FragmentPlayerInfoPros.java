@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,6 +34,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 
 public class FragmentPlayerInfoPros extends Fragment {
     private static final String TAG = "FragmentPlayerInfoPros";
@@ -46,6 +47,7 @@ public class FragmentPlayerInfoPros extends Fragment {
     private long accountId;
     private String name;
     private PlayerInfoProsViewModel viewModel;
+    private Unbinder unbinder;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -87,7 +89,7 @@ public class FragmentPlayerInfoPros extends Fragment {
 
         View view = inflater.inflate(LAYOUT, container, false);
 
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         if (getArguments() != null) {
             accountId = getArguments().getLong(ACCOUNT_ID);
@@ -118,8 +120,6 @@ public class FragmentPlayerInfoPros extends Fragment {
                 }
             }
         });
-
-        //text_no_data.setText(getString(R.string.no_games_with_pro));
 
         viewModel.getStatusCode().observe(this, statusCode -> {
             if (statusCode != null && allPros == null) {
@@ -173,7 +173,7 @@ public class FragmentPlayerInfoPros extends Fragment {
 
     public void setAdapterAndRecyclerView() {
         mAdapter = new PlayerProsAdapter(getActivity(), Glide.with(this));
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.number_row_in_line_pros_player)));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
         //mAdapter.registerAdapterDataObserver(new RVEmptyObserver(recyclerView, progressBar, recyclerView));
@@ -188,5 +188,11 @@ public class FragmentPlayerInfoPros extends Fragment {
         intent.putExtra(NAME, allPros.get(position).getName());
         intent.putExtra("urlPlayer", allPros.get(position).getAvatarmedium());
         startActivity(intent);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

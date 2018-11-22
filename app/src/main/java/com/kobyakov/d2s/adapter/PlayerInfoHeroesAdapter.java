@@ -1,9 +1,7 @@
 package com.kobyakov.d2s.adapter;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -44,10 +42,8 @@ public class PlayerInfoHeroesAdapter extends RecyclerView.Adapter<PlayerInfoHero
         @BindView(R.id.hero_name)
         TextView heroName;
 
-        @Nullable
         @BindView(R.id.winrate_hero_percent_with)
         TextView with;
-        @Nullable
         @BindView(R.id.winrate_hero_percent_against)
         TextView against;
 
@@ -113,22 +109,22 @@ public class PlayerInfoHeroesAdapter extends RecyclerView.Adapter<PlayerInfoHero
 
                 holder.winRateHeroPercent.setText(twoNumberAfterPoint(winRate));
 
-                if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
-                    double withWin = (double) playerHero.getWithWin() / (double) playerHero.getWithGames() * 100;
-                    double againstWin = (double) playerHero.getAgainstWin() / (double) playerHero.getAgainstGames() * 100;
+                //if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
+                double withWin = (double) playerHero.getWithWin() / (double) playerHero.getWithGames() * 100;
+                double againstWin = (double) playerHero.getAgainstWin() / (double) playerHero.getAgainstGames() * 100;
 
-                    if (playerHero.getWithWin() != 0) {
-                        holder.with.setText(context.getResources().getString(R.string.matches_with_win, twoNumberAfterPoint(withWin, playerHero.getWithGames())));
-                    } else {
-                        holder.with.setText(context.getResources().getString(R.string.matches_with_win, "0"));
-                    }
-
-                    if (playerHero.getAgainstWin() != 0) {
-                        holder.against.setText(context.getResources().getString(R.string.matches_with_win, twoNumberAfterPoint(againstWin, playerHero.getAgainstGames())));
-                    } else {
-                        holder.against.setText(context.getResources().getString(R.string.matches_with_win, "0"));
-                    }
+                if (playerHero.getWithWin() != 0) {
+                    holder.with.setText(context.getResources().getString(R.string.matches_with_win, twoNumberAfterPoint(withWin, playerHero.getWithGames())));
+                } else {
+                    holder.with.setText(context.getResources().getString(R.string.matches_with_win, "0"));
                 }
+
+                if (playerHero.getAgainstWin() != 0) {
+                    holder.against.setText(context.getResources().getString(R.string.matches_with_win, twoNumberAfterPoint(againstWin, playerHero.getAgainstGames())));
+                } else {
+                    holder.against.setText(context.getResources().getString(R.string.matches_with_win, "0"));
+                }
+                //}
             }
         }
     }

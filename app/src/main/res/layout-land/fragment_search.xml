@@ -10,7 +10,7 @@
 
     <include
         layout="@layout/fragment_search_players"
-        android:layout_width="200dp"
+        android:layout_width="@dimen/search_bar_size"
         android:layout_height="match_parent"
         android:layout_margin="16dp" />
 

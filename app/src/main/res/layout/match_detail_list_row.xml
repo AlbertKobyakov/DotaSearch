@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:focusable="true"
@@ -19,7 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            tools:ignore="UseCompoundDrawables">
 
             <TextView
                 android:id="@+id/team_type"
@@ -60,7 +62,7 @@
                 android:id="@+id/text_view_1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.4"
+                android:layout_weight="1.2"
                 android:gravity="center"
                 android:text="@string/hero_name_title"
                 android:textColor="@color/white"
@@ -113,49 +115,36 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="@dimen/logo_hero_width"
-            android:layout_height="@dimen/logo_hero_height"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1.2"
             android:contentDescription="@string/img_hero"
+            android:padding="5dp"
             android:scaleType="centerCrop"
             android:src="@drawable/avatar_unknown_medium" />
 
-        <LinearLayout
-            android:id="@+id/name_and_tier"
+        <TextView
+            android:id="@+id/player_name"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:lines="1"
+            android:padding="5dp"
+            android:text="@string/anonymous"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/player_kda"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/player_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:lines="2"
-                android:text="@string/anonymous"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/lvl_and_kda"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/player_kda"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/default_kda"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
-        </LinearLayout>
+            android:text="@string/default_kda"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/items"
@@ -198,7 +187,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center">
 
                 <ImageView
@@ -248,78 +237,200 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/player_gold_per_minute"
-                    style="@style/TextViewBlockMatchDetail"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/player_experience_per_minute"
-                    style="@style/TextViewBlockMatchDetail"
+                    <TextView
+                        android:id="@+id/player_gold_per_minute_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:text="@string/gold_per_min_value" />
+
+                    <TextView
+                        android:id="@+id/player_gold_per_minute"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8" />
+
+                    <TextView
+                        android:id="@+id/player_lvl_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:text="@string/level" />
+
+                    <TextView
+                        android:id="@+id/player_lvl"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/player_hero_damage"
-                    style="@style/TextViewBlockMatchDetail"
+                    <TextView
+                        android:id="@+id/player_experience_per_minute_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:text="@string/xp_per_min_value" />
+
+                    <TextView
+                        android:id="@+id/player_experience_per_minute"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8" />
+
+                    <TextView
+                        android:id="@+id/player_randomed_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:text="@string/rand_hero" />
+
+                    <TextView
+                        android:id="@+id/player_randomed"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/player_denies"
-                    style="@style/TextViewBlockMatchDetail"
+                    <TextView
+                        android:id="@+id/player_hero_damage_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:text="@string/hero_damage_value" />
+
+                    <TextView
+                        android:id="@+id/player_hero_damage"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8" />
+
+                    <TextView
+                        android:id="@+id/tower_damage_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:text="@string/tower_damage_title_match" />
+
+                    <TextView
+                        android:id="@+id/tower_damage"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/player_last_hit"
-                    style="@style/TextViewBlockMatchDetail"
+                    <TextView
+                        android:id="@+id/player_denies_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:text="@string/denies_value" />
+
+                    <TextView
+                        android:id="@+id/player_denies"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8" />
+
+                    <TextView
+                        android:id="@+id/player_heal_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:text="@string/hero_healing_title_match" />
+
+                    <TextView
+                        android:id="@+id/player_heal"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/player_total_gold"
-                    style="@style/TextViewBlockMatchDetail"
+                    <TextView
+                        android:id="@+id/player_last_hit_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:text="@string/last_hits_value" />
+
+                    <TextView
+                        android:id="@+id/player_last_hit"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8" />
+
+                    <TextView
+                        android:id="@+id/player_total_gold_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:text="@string/total_gold_value" />
+
+                    <TextView
+                        android:id="@+id/player_total_gold"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8" />
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+                    android:layout_height="match_parent"
+                    android:gravity="center">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/player_rank_title"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/player_rank" />
 
-                <TextView
-                    android:id="@+id/player_lvl"
-                    style="@style/TextViewBlockMatchDetail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/player_randomed"
-                    style="@style/TextViewBlockMatchDetail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/tower_damage"
-                    style="@style/TextViewBlockMatchDetail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/player_heal"
-                    style="@style/TextViewBlockMatchDetail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/player_rank"
-                    style="@style/TextViewBlockMatchDetail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/player_rank"
+                        style="@style/TextViewBlockMatchDetail"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
@@ -328,13 +439,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/ripple"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text="@string/go_to_player_profile"
             android:textColor="@color/white"
             android:textSize="12sp" />
-
     </LinearLayout>
 </LinearLayout>

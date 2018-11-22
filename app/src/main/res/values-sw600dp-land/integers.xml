@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="number_row_in_line_heroes_team">2</integer>
+    <integer name="number_row_in_line_record">2</integer>
+    <integer name="number_row_in_line_ranking">3</integer>
+    <integer name="number_row_in_line_tab_pro_players">2</integer>
+    <integer name="number_row_in_line_found_players">2</integer>
+</resources>
