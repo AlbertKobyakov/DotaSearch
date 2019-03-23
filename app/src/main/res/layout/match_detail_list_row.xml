@@ -120,7 +120,6 @@
             android:layout_height="50dp"
             android:layout_weight="1.2"
             android:contentDescription="@string/img_hero"
-            android:padding="5dp"
             app:srcCompat="@drawable/help"
             android:background="@color/colorAccent"/>
 
