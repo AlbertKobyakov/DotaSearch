@@ -83,11 +83,10 @@ public class PlayerProsAdapter extends RecyclerView.Adapter<PlayerProsAdapter.My
                     .fitCenter();
 
             glide.load(proPlayer.getAvatarmedium())
-                    .error(glide.load(R.drawable.avatar_unknown_medium))
+                    .error(glide.load(R.drawable.help))
                     .apply(fitCenter)
                     .into(holder.prosAvatar);
 
-            //if (Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation) {
             double withWin = (double) proPlayer.getWithWin() / (double) proPlayer.getWithGames() * 100;
             double againstWin = (double) proPlayer.getAgainstWin() / (double) proPlayer.getAgainstGames() * 100;
 
@@ -102,7 +101,6 @@ public class PlayerProsAdapter extends RecyclerView.Adapter<PlayerProsAdapter.My
             } else {
                 holder.matchesAgainstWin.setText(context.getResources().getString(R.string.matches_with_win, "0"));
             }
-            //}
 
         } else {
             Log.d(TAG, "empty");

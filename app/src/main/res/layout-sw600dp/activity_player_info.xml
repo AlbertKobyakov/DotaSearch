@@ -49,7 +49,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:contentDescription="@string/logo_player_desc"
-                        android:src="@drawable/help" />
+                        app:srcCompat="@drawable/help" />
 
                     <LinearLayout
                         android:layout_width="0dp"

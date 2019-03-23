@@ -101,7 +101,7 @@
                 style="@style/TextViewTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="В команде" />
+                android:text="@string/in_team" />
 
             <TextView
                 android:id="@+id/is_current_team_member"

@@ -19,7 +19,7 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:contentDescription="@string/star"
-            android:src="@drawable/star_circle" />
+            card_view:srcCompat="@drawable/star_circle" />
 
         <TextView
             android:layout_width="match_parent"

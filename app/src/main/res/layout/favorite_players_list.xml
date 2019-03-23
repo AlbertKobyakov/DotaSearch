@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/list_favorite_players_wrapper"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -16,16 +17,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_marginBottom="10dp"
+                android:layout_alignParentLeft="true"
                 android:layout_marginTop="10dp"
-                android:layout_toLeftOf="@+id/vector_icon"
+                android:layout_marginBottom="10dp"
                 android:layout_toStartOf="@+id/vector_icon"
-                android:paddingEnd="10dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
+                android:layout_toLeftOf="@+id/vector_icon"
                 android:paddingStart="10dp"
+                android:paddingLeft="10dp"
+                android:paddingEnd="10dp"
+                android:paddingRight="10dp"
                 android:text="@string/favorite_players"
                 android:textAllCaps="true"
                 android:textSize="15sp"
@@ -39,11 +40,11 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="@string/vector_icon"
-                android:paddingEnd="10dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:paddingStart="10dp"
-                android:src="@drawable/account_star" />
+                android:paddingLeft="10dp"
+                android:paddingEnd="10dp"
+                android:paddingRight="10dp"
+                app:srcCompat="@drawable/account_star" />
         </RelativeLayout>
 
         <View

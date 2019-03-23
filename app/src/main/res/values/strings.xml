@@ -188,4 +188,6 @@
     <string name="logo_img">Логотип</string>
     <string name="first_team_logo_title">Логотип первой команды</string>
     <string name="second_team_logo_title">Логотип второй команды</string>
+    <string name="nothing_found">Ничего не найдено</string>
+    <string name="in_team">В команде</string>
 </resources>

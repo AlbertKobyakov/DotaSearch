@@ -21,12 +21,14 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class SearchPlayersRepository {
+    public static final String TAG = "SearchPlayersRepository";
+    private static final int NO_INTERNET_CODE = -100;
+    private static final int ERROR_RX_CODE = -200;
+    private static final int NOTHING_FOUND_CODE = 600;
+
     private LiveData<List<FavoritePlayer>> allFavoritePlayer;
     private AppDatabase db;
-    public static final String TAG = "SearchPlayersRepository";
     private MutableLiveData<Integer> responseStatusCode;
-    private static final int NO_INTERNET_CODE = -100;
-    private static final int ERROR_RX = -200;
 
     public SearchPlayersRepository() {
         db = App.get().getDB();
@@ -60,13 +62,17 @@ public class SearchPlayersRepository {
                         .subscribe(
                                 response -> {
                                     List<FoundPlayer> foundPlayers = response.body();
-                                    db.foundPlayerDao().deleteAllFoundPlayer();
-                                    db.foundPlayerDao().insertAll(foundPlayers);
-                                    responseStatusCode.postValue(response.code());
+                                    if (foundPlayers != null && foundPlayers.size() > 0) {
+                                        db.foundPlayerDao().deleteAllFoundPlayer();
+                                        db.foundPlayerDao().insertAll(foundPlayers);
+                                        responseStatusCode.postValue(response.code());
+                                    } else {
+                                        responseStatusCode.postValue(NOTHING_FOUND_CODE);
+                                    }
                                 },
                                 err -> {
                                     err.printStackTrace();
-                                    responseStatusCode.postValue(ERROR_RX);
+                                    responseStatusCode.postValue(ERROR_RX_CODE);
                                 });
             } else {
                 responseStatusCode.postValue(NO_INTERNET_CODE);

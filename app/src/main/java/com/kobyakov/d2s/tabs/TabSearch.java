@@ -131,6 +131,8 @@ public class TabSearch extends Fragment {
                         Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), R.string.errors_500, Snackbar.LENGTH_SHORT).show();
                     } else if (code == 4 && query != null) {
                         Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), R.string.errors_400, Snackbar.LENGTH_SHORT).show();
+                    } else if (code == 6 && query != null) {
+                        Snackbar.make(activity.findViewById(R.id.bottom_navigation_view), R.string.nothing_found, Snackbar.LENGTH_SHORT).show();
                     }
                 }
 

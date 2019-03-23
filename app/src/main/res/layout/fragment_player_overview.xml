@@ -41,7 +41,7 @@
                 android:id="@+id/emotion_sad"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:src="@drawable/emoticon_sad"/>
+                app:srcCompat="@drawable/emoticon_sad"/>
 
             <TextView
                 android:id="@+id/no_data_text"
