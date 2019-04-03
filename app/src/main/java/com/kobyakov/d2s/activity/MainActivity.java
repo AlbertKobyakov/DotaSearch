@@ -23,6 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
     private static final int LAYOUT = R.layout.activity_main;
 
     private TabSearch tabSearch = new TabSearch();
