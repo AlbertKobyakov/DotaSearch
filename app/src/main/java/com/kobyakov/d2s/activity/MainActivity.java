@@ -1,5 +1,6 @@
 package com.kobyakov.d2s.activity;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
@@ -8,15 +9,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.WindowManager;
 
 import com.kobyakov.d2s.R;
+import com.kobyakov.d2s.tabs.FragmentRecords;
 import com.kobyakov.d2s.tabs.TabProPlayers;
 import com.kobyakov.d2s.tabs.TabProTeam;
 import com.kobyakov.d2s.tabs.TabRanking;
-import com.kobyakov.d2s.tabs.FragmentRecords;
 import com.kobyakov.d2s.tabs.TabSearch;
 
 import butterknife.BindView;
@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.setReorderingAllowed(true);
         fragmentTransaction.commitAllowingStateLoss();
     }
+    
 
     @Override
     protected void onDestroy() {
