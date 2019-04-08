@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.setReorderingAllowed(true);
         fragmentTransaction.commitAllowingStateLoss();
     }
-    
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
