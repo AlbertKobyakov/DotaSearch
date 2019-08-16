@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -39,6 +38,7 @@ import static android.widget.LinearLayout.VERTICAL;
 public class RankingCountyFragment extends Fragment {
     private static final String TAG = "RankingCountyFragment";
     private static final int LAYOUT = R.layout.leaderboard;
+    private static final String DEFAULT_DIVISION = "europe";
     private String division;
     private String title;
     private LeaderBoardViewModel viewModel;
@@ -87,6 +87,10 @@ public class RankingCountyFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         setRecyclerViewAdapter();
+
+        if (division == null) {
+            division = DEFAULT_DIVISION;
+        }
 
         viewModel = ViewModelProviders.of(this, new FactoryForLeaderboardViewModel(division)).get(LeaderBoardViewModel.class);
         viewModel.getTimeRefreshLeaderBoardLiveData().observe(this, timeRefreshLeaderBoard -> {
