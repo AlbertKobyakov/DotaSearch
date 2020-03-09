@@ -73,7 +73,6 @@ public class LeaderboardRepository {
     }
 
     public void checkValidLeaderBoardData(String division) {
-        Log.d(TAG, division);
         Disposable d3 = db.leaderBoardDivisionDao().getConcreteDivisionRx(division)
                 .defaultIfEmpty(new TimeRefreshLeaderBoard())
                 .flatMap(timeRefreshLeaderBoard -> {

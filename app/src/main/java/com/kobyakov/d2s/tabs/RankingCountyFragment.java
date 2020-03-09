@@ -59,14 +59,8 @@ public class RankingCountyFragment extends Fragment {
     @BindView(R.id.network_error)
     TextView networkError;
 
-    public RankingCountyFragment() {
-    }
-
-    public void setDivision(String division) {
+    public RankingCountyFragment(String division, String title) {
         this.division = division;
-    }
-
-    public void setTitle(String title) {
         this.title = title;
     }
 

@@ -120,7 +120,7 @@ public class FoundPlayerAdapter extends RecyclerView.Adapter<FoundPlayerAdapter.
         if (!text.isEmpty()) {
             text = text.toLowerCase();
             for (FoundPlayer foundPlayer : foundUsersCopy) {
-                if (foundPlayer != null) {
+                if (foundPlayer != null && foundPlayer.getPersonaname() != null) {
                     if (foundPlayer.getPersonaname().toLowerCase().contains(text)) {
                         foundPlayersFiltered.add(foundPlayer);
                     }
