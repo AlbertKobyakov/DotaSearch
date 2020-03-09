@@ -42,7 +42,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class TabProTeam extends Fragment {
-    private static final String TAG = "TabProTeam";
+    private static final String TAG = TabProTeam.class.getSimpleName();
     private static final int LAYOUT = R.layout.tab_pro_team;
     private ProTeamAdapter mAdapter;
     private ProTeamsViewModel viewModel;
@@ -116,6 +116,10 @@ public class TabProTeam extends Fragment {
         viewModel.repeatRequest();
         blockError.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
+    }
+
+    public String getTAG() {
+        return TAG;
     }
 
     private void setToolbarTitle() {

@@ -21,7 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class FragmentRecords extends Fragment {
-    private static final String TAG = "FragmentRecords";
+    private static final String TAG = FragmentRecords.class.getSimpleName();
     private static final int LAYOUT = R.layout.fragment_for_tabs;
 
     @BindView(R.id.sliding_tabs)
@@ -45,6 +45,10 @@ public class FragmentRecords extends Fragment {
         initTabLayoutAndViewPager();
 
         return view;
+    }
+
+    public String getTAG() {
+        return TAG;
     }
 
     private void setToolbarTitle() {

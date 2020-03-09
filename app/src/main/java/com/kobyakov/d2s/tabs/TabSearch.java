@@ -56,7 +56,7 @@ import static android.widget.LinearLayout.VERTICAL;
 
 public class TabSearch extends Fragment {
     private final static int LAYOUT = R.layout.fragment_search;
-    private final static String TAG = "TabSearch";
+    private final static String TAG = TabSearch.class.getSimpleName();
     private final static int DELAY = 150;
 
     public SearchViewModel viewModel;
@@ -183,6 +183,10 @@ public class TabSearch extends Fragment {
             Toolbar toolbar = activity.findViewById(R.id.toolbar);
             toolbar.setTitle(R.string.search);
         }
+    }
+
+    public String getTAG() {
+        return TAG;
     }
 
     public void setAdapterAndRecyclerView() {

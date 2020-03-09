@@ -22,7 +22,7 @@ import butterknife.Unbinder;
 
 public class TabRanking extends Fragment {
 
-    private final static String TAG = "TabRanking";
+    private final static String TAG = TabRanking.class.getSimpleName();
     private static final int LAYOUT = R.layout.fragment_for_tabs;
 
     @BindView(R.id.sliding_tabs)
@@ -32,6 +32,10 @@ public class TabRanking extends Fragment {
     private View view;
 
     private Unbinder unbinder;
+
+    public String getTAG() {
+        return TAG;
+    }
 
     @Nullable
     @Override

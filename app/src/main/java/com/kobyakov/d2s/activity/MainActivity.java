@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     private TabProPlayers tabProPlayers = new TabProPlayers();
     private TabProTeam tabProTeam = new TabProTeam();
     private FragmentRecords tabProMatch = new FragmentRecords();
-
     private TabRanking tabRanking = new TabRanking();
 
     @BindView(R.id.bottom_navigation_view)
@@ -56,19 +55,19 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.player_overview:
-                    changeFragment(tabSearch, "tabSearch");
+                    changeFragment(tabSearch, tabSearch.getTAG());
                     return true;
                 case R.id.pros:
-                    changeFragment(tabProPlayers, "tabProPlayers");
+                    changeFragment(tabProPlayers, tabProPlayers.getTAG());
                     return true;
                 case R.id.navigation_notifications:
-                    changeFragment(tabRanking, "tabRanking");
+                    changeFragment(tabRanking, tabRanking.getTAG());
                     return true;
                 case R.id.navigation_notifications1:
-                    changeFragment(tabProTeam, "tabProTeam");
+                    changeFragment(tabProTeam, tabProTeam.getTAG());
                     return true;
                 case R.id.navigation_notifications2:
-                    changeFragment(tabProMatch, "tabProMatch");
+                    changeFragment(tabProMatch, tabProMatch.getTAG());
                     return true;
             }
             return false;
@@ -76,13 +75,17 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (savedInstanceState == null) {
-            navigation.setSelectedItemId(R.id.player_overview);
+            showTabSearch();
         }
 
         //remove focus EditText
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         initToolbar();
+    }
+
+    private void showTabSearch() {
+        navigation.setSelectedItemId(R.id.player_overview);
     }
 
     private void initToolbar() {
@@ -93,14 +96,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
-            super.onBackPressed();
-            return;
+            finish();
+        } else if (navigation.getSelectedItemId() != R.id.player_overview) {
+            showTabSearch();
+        } else {
+            this.doubleBackToExitPressedOnce = true;
+            Snackbar.make(findViewById(R.id.bottom_navigation_view), getResources().getString(R.string.double_click_to_exit), Snackbar.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
         }
-
-        this.doubleBackToExitPressedOnce = true;
-        Snackbar.make(findViewById(R.id.bottom_navigation_view), getResources().getString(R.string.double_click_to_exit), Snackbar.LENGTH_SHORT).show();
-
-        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }
 
     public void changeFragment(Fragment fragment, String tagFragmentName) {
@@ -125,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.setReorderingAllowed(true);
         fragmentTransaction.commitAllowingStateLoss();
     }
-
 
     @Override
     protected void onDestroy() {

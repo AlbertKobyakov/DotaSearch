@@ -141,6 +141,10 @@ public class TabProPlayers extends Fragment {
         startActivity(intent);
     }
 
+    public String getTAG() {
+        return TAG;
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
