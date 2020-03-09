@@ -1,13 +1,13 @@
 package com.kobyakov.d2s.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverters;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
-import com.kobyakov.d2s.TypeConverter.LeaderboardConverter;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.kobyakov.d2s.TypeConverter.LeaderboardConverter;
 
 import java.util.List;
 

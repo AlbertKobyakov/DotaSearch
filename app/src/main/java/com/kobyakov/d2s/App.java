@@ -2,10 +2,11 @@ package com.kobyakov.d2s;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.multidex.MultiDex;
+
+import androidx.multidex.MultiDex;
+import androidx.room.Room;
 
 import com.kobyakov.d2s.database.AppDatabase;
 

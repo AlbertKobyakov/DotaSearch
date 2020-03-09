@@ -1,9 +1,10 @@
 package com.kobyakov.d2s.repository;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 import android.util.SparseArray;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.kobyakov.d2s.App;
 import com.kobyakov.d2s.database.AppDatabase;

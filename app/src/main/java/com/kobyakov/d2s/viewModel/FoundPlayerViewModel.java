@@ -1,7 +1,7 @@
 package com.kobyakov.d2s.viewModel;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.kobyakov.d2s.model.FoundPlayer;
 import com.kobyakov.d2s.repository.FoundPlayerRepository;

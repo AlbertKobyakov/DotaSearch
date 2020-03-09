@@ -1,8 +1,8 @@
 package com.kobyakov.d2s.modelfactory;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.kobyakov.d2s.viewModel.PlayerInfoHeroesViewModel;
 

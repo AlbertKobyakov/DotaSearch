@@ -1,12 +1,14 @@
 package com.kobyakov.d2s;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.util.AttributeSet;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.snackbar.Snackbar;
 
 class BottomNavigationBehavior extends CoordinatorLayout.Behavior<View> {
     public BottomNavigationBehavior(Context context, @Nullable AttributeSet attrs) {

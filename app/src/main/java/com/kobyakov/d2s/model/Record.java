@@ -1,7 +1,7 @@
 package com.kobyakov.d2s.model;
 
-import android.arch.persistence.room.Entity;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

@@ -1,7 +1,8 @@
 package com.kobyakov.d2s;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class RVEmptyObserver extends RecyclerView.AdapterDataObserver {
     private View emptyView;
