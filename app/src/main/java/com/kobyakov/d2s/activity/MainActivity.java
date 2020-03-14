@@ -108,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeFragment(Fragment fragment, String tagFragmentName) {
-
         FragmentManager mFragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
 
