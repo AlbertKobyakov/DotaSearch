@@ -8,6 +8,9 @@ import android.os.Bundle;
 import androidx.multidex.MultiDex;
 import androidx.room.Room;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
 import com.kobyakov.d2s.database.AppDatabase;
 
 public class App extends Application implements Application.ActivityLifecycleCallbacks {
@@ -35,6 +38,14 @@ public class App extends Application implements Application.ActivityLifecycleCal
         database = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, DATABASE_NAME).build();
 
         INSTANCE = this;
+
+        try {
+            ProviderInstaller.installIfNeeded(this);
+        } catch (GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
     }
 
     public AppDatabase getDB() {
