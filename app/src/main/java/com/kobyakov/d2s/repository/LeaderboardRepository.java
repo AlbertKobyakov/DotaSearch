@@ -41,7 +41,7 @@ public class LeaderboardRepository {
 
     private void leaderboardDataAcquisitionAndRecordingToDB(String division) {
         Log.d(TAG, "NETWORK REQUEST");
-        Disposable d1 = UtilDota.initRetrofitRxDota2Ru().getLeaderBorderRx(division)
+        Disposable d1 = UtilDota.initRetrofitRxDota2Ru().getLeaderBorderRx(division, 0)
                 .flatMap(timeRefreshLeaderBoard -> {
                     Objects.requireNonNull(timeRefreshLeaderBoard.body()).setDivision(division);
                     timeRefreshLeaderBoard.body().setLeaderboard(timeRefreshLeaderBoard.body().getLeaderboard().subList(0, 100));

@@ -7,9 +7,9 @@ import com.kobyakov.d2s.model.MatchFullInfo;
 import com.kobyakov.d2s.model.MatchShortInfo;
 import com.kobyakov.d2s.model.PlayerHero;
 import com.kobyakov.d2s.model.PlayerInfo;
-import com.kobyakov.d2s.model.Record;
 import com.kobyakov.d2s.model.ProPlayer;
 import com.kobyakov.d2s.model.Pros;
+import com.kobyakov.d2s.model.Record;
 import com.kobyakov.d2s.model.Team;
 import com.kobyakov.d2s.model.TeamHero;
 import com.kobyakov.d2s.model.TeamMatch;
@@ -52,7 +52,8 @@ public interface DotaClient {
 
     @GET("/webapi/ILeaderboard/GetDivisionLeaderboard/v0001")
     Single<Response<TimeRefreshLeaderBoard>> getLeaderBorderRx(
-            @Query("division") String division
+            @Query("division") String division,
+            @Query("leaderboard") Integer leaderboard
     );
 
     @GET("/api/players/{Id}")
