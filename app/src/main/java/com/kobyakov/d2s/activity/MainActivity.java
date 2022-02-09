@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
         if (doubleBackToExitPressedOnce) {
             finish();
         } else if (navigation.getSelectedItemId() != R.id.player_overview) {
