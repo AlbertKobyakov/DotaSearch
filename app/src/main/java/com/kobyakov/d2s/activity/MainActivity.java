@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
+
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
