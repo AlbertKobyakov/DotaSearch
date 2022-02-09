@@ -30,7 +30,9 @@ jobs:
       # Runs a single command using the runners shell
       - name: Build release APK and AAB after test
         run: |
-          chmod +x ./gradlew assembleRelease
+         ./gradlew build
+         chmod +x ./gradlew
+         ./gradlew assembleRelease
           ./gradlew bundleRelease
       - name: Upload APK
         uses: actions/upload-artifact@v2
