@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
             showTabSearch();
         }
 
+
         //remove focus EditText
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
