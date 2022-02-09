@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
             showTabSearch();
         }
 
+
         //remove focus EditText
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
     }
+
 
     @Override
     public void onBackPressed() {
