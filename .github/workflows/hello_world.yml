@@ -28,10 +28,9 @@ jobs:
       # Runs a single command using the runners shell
       - name: Build release APK and AAB after test
         run: |
-         ./gradle build
-         chmod +x ./gradlew
-         ./gradlew assembleRelease
-          ./gradlew bundleRelease
+         ./gradlew test
+         ./gradlew assembleRelease --stacktrace
+         ./gradlew bundleRelease
       - name: Upload APK
         uses: actions/upload-artifact@v2
         with:
