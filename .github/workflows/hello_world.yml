@@ -28,7 +28,6 @@ jobs:
       # Runs a single command using the runners shell
       - name: Build release APK and AAB after test
         run: |
-         ./gradlew test
          ./gradlew assembleRelease --stacktrace
          ./gradlew bundleRelease
       - name: Upload APK
