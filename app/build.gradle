@@ -13,11 +13,11 @@ repositories {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.kobyakov.d2s"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 8
         versionName "1.0.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
