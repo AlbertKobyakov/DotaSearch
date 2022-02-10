@@ -32,8 +32,8 @@ jobs:
         with: { java-version: 1.8 }
 
       - name: Checkout keystore repo
-          uses: actions/checkout@v2
-          with:
+        uses: actions/checkout@v2
+        with:
             repository: ${{ secrets.KEYSTORE_GIT_REOSITORY }}
             token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
             path: app/keystore
