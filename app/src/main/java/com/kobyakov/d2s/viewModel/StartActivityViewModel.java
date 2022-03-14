@@ -15,6 +15,7 @@ public class StartActivityViewModel extends ViewModel {
         repository = new StartActivityRepository();
         repository.dataInitialization();
         isLoadMainActivity = repository.getIsDataSuccess();
+
     }
 
     public LiveData<Boolean> getIsLoadMainActivity() {
