@@ -1,8 +1,9 @@
 package com.kobyakov.d2s.repository;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.kobyakov.d2s.App;
 import com.kobyakov.d2s.database.AppDatabase;
@@ -40,7 +41,7 @@ public class LeaderboardRepository {
 
     private void leaderboardDataAcquisitionAndRecordingToDB(String division) {
         Log.d(TAG, "NETWORK REQUEST");
-        Disposable d1 = UtilDota.initRetrofitRxDota2Ru().getLeaderBorderRx(division)
+        Disposable d1 = UtilDota.initRetrofitRxDota2Ru().getLeaderBorderRx(division, 0)
                 .flatMap(timeRefreshLeaderBoard -> {
                     Objects.requireNonNull(timeRefreshLeaderBoard.body()).setDivision(division);
                     timeRefreshLeaderBoard.body().setLeaderboard(timeRefreshLeaderBoard.body().getLeaderboard().subList(0, 100));
@@ -72,7 +73,6 @@ public class LeaderboardRepository {
     }
 
     public void checkValidLeaderBoardData(String division) {
-        Log.d(TAG, division);
         Disposable d3 = db.leaderBoardDivisionDao().getConcreteDivisionRx(division)
                 .defaultIfEmpty(new TimeRefreshLeaderBoard())
                 .flatMap(timeRefreshLeaderBoard -> {

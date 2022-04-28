@@ -1,10 +1,9 @@
 package com.kobyakov.d2s.modelfactory;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.kobyakov.d2s.viewModel.PlayerInfoProsViewModel;
 import com.kobyakov.d2s.viewModel.TeamInfoPlayerViewModel;
 
 public class FactoryForTeamInfoPlayerViewModel extends ViewModelProvider.NewInstanceFactory {

@@ -1,17 +1,8 @@
 package com.kobyakov.d2s.tabs;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +14,16 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -41,7 +42,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class TabProTeam extends Fragment {
-    private static final String TAG = "TabProTeam";
+    private static final String TAG = TabProTeam.class.getSimpleName();
     private static final int LAYOUT = R.layout.tab_pro_team;
     private ProTeamAdapter mAdapter;
     private ProTeamsViewModel viewModel;
@@ -115,6 +116,10 @@ public class TabProTeam extends Fragment {
         viewModel.repeatRequest();
         blockError.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
+    }
+
+    public String getTAG() {
+        return TAG;
     }
 
     private void setToolbarTitle() {

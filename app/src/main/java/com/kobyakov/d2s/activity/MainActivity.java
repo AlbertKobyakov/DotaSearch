@@ -2,16 +2,17 @@ package com.kobyakov.d2s.activity;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.WindowManager;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.kobyakov.d2s.R;
 import com.kobyakov.d2s.tabs.FragmentRecords;
 import com.kobyakov.d2s.tabs.TabProPlayers;
@@ -29,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     private TabProPlayers tabProPlayers = new TabProPlayers();
     private TabProTeam tabProTeam = new TabProTeam();
     private FragmentRecords tabProMatch = new FragmentRecords();
-
     private TabRanking tabRanking = new TabRanking();
 
     @BindView(R.id.bottom_navigation_view)
@@ -55,19 +55,19 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.player_overview:
-                    changeFragment(tabSearch, "tabSearch");
+                    changeFragment(tabSearch, tabSearch.getTAG());
                     return true;
                 case R.id.pros:
-                    changeFragment(tabProPlayers, "tabProPlayers");
+                    changeFragment(tabProPlayers, tabProPlayers.getTAG());
                     return true;
                 case R.id.navigation_notifications:
-                    changeFragment(tabRanking, "tabRanking");
+                    changeFragment(tabRanking, tabRanking.getTAG());
                     return true;
                 case R.id.navigation_notifications1:
-                    changeFragment(tabProTeam, "tabProTeam");
+                    changeFragment(tabProTeam, tabProTeam.getTAG());
                     return true;
                 case R.id.navigation_notifications2:
-                    changeFragment(tabProMatch, "tabProMatch");
+                    changeFragment(tabProMatch, tabProMatch.getTAG());
                     return true;
             }
             return false;
@@ -75,8 +75,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (savedInstanceState == null) {
-            navigation.setSelectedItemId(R.id.player_overview);
+            showTabSearch();
         }
+
 
         //remove focus EditText
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -84,26 +85,32 @@ public class MainActivity extends AppCompatActivity {
         initToolbar();
     }
 
+    private void showTabSearch() {
+        navigation.setSelectedItemId(R.id.player_overview);
+    }
+
     private void initToolbar() {
         toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
     }
 
+
     @Override
     public void onBackPressed() {
+
         if (doubleBackToExitPressedOnce) {
-            super.onBackPressed();
-            return;
+            finish();
+        } else if (navigation.getSelectedItemId() != R.id.player_overview) {
+            showTabSearch();
+        } else {
+            this.doubleBackToExitPressedOnce = true;
+            Snackbar.make(findViewById(R.id.bottom_navigation_view), getResources().getString(R.string.double_click_to_exit), Snackbar.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
         }
-
-        this.doubleBackToExitPressedOnce = true;
-        Snackbar.make(findViewById(R.id.bottom_navigation_view), getResources().getString(R.string.double_click_to_exit), Snackbar.LENGTH_SHORT).show();
-
-        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }
 
     public void changeFragment(Fragment fragment, String tagFragmentName) {
-
         FragmentManager mFragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
 
@@ -124,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.setReorderingAllowed(true);
         fragmentTransaction.commitAllowingStateLoss();
     }
-
 
     @Override
     protected void onDestroy() {

@@ -1,26 +1,27 @@
 package com.kobyakov.d2s.tabs;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.kobyakov.d2s.AbstractChartFragment;
-import com.kobyakov.d2s.datasetmpandroidchart.HorizontalBarDataSet;
-import com.kobyakov.d2s.markerview.HorizontalChartMarker;
-import com.kobyakov.d2s.R;
-import com.kobyakov.d2s.model.ChartData;
-import com.kobyakov.d2s.modelfactory.FactoryForMatchDetailChartViewModel;
-import com.kobyakov.d2s.viewModel.MatchDetailChartViewModel;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.IMarker;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarEntry;
+import com.kobyakov.d2s.AbstractChartFragment;
+import com.kobyakov.d2s.R;
+import com.kobyakov.d2s.datasetmpandroidchart.HorizontalBarDataSet;
+import com.kobyakov.d2s.markerview.HorizontalChartMarker;
+import com.kobyakov.d2s.model.ChartData;
+import com.kobyakov.d2s.modelfactory.FactoryForMatchDetailChartViewModel;
+import com.kobyakov.d2s.viewModel.MatchDetailChartViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
